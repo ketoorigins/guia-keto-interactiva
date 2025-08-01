@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Keto Personalizada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Fondo actualizado con un degradado lineal sutil de arriba hacia abajo */
+            background: linear-gradient(to bottom, #26143c 0%, #341b3b 100%);
+            background-attachment: fixed; /* Para asegurar que el degradado cubra toda la página incluso al desplazarse */
+            color: #C9D1D9;
+        }
+        /* Estilo para la barra de desplazamiento */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0D1117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2c3340;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a4252;
+        }
+        /* Estilo para el borde degradado del menú activo */
+        .active-link {
+            position: relative;
+            background-color: rgba(76, 147, 255, 0.1);
+        }
+        .active-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #4C93FF, #A64BFF);
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        /* Transición para el acordeón */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 15000px; /* Un valor alto para permitir cualquier contenido */
+            transition: max-height 1.5s ease-in;
+        }
+        .accordion-button svg {
+            transition: transform 0.3s ease;
+        }
+        .accordion-button.open svg {
+            transform: rotate(180deg);
+        }
+        /* --- NUEVO: Estilos para el hover del acordeón --- */
+        .accordion-item {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .accordion-item:hover {
+            border-color: #4C93FF;
+            box-shadow: 0 0 15px rgba(76, 147, 255, 0.25);
+        }
+        /* --- FIN DE NUEVOS ESTILOS --- */
+        aside {
+            /* Fondo de la barra lateral actualizado para que coincida con el modal de la imagen */
+            background-color: #332145;
+            border-r: 1px solid #484f58; /* Ajuste del borde si es necesario para el nuevo fondo */
+            flex-shrink-0;
+            hidden;
+            md:flex;
+            flex-col;
+        }
+        aside nav {
+            overflow-y: auto;
+        }
+        .consumo-info {
+            color: #DFFF00; /* Amarillo Neón */
+            font-weight: 600;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(223, 255, 0, 0.05);
+            border-left: 3px solid #DFFF00;
+            border-radius: 4px;
+        }
+        /* Estilos para checkboxes personalizados */
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+        .shopping-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .shopping-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            height: 1.25rem;
+            width: 1.25rem;
+            background-color: #30363d;
+            border: 1px solid #484f58;
+            border-radius: 0.25rem;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+        }
+        .shopping-item input[type="checkbox"]::before {
+            content: "";
+            width: 0.75rem;
+            height: 0.75rem;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #4C93FF;
+            transform-origin: bottom left;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .shopping-item input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+        .shopping-item label {
+            cursor: pointer;
+        }
+        .footer-image-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 4rem; /* Aumentado para más espacio */
+        }
+        .gradient-border {
+            padding: 3px; /* Grosor del borde */
+            border-radius: 9999px; /* full */
+            background: linear-gradient(to right, #f97316, #ec4899, #8b5cf6); /* Naranja, Rosa, Púrpura */
+        }
+        .footer-image {
+            width: 18rem; /* Tamaño aumentado 3x */
+            height: 18rem; /* Tamaño aumentado 3x */
+            border-radius: 9999px; /* full */
+            object-fit: cover;
+        }
+        /* --- NUEVOS ESTILOS PARA LA LISTA DE COMPRAS --- */
+        #shopping-list-container {
+            column-count: 1;
+            column-gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            #shopping-list-container {
+                column-count: 2;
+            }
+        }
+        @media (min-width: 1024px) {
+            #shopping-list-container {
+                column-count: 3;
+            }
+        }
+        .shopping-category {
+            break-inside: avoid;
+            padding-bottom: 1rem;
+        }
+        .shopping-category h4 {
+            cursor: pointer;
+        }
+        /* --- ESTILOS PARA LA BIENVENIDA --- */
+        .welcome-title {
+            /* Degradado de color del texto del título actualizado a celeste y fucsia */
+            background: linear-gradient(to right, #00FFFF, #FF00FF); /* Celeste a Fucsia */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            /* Eliminado el text-shadow para quitar el resplandor */
+            text-shadow: none;
+        }
+        /* --- ESTILOS PARA IMAGEN DEL BOTÓN DE RECETAS --- */
+        .recipe-btn-img-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px; /* Grosor del borde */
+            border-radius: 9999px; /* Asegura que el contenedor es redondo */
+            background: linear-gradient(to right, #d946ef, #8b5cf6); /* Degradado del borde */
+            margin-right: 1rem;
+            width: 72px;
+            height: 72px;
+        }
+        .recipe-btn-img-inner {
+            background-color: #2a1735;
+            padding: 10px;
+            border-radius: 9999px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* ¡Añadido para recortar el contenido dentro del borde redondeado! */
+        }
+        .recipe-btn-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+            border-radius: 9999px; /* Asegura que la imagen en sí sea redonda */
+        }
+        /* --- ESTILOS PARA BOTÓN DE NAVEGACIÓN ASESORÍAS --- */
+        .nav-button-asesorias {
+            position: relative;
+            z-index: 1;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            color: white !important;
+            border: none;
+            padding: 2px; /* Espacio para el borde */
+            border-radius: 9999px; /* rounded-full */
+        }
+        .nav-button-asesorias-inner {
+            background: linear-gradient(to bottom right, #3A1C71, #6D439A); /* Darker purple to lighter purple */
+            padding: 0.75rem; /* p-3 */
+            border-radius: 9999px; /* rounded-full */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-button-asesorias:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+        }
+        /* Eliminar la línea amarilla del costado izquierdo para el botón de asesorías cuando está activo */
+        .nav-button-asesorias.active-link::before {
+            width: 0;
+            background: none;
+        }
+        /* --- NUEVO ESTILO PARA BOTÓN DE ENLACE DE FISIOLOGÍA --- */
+        .physiology-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            color: white;
+            background: linear-gradient(to right, #007bff, #8a2be2); /* Degradado de azul a púrpura */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none; /* Quita el subrayado del enlace */
+            margin-top: 1.5rem; /* Espacio superior */
+        }
+        .physiology-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-[#0D1117]">
+
+    <!-- Contenedor para el mensaje de alerta -->
+    <div id="alert-message" class="fixed top-5 right-5 bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg z-50 hidden opacity-0 transition-opacity duration-500"></div>
+
+    <div class="flex min-h-screen">
+        <!-- Barra de Navegación Lateral -->
+        <aside class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 hidden md:flex flex-col">
+            <div class="h-36 flex items-center justify-center border-b border-gray-800 flex-shrink-0 p-4">
+                <!-- Logo -->
+                <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo de Keto Origins" class="h-full w-auto">
+            </div>
+            <nav class="flex-grow px-4 py-6">
+                <ul class="space-y-1 text-sm" id="nav-menu">
+                    <li><a href="#introduccion" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 active-link">📖 Introducción</a></li>
+                    <li><a href="#breve-historia" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">📜 Breve historia de la Alimentación Keto</a></li>
+                    <li><a href="#como-funciona" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">⚙️ Cómo Funciona la Alimentación Keto</a></li>
+                    <li><a href="#beneficios-ayuno" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🌟 Beneficios del Ayuno Intermitente</a></li>
+                    <li><a href="#entendiendo-ayuno" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🤔 Entendiendo el Ayuno Intermitente</a></li>
+                    <li><a href="#como-comenzar-ayuno" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🚀 ¿Cómo Comenzar con el Ayuno?</a></li>
+                    <li><a href="#consideraciones-ayuno" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🔑 Consideraciones Clave para tu Ayuno</a></li>
+                    <li><a href="#suplementos" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">💊 Suplementos Recomendados</a></li>
+                    <li><a href="#hidratacion" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">💧 Hidratación</a></li>
+                    <li><a href="#consejos-hidratacion" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">💡 Consejos para una hidratación adecuada</a></li>
+                    <li><a href="#keto-mejora-salud" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">❤️ Cómo Keto Pode Mejorar la Salud</a></li>
+                    <li><a href="#importancia-comidas" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🍽️ Importancia del N° de Comidas</a></li>
+                    <li><a href="#consejos-reducir-comidas" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">📉 Consejos para Reducir Frecuencia</a></li>
+                    <li><a href="#consideraciones-importantes" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">❗ Consideraciones importantes</a></li>
+                    <li><a href="#beneficios-reducir-comidas" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">✨ Beneficios de reducir frecuencia</a></li>
+                    <li><a href="#tips-cetosis" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">⚡ Tips para Entrar en Cetosis Rápido</a></li>
+                    <li><a href="#beneficios-keto" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🏆 Beneficios Keto</a></li>
+                    <li><a href="#estrategias-sociales" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🥂 Estrategias para Eventos Sociales</a></li>
+                    <li><a href="#lista-compras" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🛒 Lista de compras</a></li>
+                    <li><a href="#niveles-cetonas" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🧪 Niveles de Cetonas</a></li>
+                    <li>
+                        <a href="#asesorias" class="nav-link nav-button-asesorias rounded-full text-white font-bold mt-2">
+                           <div class="nav-button-asesorias-inner">
+                               <span class="mr-2">💎</span> Nuestras Asesorías Keto
+                           </div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            
+            <!-- SECCIONES DE CONTENIDO -->
+            <section id="introduccion" class="content-section">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>📖 Introducción: ¿Qué es la Alimentación Keto?</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>🥑 La alimentación cetogénica, o keto, es un enfoque nutricional diseñado para inducir un cambio metabólico profundo en el organismo. Al restringir la ingesta de carbohidratos, se obliga al cuerpo a utilizar las grasas como principal fuente de energía, en lugar de la glucosa. Este proceso metabólico se conoce como cetosis. 🔥</p><p>🧠 En condiciones normales, la glucosa proveniente de los carbohidratos es el principal combustible para las células del cuerpo. Sin embargo, en una dieta cetogénica, al limitar los carbohidratos, el hígado comienza a descomponer las grasas almacenadas para producir corpos cetónicos. Estos cuerpos cetónicos se convierten en una fuente de energía alternativa para el cerebro y otros tejidos. 💪</p></div></div>
+                </div>
+
+                <!-- MENSAJE DE BIENVENIDA MODIFICADO -->
+                <div class="text-center my-10 px-4">
+                    <h2 class="text-3xl lg:text-4xl font-extrabold leading-tight mb-2">
+                        <span class="welcome-title">¡BIENVENIDO/A A NUESTRA GUÍA PASO A PASO DE CÓMO LLEVAR UNA ALIMENTACIÓN CETOGÉNICA DE MANERA EFECTIVA!</span>
+                    </h2>
+                    <h3 class="text-2xl font-bold text-white mb-4">
+                        CON KETO Origins 🥑🥥✨
+                    </h3>
+                    <p class="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
+                        ESTAMOS INCREIBLEMENTE EMOCIONADOS DE ACOMPAÑARTE EN ESTE VIAJE HACIA UN ESTILO DE VIDA MÁS SALUDABLE Y LLENO DE ENERGÍA. ¡PREPÁRATE PARA TRANSFORMAR TU METABOLISMO Y DESCUBRIR TODO EL PODER DE LA ALIMENTACIÓN CETOGÉNICA! ¡VAMOS A EMPEZAR! 🎉
+                    </p>
+                </div>
+                <!-- FIN DEL MENSAJE DE BIENVENIDA -->
+
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <div class="bg-[#161B22] p-2 rounded-full">
+                             <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="breve-historia" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>📜 Breve historia de la Alimentación Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>📜 La alimentación keto tiene sus raíces en la medicina, originalmente desarrollada en la década de 1920 como un tratamiento para la epilepsia en niños. Con el tiempo, se ha adaptado como una alimentación popular para la pérdida de peso y el control de enfermedades metabólicas. 🧑‍⚕️</p><p>⏳ A lo largo de las siguientes décadas, la dieta keto se utilizó principalmente en entornos médicos especializados para tratar enfermedades neurológicas. 🧠</p></div></div>
+                </div>
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <div class="bg-[#161B22] p-2 rounded-full">
+                             <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="como-funciona" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>⚙️ Cómo Funciona la Alimentación Keto?</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>⚙️ El cuerpo humano tiende a utilizar los carbohidratos (glucosa), como fuente principal de energía. Sin embargo, en ausencia de insulina, el cuerpo logra tener acceso a la grasa almacenada, Convirtiéndose en una máquina de quemar grasas. 🔥 produciendo cetonas como subproducto de este proceso. Estas cetonas son utilizadas por el cuerpo y el cerebro como una eficiente fuente de energía. ⚡</p></div></div>
+                </div>
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <div class="bg-[#161B22] p-2 rounded-full">
+                             <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="beneficios-ayuno" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🌟 Beneficios del Ayuno Intermitente</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <h4 class="font-semibold text-white">⚖️ Pérdida de peso y composición corporal:</h4><ul class="list-disc list-inside space-y-2"><li>Aumento de la lipólisis. estimula el procesamiento de las grasas almacenadas.</li><li>Preservación de la masa muscular: el ayuno intermitente, cuando se combina con un entrenamiento de fuerza adecuado, ayuda a preservar o incluso aumentar la masa muscular.</li><li>Adaptación metabólica: El cuerpo se adapta a utilizar las grasas como principal fuente de energía, lo que facilita la pérdida de peso a largo plazo.</li></ul>
+                        <h4 class="font-semibold text-white">❤️ Mejora de la salud metabólica:</h4><ul class="list-disc list-inside space-y-2"><li>Sensibilidad a la insulina: Aumenta la sensibilidad a la insulina, lo que facilita que la glucosa entre en las células y sea utilizada como energía, reduciendo el riesgo de desarrollar resistencia a la insulina y diabetes tipo 2.</li><li>Reducción de los niveles de glucosa en sangre: Al disminuir la ingesta de carbohidratos y aumentar la sensibilidad a la insulina, el ayuno intermitente contribuye a estabilizar los niveles de glucosa en sangre.</li><li>Mejora del perfil lipídico: Ayuda reducir los niveles de triglicéridos y aumentar los niveles de colesterol HDL .</li></ul>
+                        <h4 class="font-semibold text-white">🧠 Beneficios para la salud cerebral:</h4><ul class="list-disc list-inside space-y-2"><li>Neuroprotección: Algunos estudios sugieren que el ayuno intermitente puede estimular la neurogénesis (formación de nuevas neuronas) y proteger contra enfermedades neurodegenerativas como el Alzheimer y el Parkinson.</li><li>Mayor claridad mental y concentración: La adaptación metabólica a la utilización de corpos cetónicos como fuente de energía puede mejorar la función cognitiva y aumentar la claridad mental.</li><li>Reducción de la degradación cerebral: El ayuno intermitente puede ayudar a reducir los procesos inflamatorios en el cerebro, lo que se ha asociado con diversas enfermedades neurológicas.</li></ul>
+                        <h4 class="font-semibold text-white">✨ Otros beneficios:</h4><ul class="list-disc list-inside space-y-2"><li>Autofagia: El ayuno intermitente induce la autofagia, un proceso celular que elimina las células dañadas y promueve la renovación celular.</li><li>Reducción de la inflamación sistémica: Puede ayudar a reducir los marcadores inflamatorios en el organismo, lo que se relaciona con diversas enfermedades crónicas.</li><li>Apoptosis: Además de la autofagia, el ayuno intermitente estimula la apoptosis, que es un proceso de "suicidio celular programado". Imagina que nuestras células son como pequeñas fábricas. A veces, estas fábricas producen productos defectuosos o se dañan. La apoptosis es como un interruptor de apagado automático que se activa en estas células defectuosas, evitando que causen problemas mayores en el organismo.</li></ul>
+                    </div></div>
+                </div>
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <div class="bg-[#161B22] p-2 rounded-full">
+                             <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="entendiendo-ayuno" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🤔 Entendiendo el Ayuno Intermitente</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p>🤔 El ayuno intermitente no es una dieta, sino un patrón alimentario que alterna períodos de alimentación con períodos de ayuno. Se ha practicado durante siglos por diversas culturas y religiones. Sus beneficios no solo se limitan a la pérdida de peso, sino que también incluyen mejoras en la sensibilidad a la insulina, la autofagia (un proceso de limpieza celular), la reducción de la inflamación y la mejora de la salud cerebral. 🧠</p>
+                        <h4 class="font-semibold text-white">🔗 Pilares de la Alimentación Keto.</h4>
+                        <p><strong>Ayuno Intermitente.</strong></p>
+                        <p>🤝 La combinación de ayuno intermitente y la alimentación keto ha ganado popularidad en los últimos años debido a sus potenciales beneficios para la salud y la pérdida de peso.Ambas prácticas actúan de manera sinérgica para acelerar el proceso de quema de grasas y promover la cetosis 🔥</p>
+                        <p>🕒 El ayuno intermitente consiste en alternar periodos de alimentación con periodos de ayuno. Existen diferentes protocolos de ayuno intermitente, pero los más comunes son el 14/10 (14 horas de ayuno y 10 horas de alimentación) o 16/8 (16 horas de ayuno y 8 horas de alimentación) .</p>
+                    </div>
+                    <!-- Nuevo botón para Fisiología y Bioquímica -->
+                    <div class="flex justify-center p-5 border-t border-gray-700">
+                        <a href="https://fisiosem.my.canva.site/fisiologia-y-bioquimica-en-el-ayuno" target="_blank" class="physiology-button">
+                            Fisiología y bioquímica en el ayuno
+                        </a>
+                    </div>
+                    </div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <div class="bg-[#161B22] p-2 rounded-full">
+                             <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="como-comenzar-ayuno" class="content-section hidden">
+                <h2 class="text-2xl font-bold text-white mb-4">🚀 ¿Cómo Comenzar con el Ayuno Intermitente?</h2>
+                <p class="mb-6 text-gray-400">Cada protocolo de ayuno intermitente tiene sus propias particularidades y está diseñado para adaptarse a diferentes estilos de vida y objetivos. La clave es encontrar el que mejor se ajuste a ti y, por supuesto, escuchar a tu cuerpo. 🧘‍♀️</p>
+                <div class="space-y-4">
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>1️⃣ Ayuno 12/12: La Puerta de Entrada Natural</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                            <p>Este es el ayuno más amable y el punto de partida ideal para cualquiera que desee explorar el ayuno intermitente. 😊</p>
+                            <p><b>🧬 Fundamento Biológico:</b> Se alinea de forma muy natural con nuestros ritmos circadianos, el reloj interno del cuerpo que regula funciones como el sueño, la digestión y el metabolismo. Históricamente, antes de la electricidad y el acceso constante a alimentos, era la norma ayunar durante la noche. 🌙</p>
+                            <p><b>🎯 ¿Para quién es ideal?</b><br>Principiantes absolutos: Si nunca has ayunado antes, esta es tu mejor opción para empezar.<br>Personas con sensibilidad digestiva: Permite un descanso digestivo adecuado durante la noche, lo que puede mejorar la digestión y reducir la hinchazón.<br>Mejora del sueño: Terminar de comer antes de acostarse puede favorecer un sueño más profundo y reparador, ya que tu cuerpo no está activamente digiriendo mientras intentas descansar.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Descanso Digestivo: Permite que tu sistema gastrointestinal se recupere y se repare.<br>Optimización Circadiana: Refuerza los ciclos naturales de tu cuerpo, mejorando la eficiencia metabólica general.<br>Introducción a la flexibilidad metabólica: Aunque de forma leve, tu cuerpo empieza a acostumbrarse a depender de sus propias reservas para un período.</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>2️⃣ Ayuno 14/10: Dando un Paso Adelante</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                            <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p>
+                            <p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p>
+                            <p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Mayor Quema de Grasa: El cuerpo tiene más tiempo para acceder y movilizar las reservas de grasa como combustible.<br>Inicio de Flexibilidad Metabólica: Tu cuerpo se vuelve más eficiente alternando entre la quema de glucosa y la quema de grasa.<br>Primeros Indicios de Autofagia: Aunque la activación significativa de la autofagia ocurre más tarde, este ayuno puede empezar a iniciar algunos procesos leves de reciclaje celular.</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b> Experimenta con el horario. Puedes retrasar el desayuno o adelantar la cena, lo que te resulte más fácil. Por ejemplo, si cenas a las 8 PM, tu primera comida sería a las 10 AM del día siguiente. Si entrenas por la mañana, considera hacer una comida densa en nutrientes la noche anterior.</p>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>3️⃣ Ayuno 16/8: El Estándar de Oro</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                            <p>Este es, quizás, el protocolo más popular y estudiado, a menudo considerado el punto óptimo para activar beneficios metabólicos significativos. 🌟</p>
+                            <p><b>🧬 Fundamento Biológico:</b> La duración de 16 horas es el tiempo en el que, como hemos visto, el cuerpo ha agotado la mayor parte de sus reservas de glucógeno y se sumerge completamente en la quema de grasa (cetosis leve). Es en esta ventana donde la autofagia se activa de manera robusta. La disminución de la insulina y el aumento de AMPK y hormona de crecimiento son claves aquí.</p>
+                            <p><b>🎯 ¿Para quién es ideal?</b><br>Personas que buscan pérdida de peso constante: Muy efectivo para la gestión del peso y la reducción de grasa corporal.<br>Mejora de la sensibilidad a la insulina: Al dar un descanso prolongado al páncreas, las células se vuelven más receptivas a la insulina.<br>Beneficios de la autofagia: Ideal para aquellos interesados en los efectos antienvejecimiento y de limpieza celular.<br>Atletas que buscan optimizar la composición corporal: Puede ayudar a preservar la masa muscular mientras se reduce la grasa.</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Activación Profunda de la Autofagia: Permite a las células realizar una limpieza y reparación exhaustiva.<br>Mayor Producción de Cuerpos Cetónicos: El cerebro y el cuerpo utilizan eficientemente las grasas para obtener energía, lo que puede resultar en mayor claridad mental y energía sostenida.<br>Optimización Hormonal: Mejora la sensibilidad a la insulina y puede aumentar la hormona de crecimiento, lo que es beneficioso para la preservación muscular.</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b> La calidad de tus comidas en la ventana de 8 horas es crucial. No es una licencia para comer cualquier cosa. Enfócate en proteínas de alta calidad, grasas saludables, carbohidratos complejos vegetales de hojas verdes y fibra. Si te sientes mareado o con poca energía, asegúrate de beber suficiente agua con electrolitos (sal y limón) y considera ajustar tu ventana si es necesario. Es común que la primera semana sea un poco más difícil mientras tu cuerpo se adapta.</p>
+                        </div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>4️⃣ OMAD (One Meal A Day): El Reto Avanzado</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                            <p>Este es el protocolo más intenso y avanzado de los cuatro, reservado para aquellos con experiencia en ayuno y un metabolismo bien adaptado. 💪</p>
+                            <p><b>🧬 Fundamento Biológico:</b> Al ayunar aproximadamente 23 horas, el cuerpo pasa un período muy prolongado en un estado de cetosis profunda y autofagia máxima. Esto maximiza los beneficios de la quema de grasa y la limpieza celular. También significa que el sistema digestivo tiene un descanso muy extenso.</p>
+                            <p><b>🎯 ¿Para quién es ideal?</b><br>Ayunos experimentados: No es para principiantes. Requiere una adaptación gradual.<br>Pérdida de peso significativa: Puede ser muy efectivo para la pérdida de peso y la gestión de la grasa corporal.<br>Control de azúcar en sangre muy estricto: Beneficioso para la diabetes tipo 2 (siempre bajo supervisión médica).<br>Maximizar la autofagia: Para quienes buscan los mayores beneficios de renovación celular.</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Autofagia al Máximo: El cuerpo se dedica a una limpieza y reparación profunda a nivel celular.<br>Cetosis Profunda: Mayor producción de corpos cetónicos, lo que puede resultar en niveles de energía muy estables y gran claridad mental.<br>Gran Descenso de Insulina: Permite una resensibilización muy efectiva a la insulina.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b><br>Calidad sobre Cantidad: La única comida del día DEBE ser nutricionalmente densa. Piensa en una gran cantidad de verduras, una porción generosa de proteína (carne, pescado, huevos), grasas saludables (aguacate, aceite de oliva, frutos secos) y quizás algunos carbohidratos complejos. La insuficiencia nutricional puede llevar a deficiencias y problemas de salud.<br>Hidratación y Electrolitos son NO NEGOCIABLES: Es aún más crítico que en otros ayunos. Si no mantienes tus electrolitos balanceados, experimentarás fatiga, dolores de cabeza y calambres. La mezcla de agua, sal y limón es tu mejor amiga.<br>Adaptación Gradual: No pases del 16/8 a OMAD de la noche a la mañana. Puedes hacer ayunos de 18 o 20 horas primero para acostumbrar a tu cuerpo.<br>Escucha a tu Cuerpo: Si experimentas mareos severos, debilidad extrema o cualquier otro síntoma preocupante, rompe el ayuno y reevalúa. OMAD no es para todos y puede no ser sostenible a largo plazo para algunas personas.</p>
+                        </div></div>
+                    </div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="consideraciones-ayuno" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🔑 Consideraciones Clave para tu Ayuno</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <h4 class="font-semibold text-white">1. 💧 Hidratación Esencial: Agua Mineral, Sal de Mar y Limón</h4><p>La hidratación es más que solo beber agua. Necesitas mantener el equilibrio de electrolitos. Durante el ayuno, pierdes electrolitos. La sal de mar (rica en sodio, magnesio, potasio) ayuda a tu cuerpo a retener agua y minerales esenciales. El limón aporta algo de potasio y un sabor agradable. Preparación: Añade una pizca de sal de mar (aprox. 1/2 cucharadita por litro) y zumo de medio limón a tu agua mineral. Bebe esto durante tu ayuno. 🍋</p>
+                        <h4 class="font-semibold text-white">2. 🍲 Rompiendo el Ayuno: El Poder del Caldo de Huesos</h4><p>Después de un ayuno, tu sistema digestivo necesita un reinicio suave. El caldo de huesos es la mejor opción. Es rico en Colágeno, Aminoácidos, Elastina y Minerales. <br><b>Cómo Romper el Ayuno:</b> Inicio Lento: Bebe una taza de caldo de huesos caliente, lentamente. Esperar un Poco: Después del caldo, espera 15-30 minutos antes de tu primera comida sólida. Primera Comida Sólida: Opta por alimentos ligeros y nutritivos. 🥣</p>
+                        <h4 class="font-semibold text-white">3. ☕ Bebidas durante el Ayuno</h4><p>Café y Té de Hierbas: Puedes beberlos solos (sin azúcar, leche, cremas ni edulcorantes artificiales). No rompen el ayuno. ¡Atención! No sustituyen la hidratación esencial con agua mineral, sal de mar y limón. 🍵</p>
+                        <h4 class="font-semibold text-white">4. 🧘‍♀️ Paciencia, Nutrición y Precaución</h4><p>Consistencia: Los resultados requieren paciencia. Nutrición de Calidad: Siempre consume alimentos integrales. Escucha a tu Cuerpo: Si sientes mareos, debilidad, rompe el ayuno. Consulta Profesional: El ayuno intermitente no es para todos. Siempre consulta a un médico antes de iniciar. 🙏</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="suplementos" class="content-section hidden">
+                <h2 class="text-2xl font-bold text-white mb-4">💊 Suplementos Recomendados</h2>
+                <div class="space-y-4">
+                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>☀️ Vitamina D</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>Más que huesos fuertes. La vitamina D, más que una simple vitamina, actúa como una hormona que regula la absorción de calcio y fósforo, esenciales para la salud ósea. Sin embargo, sus funciones trascienden el sistema esquelético. La vitamina D interviene en: Sistema inmunológico, Salud cardiovascular, Salud mental, Función muscular. Desde una perspectiva metabólica, la vitamina D influye en la expresión de miles de genes. La mejor fuente de vitamina D, es y siempre será EL SOL. ☀️</p></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🧠 Omega-3</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>Más allá del corazón. Los ácidos grasos omega-3, especialmente el DHA (ácido docosahexaenoico) , son esenciales para la salud cerebral, ya que son componentes estructurales de las membranas celulares de las neuronas. El DHA se ha relacionado con mejoras en la memoria, el aprendizaje y la función cognitiva. Aunque el EPA (ácido eicosapentaenoico) también es beneficioso, el DHA tiene un papel más específico en la salud cerebral. 🐟</p><div class="consumo-info">Cómo consumirlo: Con alimentos: Las grasas saludables de los alimentos ayudan a la absorción de los ácidos grasos omega-3.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>⚡ NAD+</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>El NAD+ (nicotinamida adenina dinucleótido) es una coenzima esencial para numerosos procesos metabólicos, incluida la producción de energía celular. Actúa como un transportador de electrones en la respiración celular, permitiendo que las células obtengan energía de los nutrientes. Además, el NAD+ está involucrado en la reparación del ADN, la regulación de los ritmos circadianos y la longevidad celular. 🧬</p><div class="consumo-info">Cómo consumirlo: En ayunas: Se sugiere tomar en ayunas para una mejor absorción y aprovechar al máximo sus propiedades energéticas.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💧 Citrato de potasio</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>El citrato de potasio es una sal que combina el potasio, un mineral esencial para el funcionamiento nervioso y muscular, con el citrato, un anión que ayuda a alcalinizar la orina. Esta combinación es beneficiosa para personas con dietas bajas en carbohidratos o que experimentan una pérdida significativa de potasio, como en el caso de la cetosis. El citrato de potasio ayuda a prevenir la formación de cálculos renales y puede mejorar la absorción de otros minerales. 🍌</p><div class="consumo-info">Cómo consumirlo: Con alimentos: Estos minerales suelen tolerarse mejor después de una comida, lo que ayuda a prevenir molestias estomacales y se presenta una mejor absorción. Idealmente después de la 1ra comida o la 2da comida.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🧘 Citrato de magnesio</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>El citrato de magnesio es una forma altamente biodisponible de magnesio, un mineral involucrado en cientos de reacciones enzimáticas en el organismo. El magnesio es esencial para la función muscular y nerviosa, la salud ósea, la regulación de la presión arterial y la producción de energía. El citrato de magnesio también tiene un efecto laxante suave, lo que puede ser beneficioso para algunas personas. Ayuda a conciliar el sueño para personas con insomnio. 😴</p><div class="consumo-info">Cómo consumirlo: Con alimentos: Estos minerales suelen tolerarse mejor después de una comida, lo que ayuda a prevenir molestias estomacales y se presenta una mejor absorción. Idealmente después de la 1ra comida o la 2da comida.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🛡️ Glutatión</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>El glutatión es un poderoso antioxidante producido por nuestro cuerpo. Actúa como un escudo protector a nivel celular, neutralizando los radicales libres y previniendo el daño oxidativo. Además, juega un papel crucial en la desintoxicación del hígado y en el fortalecimiento del sistema inmunológico. Es considerado el "antioxidante maestro" por su capacidad para regenerar otros antioxidantes como la vitamina C y la vitamina E. 🛡️</p><div class="consumo-info">Cómo consumirlo: Con alimentos: Aunque se puede tomar en cualquier momento, consumirlo con una comida rica en grasas puede mejorar su absorción.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🍊 Vitamina C</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>La vitamina C es un poderoso antioxidante soluble en agua que protege las células del daño causado por los radicales libres. También es esencial para la síntesis de colágeno, una proteína estructural importante para la piel, los huesos y los vasos sanguíneos. Además, la vitamina C refuerza el sistema inmunológico y ayuda a absorber el hierro de los alimentos vegetales. 🍊</p><div class="consumo-info">Cómo consumirlo: Con alimentos: Aunque se absorba bien en cualquier momento, consumirla con alimentos ricos en hierro puede potenciar su absorción.</div></div></div>
+                    </div>
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💪 Creatina</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>La creatina es un compuesto nitrogenado que se encuentra principalmente en los músculos. Aumenta la disponibilidad de energía en forma de ATP (trifosfato de adenosina), lo que mejora el rendimiento físico, especialmente en actividades de alta intensidad y corta duración. También puede proteger las células musculares del daño y promover la recuperación después del ejercicio. 💪</p><div class="consumo-info">Cómo consumirlo: Se puede consumir en diferentes momentos del día, pero antes o durante la actividad física es más común para aprovechar su efecto en el rendimiento. Si no hay entrenamiento, idealmente junto con la 2 comida.</div></div></div>
+                    </div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="hidratacion" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💧 Hidratación y Electrolitos</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>💧 La pérdida de electrolitos, especialmente sodio, potasio y magnesio, es común al iniciar una dieta cetogénica. El sodio y el potasio son cruciales para mantener el equilibrio hídrico y la función nerviosa y muscular. El magnesio, por su parte, interviene en cientos de reacciones enzimáticas en el organismo.</p><p>⚡ Es fundamental reponer estos minerales a través de la alimentación o suplementos. El citrato de potasio es una forma especialmente beneficiosa de potasio, ya que además de regular los niveles de potasio, ayuda a alcalinizar la orina y puede mejorar la absorción de otros minerales. 💪</p></div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="consejos-hidratacion" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💡 Consejos para Mantener una hidratación adecuada</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>✅ Bebe agua regularmente a lo largo del día: No esperes a tener sed.</li>
+                            <li>🍓 Prepara agua con frutas silvestres como las fresas, arándanos, frambuesas, limón, pepino...etc.</li>
+                            <li>🥵 Aumenta la ingesta en días de calor o ejercicio.</li>
+                            <li>🥤 Limite el consumo de bebidas azucaradas y con cafeína.</li>
+                            <li>👂 Escucha a tu cuerpo: Si tienes sed, bebe.</li>
+                            <li>🏋️‍♂️ Hidrátate antes, durante y después del ejercicio.</li>
+                            <li>⚡ Considere las bebidas isotónicas durante el ejercicio intenso.</li>
+                        </ul>
+                        <p><b>🤔 ¿Qué cantidad de agua debe beber?</b> La cantidad de agua que necesitas varía según factores como la edad, el peso, el nivel de actividad física, la temperatura ambiente y la humedad. si quieres conocer tu cantidad ideal ocupa tu calculadora para saberlo. 💧</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="keto-mejora-salud" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>❤️ Cómo la Alimentación Keto Puede Mejorar la Salud</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p>La alimentación keto puede ser efectiva para tratar y mejorar diversas condiciones de salud. Aquí te explicamos cómo puede ayudar en cada caso: ❤️</p>
+                        <p><b>📉 Resistencia a la Insulina y Diabetes Tipo 2</b><br>Reduciendo los niveles de insulina, la alimentación keto mejora la sensibilidad a la insulina y puede contribuir al control y, en algunos casos, la reversión de la diabetes tipo 2. Estudios han demostrado que una dieta baja en carbohidratos puede reducir significativamente los niveles de glucosa en sangre.</p>
+                        <p><b>🩺 Hígado Graso.</b><br>La reducción en el consumo de carbohidratos y la quema de grasa ayuda a reducir la grasa acumulada en el hígado, mejorando la función hepática. Esto se debe a la disminución de la producción de triglicéridos hepáticos.</p>
+                        <p><b>🦋 Hipotiroidismo.</b><br>Aunque la alimentación keto no es un tratamiento directo para el hipotiroidismo, una alimentación balanceada y baja en carbohidratos puede mejorar la energía y el metabolismo en personas con esta condición. Es importante trabajar junto a un profesional de la salud para ajustar la dieta según las necesidades individuales.</p>
+                        <p><b>⚖️ Sobrepeso y Obesidad.</b><br>Al inducir la quema de grasa, la alimentación keto puede ser una herramienta efectiva para la pérdida de peso sostenida. La cetosis permite al cuerpo utilizar las reservas de grasa como fuente de energía primaria, lo cual es eficiente para la reducción de peso.</p>
+                        <p><b>💓 Hipertensión Arterial y Síndrome Metabólico.</b><br>Al mejorar la salud metabólica, la alimentación keto puede contribuir a la reducción de la presión arterial y la mejora de los indicadores de síndrome metabólico. Esto incluye la mejora del perfil lipídico y la reducción de la inflamación sistémica.</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="importancia-comidas" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🍽️ Importancia del N° de Comidas</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>🍽️ Comer máximo tres veces al día, permite a tu cuerpo utilizar de manera eficiente los alimentos ingeridos y facilita el mantenimiento de niveles bajos de insulina, promoviendo la quema de grasa.</p><p>📉 Necesitamos controlar la liberación de insulina, al comer 3 veces al día, tu cuerpo tiene el horario perfecto para trabajar correctamente, manteniendo tus niveles de azúcar en sangre, totalmente bajo control.</p><p>🥪 Cuando hablamos de tres comidas, nos referimos a 3 platos de comida, Osea, un té o un café con algún sándwich, no es una comida completa, y el hambre aparecerá pronto.</p><p>😋 Saltarse comidas también puede ayudar a mantener la cetosis y mejorar el control del apetito.</p></div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="consejos-reducir-comidas" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>📉 Consejos para Reducir la Frecuencia de Comidas</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p><b>🍽️ Aumenta el tamaño de las porciones:</b> En lugar de comer muchas veces al día, aumenta el tamaño de tus comidas principales para mantenerte satisfecho por más tiempo.</p>
+                        <p><b>🥑 Prioriza las grasas saludables:</b> Las grasas saludables te sacian más y te proporcionan energía de forma sostenida. Incluye aguacate o palta, aceite de oliva, frutos secos y semillas en tus comidas.</p>
+                        <p><b>🥩 Asegura una buena cantidad de proteínas:</b> Las proteínas también ayudan a mantener la sensación de saciedad. Incorpora carnes, pescados, huevos y frutos secos en tus platos.</p>
+                        <p><b>🥦 Come alimentos fibrosos:</b> Las verduras bajas en carbohidratos, como las espinacas, brócoli y coliflor, añaden volumen a tus comidas y te hacen sentir lleno.</p>
+                        <p><b>💧 Bebe suficiente agua:</b> A veces, la sed se confunde con el hambre. Asegúrese de estar muy bien hidratado.</p>
+                        <p><b>🕒 Introduzca el ayuno intermitente:</b> Esta práctica puede ayudar a reducir la frecuencia de comidas y acelerar la pérdida de peso.</p>
+                        <p><b>👂 Escucha a tu cuerpo:</b> Presta atención a las señales de hambre y saciedad. No comas por aburrimiento o por costumbre.</p>
+                    </div></div>
+                </div>
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="consideraciones-importantes" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>❗ Consideraciones importantes</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p>🐢 <b>No reduzcas las comidas desechables de la noche a la mañana:</b> Hazlo de forma gradual para que tu cuerpo se adapte.</p>
+                        <p>🔋 <b>Monitorea tus niveles de energía:</b> Si te sientes débil o mareado, es posible que necesites ajustar tu ingesta de alimentos.</p>
+                        <p>💧 <b>Complementa con electrolitos:</b> La pérdida de líquidos y electrolitos es común en la alimentación cetogénica. Asegúrese de consumir suficiente sal, potasio y magnesio.</p>
+                        <p>💊 <b>Considere suplementos:</b> En algunos casos, los suplementos pueden ser beneficiosos para complementar su dieta.</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="beneficios-reducir-comidas" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>✨ Beneficios potenciales de reducir la frecuencia de comidas en keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-lg text-white mb-2">📉 Mayor pérdida de peso</h4>
+                            <p>Al comer con menos frecuencia, es natural que se reduzca la ventana de tiempo para consumir alimentos, lo que a menudo conduce a una menor ingesta calórica total sin necesidad de contar calorías obsesivamente. Además, al mantener los niveles de insulina bajos durante períodos más largos, tu cuerpo se vuelve extremadamente eficiente en acceder y quemar la grasa almacenada como combustible.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-white mb-2">🔥 Aumento de la cetosis</h4>
+                            <p>Cada vez que comes, incluso una comida keto, hay una pequeña respuesta de la insulina. Al reducir el número de comidas, minimizas estos picos de insulina. Esto permite que tu cuerpo permanezca en un estado de cetosis más profundo y estable durante más tiempo, maximizando la producción de cetonas y los beneficios asociados, como la claridad mental y la energía sostenida.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-white mb-2">😋 Mejor control del apetito</h4>
+                            <p>Comer constantemente, incluso snacks saludables, puede mantener el sistema digestivo siempre activo y generar un ciclo de hambre. Al espaciar tus comidas, le das a tu cuerpo un descanso digestivo y permites que tus hormonas del hambre y la saciedad (grelina y leptina) se regulen de manera más efectiva. Con el tiempo, te sorprenderá sentir menos antojos y tener un control mucho mayor sobre cuándo y cuánto comes.</p>
+                        </div>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="tips-cetosis" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>⚡ Tips para Entrar en Cetosis Más Rápido</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                        <p><b>🚫 Restricción severa de carbohidratos:</b><br>Por qué: Cuando reduce los carbohidratos, obliga a tu cuerpo a buscar otras fuentes de energía. Al no tener glucosa (proveniente de los carbohidratos) disponible, tu hígado comienza a convertir la grasa en cetonas, que son como un "combustible alternativo" para tu cuerpo. En términos más simples: Es como quitarle la gasolina a un coche y obligarlo a usar aceite.</p>
+                        <p><b>🥑 Aumente la ingesta de grasas saludables:</b><br>Por qué: Al aumentar las grasas, proporcionan a tu cuerpo una fuente de energía abundante y de liberación lenta. Además, las grasas ayudan a mantenerte satisfecho por más tiempo. En otras palabras: Es como llenar el tanque de tu coche con un combustible de larga duración.</p>
+                        <p><b>🧂 Electrolitos:</b><br>Por qué: Cuando reduce los carbohidratos, pierdes líquidos y electrolitos como sodio, potasio y magnesio. Reponerlos es crucial para prevenir calambres, fatiga y otros síntomas desagradables. Es como cambiar el aceite de tu coche: Necesitas cambiar los líquidos regularmente para que funcione correctamente.</p>
+                        <p><b>💊 Suplementos:</b><br>Por qué: Algunos suplementos como el aceite MCT pueden proporcionar una fuente rápida de cetonas y facilitar la entrada en cetosis. Es como agregar un aditivo a tu combustible para mejorar el rendimiento de tu cuerpo.</p>
+                        <p><b>💧 Hidratación:</b><br>Por qué: Beber suficiente agua ayuda a eliminar las toxinas ya mantener tus órganos funcionando correctamente. El mantener nuestro organismo hidratado es vital para nuestra existencia. el cuerpo no puede funcionar sin agua. Tenemos reservas para pasar meses sin comer, pero sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p>
+                        <p><b>😴 Sueño:</b><br>Por qué: El sueño es esencial para la recuperación y la regulación hormonal. tu cuerpo necesita descanso para utilizar lo consumido en tus comidas para repararse: Necesita tiempo para recargar energías.</p>
+                        <p><b>🧘‍♂️ Manejo del estrés:</b><br>Por qué: El estrés crónico puede aumentar los niveles de cortisol, una hormona que promueve el almacenamiento de grasa. busca actividades que te ayuden a reducir tus niveles de estrés. Baile, ejercicio, música, pintura, manualidades ...etc</p>
+                        <p><b>🏋️‍♀️ Entrenamiento de fuerza:</b><br>Por qué: Al fortalecer tus músculos, aceleras tu metabolismo, aumentando el números de mitocondrias y por ende quemas más calorías incluso en reposo. ¡Es como tener un motor más potente en tu cuerpo!</p>
+                        <p><b>🏃‍♂️ Ejercicios en ayunas:</b><br>Por qué: Entrenar en ayunas es como encender una fogata con leña seca. Tu cuerpo, al no tener glucosa (energía rápida) proveniente de los alimentos, recurre a la grasa almacenada (la leña) para obtener energía.</p>
+                        <p><b>💨 HIIT (entrenamiento de intervalos de alta intensidad):</b><br>Por qué: El HIIT es como hacer sprints cortos y rápidos. Estos intervalos intensos hacen que tu cuerpo trabaje duro y quemen muchas calorías, incluso después de terminar el entrenamiento!</p>
+                        <p><b>🕒 Ayuno intermitente:</b><br>Por qué: El ayuno intermitente es como darle un descanso a tu sistema digestivo. Al no comer durante un período, tu cuerpo entra en modo de ahorro de energía y comienza a utilizar la grasa almacenada como combustible. ¡Es como limpiar tu despensa y solo comer los alimentos más nutritivos!</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="beneficios-keto" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🏆 Beneficios de la Alimentación Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                        <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas almacenadas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p>
+                        <p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p>
+                        <p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p>
+                        <p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p>
+                        <div class="pt-4 flex justify-center">
+                             <a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity">
+                                 ¡Más Beneficios!
+                            </a>
+                        </div>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="estrategias-sociales" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🥂 Estrategias Profesionales para Eventos Sociales y Comidas Fuera</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p>
+                        <h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p>
+                        <h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p>
+                        <h4 class="font-semibold text-white">3. 🍽️ Comiendo Fuera (Restaurantes): Tu Menú Bajo en Carbos</h4><p><b>Investiga el Menú Online:</b> Antes de llegar, revisa el menú del restaurante. Identifica platos que puedas adaptar o que naturalmente sean cetogénicos. Esto elimina la presión y la toma de decisiones impulsivas.<br><b>Comunica tus Requerimientos Claramente al Camarero:</b> No tengas miedo de pedir modificaciones; es común en la cocina actual. "¿Puedo cambiar las papas o el arroz por una porción doble de vegetales salteados (sin salsa) o una ensalada verde simple?"<br>"Por favor, mi carne/pescado a la plancha, sin salsas o marinadas azucaradas, o si es posible, la salsa aparte."<br>"¿Este plato contiene azúcares añadidos o harinas?" (Pregunta clave para salsas).<br>Pide que no te traigan pan o entradas con almidón a la mesa.<br><b>Opciones por Tipo de Cocina:</b><br>Restaurante de Carnes/Parrillada: Tu paraíso. Pide cortes de carne, aves o pescado. Acompaña con vegetales a la parrilla o al vapor.<br>Pescados y Mariscos: Excelente opción. Pide pescados a la plancha, al horno o mariscos sin rebozar ni freír.<br>Ensaladas: Pide ensaladas base (hojas verdes, proteína, aguacate, nueces) y siempre pide el aderezo aparte (aceite de oliva y vinagre es lo más seguro). Evita frutas o aderezos cremosos.<br>Comida Oriental (Japonesa/China): Cuidado extremo con las salsas (teriyaki, agridulce) y el arroz. Opta por sashimi, rollos sin arroz (Naruto, "protein style"), o platos de carne/pescado salteados con vegetales, pidiendo "sin salsa" o "salsa muy ligera".<br>Comida Italiana: Evita pasta y pizza. Busca carpaccios, antipastos de embutidos y quesos, o platos de carne/pescado con vegetales.</p>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="lista-compras" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🛒 Lista de Compras Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content">
+                        <!-- SECCIÓN DE LISTA DE COMPRAS MODIFICADA -->
+                        <div id="shopping-list-container" class="p-5 border-t border-gray-700 text-gray-400">
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🥑 GRASAS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item1"><label for="item1">Aceite de coco extra virgen</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item2"><label for="item2">Aceite de oliva extra virgen (aove)</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item3"><label for="item3">Aceitunas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item4"><label for="item4">Palta</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item5"><label for="item5">Aceite de palta extra virgen</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item7"><label for="item7">Mantequilla</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item8"><label for="item8">Mantequilla de coco orgánico</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item9"><label for="item9">Pescado azul (salmón, sardinas, etc.)</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item10"><label for="item10">Mantequilla Clarificada o Ghee</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item11"><label for="item11">Cacao 100%</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item12"><label for="item12">Chocolate negro o semillas de cacao puro</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🌰 FRUTOS SECOS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item13"><label for="item13">Almendras</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item14"><label for="item14">Avellanas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item15"><label for="item15">Nueces pecanas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item16"><label for="item16">Nueces de castilla</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item17"><label for="item17">Nueces de Brasil</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item18"><label for="item18">Nueces de macadamias</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item19"><label for="item19">Pistachos</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🌱 SEMILLAS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item20"><label for="item20">Maravilla o girasol</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item21"><label for="item21">Zapallo o pepas de calabaza</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item22"><label for="item22">Chía</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item23"><label for="item23">Cáñamo</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item24"><label for="item24">Sésamo</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item25"><label for="item25">Lino</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🥩 PROTEÍNAS</h4>
+                                <p class="font-medium text-gray-300 mt-2 mb-1">Pescados:</p>
+                                <div class="shopping-item"><input type="checkbox" id="item27"><label for="item27">Caballa</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item28"><label for="item28">Anchoas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item29"><label for="item29">Atún</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item30"><label for="item30">Salmón salvaje</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item31"><label for="item31">Sardinas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item32"><label for="item32">Arenques</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item33"><label for="item33">Mariscos</label></div>
+                                <p class="font-medium text-gray-300 mt-2 mb-1">Carnes:</p>
+                                 <div class="shopping-item"><input type="checkbox" id="item35"><label for="item35">Tocino</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item36"><label for="item36">Pollo</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item37"><label for="item37">Res</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item38"><label for="item38">Pavo</slabel></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item39"><label for="item39">Cerdo</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item40"><label for="item40">Cordero</label></div>
+                                 <p class="font-medium text-gray-300 mt-2 mb-1">Otros:</p>
+                                  <div class="shopping-item"><input type="checkbox" id="item41"><label for="item41">Huevos (idealmente de campo)</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item42"><label for="item42">Caldo de huesos</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🧀 LÁCTEOS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item43"><label for="item43">Queso Mozzarella</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item44"><label for="item44">Queso Gouda</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item45"><label for="item45">Queso Crema</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item46"><label for="item46">Queso Chanco</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item47"><label for="item47">Queso Fresco</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item48"><label for="item48">Queso Parmesano</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item49"><label for="item49">Queso Dubliner</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item50"><label for="item50">Queso Cheddar</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item51"><label for="item51">Queso Brie</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item52"><label for="item52">Queso Feta</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item53"><label for="item53">Crema Espesa en tarro</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item54"><label for="item54">Yogurt de pajaritos o Kéfir</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🥦 VERDURAS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item55"><label for="item55">Acelgas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item56"><label for="item56">Algas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item57"><label for="item57">Apio</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item58"><label for="item58">Ajo</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item59"><label for="item59">Ajíes</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item60"><label for="item60">Achicoria</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item61"><label for="item61">Berenjena</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item62"><label for="item62">Brócoli</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item63"><label for="item63">Cebolla</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item64"><label for="item64">Coliflor</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item65"><label for="item65">Espinacas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item66"><label for="item66">Espárragos</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item67"><label for="item67">Lechuga</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item68"><label for="item68">Pimentón</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item69"><label for="item69">Rúcula</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item70"><label for="item70">Repollo Fermentado</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item71"><label for="item71">Setas y Hongos</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item72"><label for="item72">Tomates</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item73"><label for="item73">Zapallo Italiano</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item74"><label for="item74">Pepino</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item75"><label for="item75">Rábanos</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">🍓 FRUTAS Y BAYAS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item76"><label for="item76">Coco</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item77"><label for="item77">Limón</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item78"><label for="item78">Palta</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item79"><label for="item79">Frutillas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item80"><label for="item80">Moras</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item81"><label for="item81">Frambuesas</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item82"><label for="item82">Arándanos</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item83"><label for="item83">Grosellas</label></div>
+                            </div>
+                            <div class="shopping-category">
+                                <h4 class="font-semibold text-white mb-2">💧 HIDRATACIÓN Y BEBIDAS</h4>
+                                <div class="shopping-item"><input type="checkbox" id="item84"><label for="item84">Agua mineral (con/sin gas)</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item86"><label for="item86">Agua saborizadas naturalmente</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item87"><label for="item87">Café grano o molido</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item88"><label for="item88">Café orgánico</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item89"><label for="item89">Yerba mate</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item90"><label for="item90">Té</label></div>
+                                <div class="shopping-item"><input type="checkbox" id="item91"><label for="item91">Sal de mar</label></div>
+                            </div>
+                        </div>
+                        <div class="p-5 mt-4 flex flex-col md:flex-row flex-wrap gap-4 justify-center items-center">
+                            <a href="https://ketoorigins-recetas.netlify.app/" target="_blank" class="recipe-button text-white font-bold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
+                                <div class="recipe-button-inner">
+                                    <div class="recipe-btn-img-wrapper">
+                                        <div class="recipe-btn-img-inner">
+                                            <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px.png" alt="Recetas" class="recipe-btn-img">
+                                        </div>
+                                    </div>
+                                    <span>RECETAS KETO Origins</span>
+                                </div>
+                            </a>
+                             <a href="https://fisiosem.my.canva.site/que-comer-peso-normal" target="_blank" class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
+                                 ¿Qué Comer?
+                            </a>
+                            <button id="download-list-btn" class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity text-lg">
+                                Descargar Selección
+                            </button>
+                            <a href="https://fisiosem.my.canva.site/keto-origins-" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
+                                Nuestras Asesorías
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+            <section id="niveles-cetonas" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🧪 Entendiendo tus Niveles de Cetonas (mmol/L)</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <div class="p-4 rounded-lg bg-gray-700/50 border border-gray-500"><p class="font-bold text-white">⚪️🤷‍♂️ &lt;0.5: Fuera de Cetosis</p><p>El nivel de cetonas en sangre está por debajo de 0.5 mmol/L, que es el nivel de cetona en sangre habitual con una dieta que incluye carbohidratos, grasas y proteínas. En esta situación, el cuerpo obtiene la energía en base principalmente al uso de azúcar y carbohidratos, y está lejos de quemar grasa.</p></div>
+                        <div class="p-4 rounded-lg bg-blue-900/50 border border-blue-700"><p class="font-bold text-white">🔵👍 0.5 a 1.5: Cetosis Leve</p><p>Nivel de cetona en sangre entre 0.5-1.5 mmol/L se llama cetosis vegetativa leve, y con estas concentraciones de cetonas en sangre se considera que las grasas también son utilizadas en el proceso de obtención de energía; el peso corporal se controla lentamente, pero el nivel de cetosis todavía no se encuentra en el intervalo óptimo para perder peso.</p></div>
+                        <div class="p-4 rounded-lg bg-green-900/50 border border-green-600"><p class="font-bold text-white">🟢🏆 1.5 a 3.0: Cetosis Óptima</p><p>Aproximadamente 1.5-3.0 mmol/L de cetonas en sangre lo que puede considerarse un nivel de cetosis óptima, siendo el nivel de cetonas que tienen como objetivo aqueles que realizan una dieta cetogénica. Se recomienda aumentar el entrenamiento mental y físico, para quemar la grasa de la manera más eficiente y perder peso; este nivel de cetonas implica un alto consumo de grasa por lo que el resultado de la dieta cetogénica está siendo muy bueno.</p></div>
+                        <div class="p-4 rounded-lg bg-yellow-900/50 border border-yellow-600"><p class="font-bold text-white">🟡⚠️ &lt; 3.0: Cetosis Profunda (Atención)</p><p>El nivel de cetona superior a 3 mmol/L supera el objetivo de la persona que realiza una dieta cetogénica y no consigue el mismo efecto de utilización de grasa en la formación de energía que se consigue con un nivel de cetonas en sangre que se encuentra en el rango de 1.5-3.0 mMol/l. Un nivel más alto de cetonas puede ser también indicativo de que el organismo no está suficientemente hidratado, o que el aporte de comida es insuficiente. Si este elevado nivel de cetonas se encuentra en pacientes con diabetes tipo 1, su interpretación debe ir ligada al nivel de glucemia; se debe prestar más atención al control de la insulina y debe consultarse la situación con su médico.</p></div>
+                        <div class="p-4 rounded-lg bg-red-900/50 border border-red-700"><p class="font-bold text-white">🔴☠️ &lt; 8.0: Cetoacidosis (Peligro)</p><p>El nivel de cetona superior a 8 mmol/L es un nivel peligroso. El texto proporcionado para este nivel es idéntico al de >3.0, pero es crucial entender que este rango es indicativo de cetoacidosis diabética, una emergencia médica que requiere atención inmediata, especialmente en diabéticos tipo 1.</p></div>
+                    </div></div>
+                </div>
+                   <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+            
+            <!-- NUEVA SECCIÓN DE ASESORÍAS -->
+            <section id="asesorias" class="content-section hidden">
+                <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💎 Nuestras Asesorías Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="accordion-content">
+                        <div class="p-5 border-t border-gray-700 text-gray-400 space-y-4 text-center">
+                            <h3 class="text-2xl font-bold text-white mb-4">✨ Transforma tu Salud con Nuestra Guía Experta ✨</h3>
+                            <p class="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                                ¿Estás listo para llevar tu viaje Keto al siguiente nivel? Nuestras asesorías personalizadas están diseñadas para darte el conocimiento, el apoyo y la motivación que necesitas para alcanzar tus metas de salud y bienestar de manera efectiva y sostenible. 💪
+                            </p>
+                            <div class="pt-6">
+                                <a href="https://fisiosem.my.canva.site/keto-origins-" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-10 rounded-lg hover:opacity-90 transition-opacity inline-block text-xl shadow-lg">
+                                    ¡Conoce Más Sobre las Asesorías!
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-image-wrapper">
+                    <div class="gradient-border">
+                        <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            const downloadBtn = document.getElementById('download-list-btn');
+            const categoryTitles = document.querySelectorAll('.shopping-category h4');
+
+            // --- NUEVA FUNCIÓN PARA MOSTRAR MENSAJES ---
+            function showMessage(text) {
+                const messageBox = document.getElementById('alert-message');
+                if (!messageBox) return;
+                messageBox.textContent = text;
+                messageBox.classList.remove('hidden', 'opacity-0');
+                messageBox.classList.add('opacity-100');
+                setTimeout(() => {
+                    messageBox.classList.remove('opacity-100');
+                    messageBox.classList.add('opacity-0');
+                    setTimeout(() => {
+                           messageBox.classList.add('hidden');
+                    }, 500); // Coincide con la duración de la transición
+                }, 3000); // El mensaje es visible por 3 segundos
+            }
+
+            // Función para manejar la navegación
+            function handleNavigation(targetId) {
+                // Manejar clase activa en el menú
+                navLinks.forEach(l => l.classList.remove('active-link'));
+                const activeLink = document.querySelector(`a[href="#${targetId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active-link');
+                }
+
+                // Mostrar el contenido correspondiente
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Navegación con click
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    handleNavigation(targetId);
+                    // Opcional: cambiar la URL sin recargar la página
+                    window.history.pushState(null, '', `#${targetId}`);
+                });
+            });
+
+            // Acordeones
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    this.classList.toggle('open');
+                    content.classList.toggle('open');
+                });
+            });
+            
+            // Funcionalidad para seleccionar/deseleccionar toda una categoría
+            categoryTitles.forEach(title => {
+                title.addEventListener('click', function() {
+                    const category = this.parentElement;
+                    const checkboxes = category.querySelectorAll('input[type="checkbox"]');
+                    // Determinar si vamos a seleccionar o deseleccionar
+                    // Si al menos uno no está marcado, marcamos todos. Si todos están marcados, desmarcamos todos.
+                    const shouldCheck = Array.from(checkboxes).some(cb => !cb.checked);
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = shouldCheck;
+                    });
+                });
+            });
+
+            // Funcionalidad del botón de descarga
+            downloadBtn.addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const checkedItems = document.querySelectorAll('#shopping-list-container input[type="checkbox"]:checked');
+                if (checkedItems.length === 0) {
+                    // --- CAMBIO: USAR showMessage EN LUGAR DE alert ---
+                    showMessage("Por favor, selecciona al menos un artículo para descargar.");
+                    return; 
+                }
+
+                let y = 20; // Posición Y inicial
+                const lineHeight = 7;
+                const pageHeight = 280; // Margen inferior
+                const leftMargin = 15;
+
+                doc.setFontSize(20);
+                doc.text('Mi Lista de Compras Keto', leftMargin, y);
+                y += 15;
+
+                const categories = {};
+
+                checkedItems.forEach(item => {
+                    let parent = item.closest('.shopping-category');
+                    let categoryTitle = 'General';
+                    
+                    if (parent) {
+                        const categoryTitleElement = parent.querySelector('h4, p');
+                        if (categoryTitleElement) {
+                            // Limpiar emojis y espacios extra para el PDF
+                            categoryTitle = categoryTitleElement.textContent.replace(/[^\x00-\x7F]/g, "").trim();
+                        }
+                    }
+
+                    const itemName = item.nextElementSibling.textContent.trim();
+                    
+                    if (!categories[categoryTitle]) {
+                        categories[categoryTitle] = [];
+                    }
+                    categories[categoryTitle].push(itemName);
+                });
+
+                for (const category in categories) {
+                    if (y > pageHeight) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.setFontSize(16);
+                    doc.text(category, leftMargin, y);
+                    y += lineHeight + 3;
+
+                    doc.setFontSize(12);
+                    categories[category].forEach(item => {
+                        if (y > pageHeight) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`- ${item}`, leftMargin + 5, y);
+                        y += lineHeight;
+                    });
+                    y += 5; // Espacio extra entre categorías
+                }
+
+                doc.save('lista-de-compras-keto.pdf');
+            });
+
+
+            // Cargar contenido basado en el hash de la URL al cargar la página
+            const initialTargetId = window.location.hash.substring(1) || 'introduccion';
+            handleNavigation(initialTargetId);
+            
+            // Eliminar la lógica para abrir el primer acordeón por defecto
+            // const activeSection = document.querySelector(`#${initialTargetId}`);
+            // if(activeSection){
+            //     const firstAccordionButton = activeSection.querySelector('.accordion-button');
+            //     if(firstAccordionButton){
+            //         firstAccordionButton.click();
+            //     }
+            // }
+        });
+    </script>
+</body>
+</html>
