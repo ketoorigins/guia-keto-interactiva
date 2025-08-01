@@ -73,11 +73,27 @@
         aside {
             /* Fondo de la barra lateral actualizado para que coincida con el modal de la imagen */
             background-color: #332145;
-            border-r: 1px solid #484f58; /* Ajuste del borde si es necesario para el nuevo fondo */
+            border-right: 1px solid #484f58;
             flex-shrink-0;
-            hidden;
-            md:flex;
-            flex-col;
+            display: flex;
+            flex-direction: column;
+            position: fixed; /* Posición fija para móviles */
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 288px;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        aside.open {
+            transform: translateX(0);
+        }
+        @media (min-width: 768px) {
+            aside {
+                position: relative;
+                transform: translateX(0);
+            }
         }
         aside nav {
             overflow-y: auto;
@@ -181,6 +197,23 @@
             text-shadow: none;
         }
         /* --- ESTILOS PARA IMAGEN DEL BOTÓN DE RECETAS --- */
+        .recipe-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start; /* Alinea los elementos a la izquierda para el ícono */
+            padding: 0.5rem 1.5rem; /* py-2 px-6 */
+            border-radius: 9999px; /* Botón redondeado */
+            font-weight: 700; /* font-bold */
+            color: white;
+            background: linear-gradient(to right, #581c87, #8a2be2); /* Degradado actualizado de morado oscuro a púrpura */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), 0 0 10px rgba(138, 43, 226, 0.5); /* Sombra y resplandor para efecto 3D */
+            transition: all 0.2s ease-in-out;
+            text-decoration: none; /* Quita el subrayado del enlace */
+        }
+        .recipe-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3), 0 0 15px rgba(138, 43, 226, 0.7);
+        }
         .recipe-btn-img-wrapper {
             display: inline-flex;
             align-items: center;
@@ -191,6 +224,7 @@
             margin-right: 1rem;
             width: 72px;
             height: 72px;
+            box-shadow: 0 0 10px rgba(217, 70, 239, 0.5); /* Resplandor al borde */
         }
         .recipe-btn-img-inner {
             background-color: #2a1735;
@@ -206,6 +240,7 @@
             height: 100%;
             object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
             border-radius: 9999px; /* Asegura que la imagen en sí sea redonda */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Added a light glow to the icon */
         }
         /* --- ESTILOS PARA BOTÓN DE NAVEGACIÓN ASESORÍAS --- */
         .nav-button-asesorias {
@@ -257,23 +292,54 @@
             box-shadow: 0 8px 12px rgba(0,0,0,0.3);
             opacity: 0.9;
         }
+        .menu-button {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 60;
+            background-color: #332145;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        @media (max-width: 767px) {
+            .menu-button {
+                display: block;
+            }
+        }
+        .main-content-wrapper {
+            margin-left: 0;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .main-content-wrapper.menu-open {
+            margin-left: 288px;
+        }
     </style>
 </head>
-<body class="bg-[#0D1117]">
+<body>
 
     <!-- Contenedor para el mensaje de alerta -->
     <div id="alert-message" class="fixed top-5 right-5 bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg z-50 hidden opacity-0 transition-opacity duration-500"></div>
 
+    <!-- Botón de menú para móviles -->
+    <button id="menu-button" class="menu-button">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+
     <div class="flex min-h-screen">
         <!-- Barra de Navegación Lateral -->
-        <aside class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 hidden md:flex flex-col">
+        <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 hidden md:flex flex-col">
             <div class="h-36 flex items-center justify-center border-b border-gray-800 flex-shrink-0 p-4">
                 <!-- Logo -->
                 <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo de Keto Origins" class="h-full w-auto">
             </div>
             <nav class="flex-grow px-4 py-6">
                 <ul class="space-y-1 text-sm" id="nav-menu">
-                    <li><a href="#introduccion" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 active-link">📖 Introducción</a></li>
+                    <li><a href="#introduccion" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">📖 Introducción</a></li>
                     <li><a href="#breve-historia" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">📜 Breve historia de la Alimentación Keto</a></li>
                     <li><a href="#como-funciona" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">⚙️ Cómo Funciona la Alimentación Keto</a></li>
                     <li><a href="#beneficios-ayuno" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🌟 Beneficios del Ayuno Intermitente</a></li>
@@ -305,7 +371,7 @@
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto">
             
             <!-- SECCIONES DE CONTENIDO -->
             <section id="introduccion" class="content-section">
@@ -432,7 +498,7 @@
                             <p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p>
                             <p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p>
                             <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Mayor Quema de Grasa: El cuerpo tiene más tiempo para acceder y movilizar las reservas de grasa como combustible.<br>Inicio de Flexibilidad Metabólica: Tu cuerpo se vuelve más eficiente alternando entre la quema de glucosa y la quema de grasa.<br>Primeros Indicios de Autofagia: Aunque la activación significativa de la autofagia ocurre más tarde, este ayuno puede empezar a iniciar algunos procesos leves de reciclaje celular.</p>
-                            <p><b>💡 Consejo de Implementación Clave:</b> Experimenta con el horario. Puedes retrasar el desayuno o adelantar la cena, lo que te resulte más fácil. Por ejemplo, si cenas a las 8 PM, tu primera comida sería a las 10 AM del día siguiente. Si entrenas por la mañana, considera hacer una comida densa en nutrientes la noche anterior.</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p>
                         </div></div>
                     </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
@@ -451,7 +517,7 @@
                             <p>Este es el protocolo más intenso y avanzado de los cuatro, reservado para aquellos con experiencia en ayuno y un metabolismo bien adaptado. 💪</p>
                             <p><b>🧬 Fundamento Biológico:</b> Al ayunar aproximadamente 23 horas, el cuerpo pasa un período muy prolongado en un estado de cetosis profunda y autofagia máxima. Esto maximiza los beneficios de la quema de grasa y la limpieza celular. También significa que el sistema digestivo tiene un descanso muy extenso.</p>
                             <p><b>🎯 ¿Para quién es ideal?</b><br>Ayunos experimentados: No es para principiantes. Requiere una adaptación gradual.<br>Pérdida de peso significativa: Puede ser muy efectivo para la pérdida de peso y la gestión de la grasa corporal.<br>Control de azúcar en sangre muy estricto: Beneficioso para la diabetes tipo 2 (siempre bajo supervisión médica).<br>Maximizar la autofagia: Para quienes buscan los mayores beneficios de renovación celular.</p>
-                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Autofagia al Máximo: El cuerpo se dedica a una limpieza y reparación profunda a nivel celular.<br>Cetosis Profunda: Mayor producción de corpos cetónicos, lo que puede resultar en niveles de energía muy estables y gran claridad mental.<br>Gran Descenso de Insulina: Permite una resensibilización muy efectiva a la insulina.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Activación Profunda de la Autofagia: Permite a las células realizar una limpieza y reparación exhaustiva.<br>Mayor Producción de Cuerpos Cetónicos: El cerebro y el cuerpo utilizan eficientemente las grasas para obtener energía, lo que puede resultar en mayor claridad mental y energía sostenida.<br>Gran Descenso de Insulina: Permite una resensibilización muy efectiva a la insulina.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p>
                             <p><b>💡 Consejo de Implementación Clave:</b><br>Calidad sobre Cantidad: La única comida del día DEBE ser nutricionalmente densa. Piensa en una gran cantidad de verduras, una porción generosa de proteína (carne, pescado, huevos), grasas saludables (aguacate, aceite de oliva, frutos secos) y quizás algunos carbohidratos complejos. La insuficiencia nutricional puede llevar a deficiencias y problemas de salud.<br>Hidratación y Electrolitos son NO NEGOCIABLES: Es aún más crítico que en otros ayunos. Si no mantienes tus electrolitos balanceados, experimentarás fatiga, dolores de cabeza y calambres. La mezcla de agua, sal y limón es tu mejor amiga.<br>Adaptación Gradual: No pases del 16/8 a OMAD de la noche a la mañana. Puedes hacer ayunos de 18 o 20 horas primero para acostumbrar a tu cuerpo.<br>Escucha a tu Cuerpo: Si experimentas mareos severos, debilidad extrema o cualquier otro síntoma preocupante, rompe el ayuno y reevalúa. OMAD no es para todos y puede no ser sostenible a largo plazo para algunas personas.</p>
                         </div></div>
                     </div>
@@ -580,7 +646,8 @@
             <section id="importancia-comidas" class="content-section hidden">
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🍽️ Importancia del N° de Comidas</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>🍽️ Comer máximo tres veces al día, permite a tu cuerpo utilizar de manera eficiente los alimentos ingeridos y facilita el mantenimiento de niveles bajos de insulina, promoviendo la quema de grasa.</p><p>📉 Necesitamos controlar la liberación de insulina, al comer 3 veces al día, tu cuerpo tiene el horario perfecto para trabajar correctamente, manteniendo tus niveles de azúcar en sangre, totalmente bajo control.</p><p>🥪 Cuando hablamos de tres comidas, nos referimos a 3 platos de comida, Osea, un té o un café con algún sándwich, no es una comida completa, y el hambre aparecerá pronto.</p><p>😋 Saltarse comidas también puede ayudar a mantener la cetosis y mejorar el control del apetito.</p></div></div>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
+                        <p>🍽️ Comer máximo tres veces al día, permite a tu cuerpo utilizar de manera eficiente los alimentos ingeridos y facilita el mantenimiento de niveles bajos de insulina, promoviendo la quema de grasa.</p><p>📉 Necesitamos controlar la liberación de insulina, al comer 3 veces al día, tu cuerpo tiene el horario perfecto para trabajar correctamente, manteniendo tus niveles de azúcar en sangre, totalmente bajo control.</p><p>🥪 Cuando hablamos de tres comidas, nos referimos a 3 platos de comida, Osea, un té o un café con algún sándwich, no es una comida completa, y el hambre aparecerá pronto.</p><p>😋 Saltarse comidas también puede ayudar a mantener la cetosis y mejorar el control del apetito.</p></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -593,14 +660,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>📉 Consejos para Reducir la Frecuencia de Comidas</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <p><b>🍽️ Aumenta el tamaño de las porciones:</b> En lugar de comer muchas veces al día, aumenta el tamaño de tus comidas principales para mantenerte satisfecho por más tiempo.</p>
-                        <p><b>🥑 Prioriza las grasas saludables:</b> Las grasas saludables te sacian más y te proporcionan energía de forma sostenida. Incluye aguacate o palta, aceite de oliva, frutos secos y semillas en tus comidas.</p>
-                        <p><b>🥩 Asegura una buena cantidad de proteínas:</b> Las proteínas también ayudan a mantener la sensación de saciedad. Incorpora carnes, pescados, huevos y frutos secos en tus platos.</p>
-                        <p><b>🥦 Come alimentos fibrosos:</b> Las verduras bajas en carbohidratos, como las espinacas, brócoli y coliflor, añaden volumen a tus comidas y te hacen sentir lleno.</p>
-                        <p><b>💧 Bebe suficiente agua:</b> A veces, la sed se confunde con el hambre. Asegúrese de estar muy bien hidratado.</p>
-                        <p><b>🕒 Introduzca el ayuno intermitente:</b> Esta práctica puede ayudar a reducir la frecuencia de comidas y acelerar la pérdida de peso.</p>
-                        <p><b>👂 Escucha a tu cuerpo:</b> Presta atención a las señales de hambre y saciedad. No comas por aburrimiento o por costumbre.</p>
-                    </div></div>
+                        <p><b>🍽️ Aumenta el tamaño de las porciones:</b> En lugar de comer muchas veces al día, aumenta el tamaño de tus comidas principales para mantenerte satisfecho por más tiempo.</p><p><b>🥑 Prioriza las grasas saludables:</b> Las grasas saludables te sacian más y te proporcionan energía de forma sostenida. Incluye aguacate o palta, aceite de oliva, frutos secos y semillas en tus comidas.</p><p><b>🥩 Asegura una buena cantidad de proteínas:</b> Las proteínas también ayudan a mantener la sensación de saciedad. Incorpora carnes, pescados, huevos y frutos secos en tus platos.</p><p><b>🥦 Come alimentos fibrosos:</b> Las verduras bajas en carbohidratos, como las espinacas, brócoli y coliflor, añaden volumen a tus comidas y te hacen sentir lleno.</p><p><b>💧 Bebe suficiente agua:</b> A veces, la sed se confunde con el hambre. Asegúrese de estar muy bien hidratado.</p><p><b>🕒 Introduzca el ayuno intermitente:</b> Esta práctica puede ayudar a reducir la frecuencia de comidas y acelerar la pérdida de peso.</p><p><b>👂 Escucha a tu cuerpo:</b> Presta atención a las señales de hambre y saciedad. No comas por aburrimiento o por costumbre.</p></div></div>
                 </div>
                 <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -613,11 +673,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>❗ Consideraciones importantes</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <p>🐢 <b>No reduzcas las comidas desechables de la noche a la mañana:</b> Hazlo de forma gradual para que tu cuerpo se adapte.</p>
-                        <p>🔋 <b>Monitorea tus niveles de energía:</b> Si te sientes débil o mareado, es posible que necesites ajustar tu ingesta de alimentos.</p>
-                        <p>💧 <b>Complementa con electrolitos:</b> La pérdida de líquidos y electrolitos es común en la alimentación cetogénica. Asegúrese de consumir suficiente sal, potasio y magnesio.</p>
-                        <p>💊 <b>Considere suplementos:</b> En algunos casos, los suplementos pueden ser beneficiosos para complementar su dieta.</p>
-                    </div></div>
+                        <p>🐢 <b>No reduzcas las comidas desechables de la noche a la mañana:</b> Hazlo de forma gradual para que tu cuerpo se adapte.</p><p>🔋 <b>Monitorea tus niveles de energía:</b> Si te sientes débil o mareado, es posible que necesites ajustar tu ingesta de alimentos.</p><p>💧 <b>Complementa con electrolitos:</b> La pérdida de líquidos y electrolitos es común en la alimentación cetogénica. Asegúrese de consumir suficiente sal, potasio y magnesio.</p><p>💊 <b>Considere suplementos:</b> En algunos casos, los suplementos pueden ser beneficiosos para complementar su dieta.</p></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -630,18 +686,9 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>✨ Beneficios potenciales de reducir la frecuencia de comidas en keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-6">
-                        <div>
-                            <h4 class="font-semibold text-lg text-white mb-2">📉 Mayor pérdida de peso</h4>
-                            <p>Al comer con menos frecuencia, es natural que se reduzca la ventana de tiempo para consumir alimentos, lo que a menudo conduce a una menor ingesta calórica total sin necesidad de contar calorías obsesivamente. Además, al mantener los niveles de insulina bajos durante períodos más largos, tu cuerpo se vuelve extremadamente eficiente en acceder y quemar la grasa almacenada como combustible.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-white mb-2">🔥 Aumento de la cetosis</h4>
-                            <p>Cada vez que comes, incluso una comida keto, hay una pequeña respuesta de la insulina. Al reducir el número de comidas, minimizas estos picos de insulina. Esto permite que tu cuerpo permanezca en un estado de cetosis más profundo y estable durante más tiempo, maximizando la producción de cetonas y los beneficios asociados, como la claridad mental y la energía sostenida.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-white mb-2">😋 Mejor control del apetito</h4>
-                            <p>Comer constantemente, incluso snacks saludables, puede mantener el sistema digestivo siempre activo y generar un ciclo de hambre. Al espaciar tus comidas, le das a tu cuerpo un descanso digestivo y permites que tus hormonas del hambre y la saciedad (grelina y leptina) se regulen de manera más efectiva. Con el tiempo, te sorprenderá sentir menos antojos y tener un control mucho mayor sobre cuándo y cuánto comes.</p>
-                        </div>
+                        <div><h4 class="font-semibold text-lg text-white mb-2">📉 Mayor pérdida de peso</h4><p>Al comer con menos frecuencia, es natural que se reduzca la ventana de tiempo para consumir alimentos, lo que a menudo conduce a una menor ingesta calórica total sin necesidad de contar calorías obsesivamente. Además, al mantener los niveles de insulina bajos durante períodos más largos, tu cuerpo se vuelve extremadamente eficiente en acceder y quemar la grasa almacenada como combustible.</p></div>
+                        <div><h4 class="font-semibold text-lg text-white mb-2">🔥 Aumento de la cetosis</h4><p>Cada vez que comes, incluso una comida keto, hay una pequeña respuesta de la insulina. Al reducir el número de comidas, minimizas estos picos de insulina. Esto permite que tu cuerpo permanezca en un estado de cetosis más profundo y estable durante más tiempo, maximizando la producción de cetonas y los beneficios asociados, como la claridad mental y la energía sostenida.</p></div>
+                        <div><h4 class="font-semibold text-lg text-white mb-2">😋 Mejor control del apetito</h4><p>Comer constantemente, incluso snacks saludables, puede mantener el sistema digestivo siempre activo y generar un ciclo de hambre. Al espaciar tus comidas, le das a tu cuerpo un descanso digestivo y permites que tus hormonas del hambre y la saciedad (grelina y leptina) se regulen de manera más efectiva. Con el tiempo, te sorprenderá sentir menos antojos y tener un control mucho mayor sobre cuándo y cuánto comes.</p></div>
                     </div></div>
                 </div>
                    <div class="footer-image-wrapper">
@@ -655,18 +702,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>⚡ Tips para Entrar en Cetosis Más Rápido</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                        <p><b>🚫 Restricción severa de carbohidratos:</b><br>Por qué: Cuando reduce los carbohidratos, obliga a tu cuerpo a buscar otras fuentes de energía. Al no tener glucosa (proveniente de los carbohidratos) disponible, tu hígado comienza a convertir la grasa en cetonas, que son como un "combustible alternativo" para tu cuerpo. En términos más simples: Es como quitarle la gasolina a un coche y obligarlo a usar aceite.</p>
-                        <p><b>🥑 Aumente la ingesta de grasas saludables:</b><br>Por qué: Al aumentar las grasas, proporcionan a tu cuerpo una fuente de energía abundante y de liberación lenta. Además, las grasas ayudan a mantenerte satisfecho por más tiempo. En otras palabras: Es como llenar el tanque de tu coche con un combustible de larga duración.</p>
-                        <p><b>🧂 Electrolitos:</b><br>Por qué: Cuando reduce los carbohidratos, pierdes líquidos y electrolitos como sodio, potasio y magnesio. Reponerlos es crucial para prevenir calambres, fatiga y otros síntomas desagradables. Es como cambiar el aceite de tu coche: Necesitas cambiar los líquidos regularmente para que funcione correctamente.</p>
-                        <p><b>💊 Suplementos:</b><br>Por qué: Algunos suplementos como el aceite MCT pueden proporcionar una fuente rápida de cetonas y facilitar la entrada en cetosis. Es como agregar un aditivo a tu combustible para mejorar el rendimiento de tu cuerpo.</p>
-                        <p><b>💧 Hidratación:</b><br>Por qué: Beber suficiente agua ayuda a eliminar las toxinas ya mantener tus órganos funcionando correctamente. El mantener nuestro organismo hidratado es vital para nuestra existencia. el cuerpo no puede funcionar sin agua. Tenemos reservas para pasar meses sin comer, pero sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p>
-                        <p><b>😴 Sueño:</b><br>Por qué: El sueño es esencial para la recuperación y la regulación hormonal. tu cuerpo necesita descanso para utilizar lo consumido en tus comidas para repararse: Necesita tiempo para recargar energías.</p>
-                        <p><b>🧘‍♂️ Manejo del estrés:</b><br>Por qué: El estrés crónico puede aumentar los niveles de cortisol, una hormona que promueve el almacenamiento de grasa. busca actividades que te ayuden a reducir tus niveles de estrés. Baile, ejercicio, música, pintura, manualidades ...etc</p>
-                        <p><b>🏋️‍♀️ Entrenamiento de fuerza:</b><br>Por qué: Al fortalecer tus músculos, aceleras tu metabolismo, aumentando el números de mitocondrias y por ende quemas más calorías incluso en reposo. ¡Es como tener un motor más potente en tu cuerpo!</p>
-                        <p><b>🏃‍♂️ Ejercicios en ayunas:</b><br>Por qué: Entrenar en ayunas es como encender una fogata con leña seca. Tu cuerpo, al no tener glucosa (energía rápida) proveniente de los alimentos, recurre a la grasa almacenada (la leña) para obtener energía.</p>
-                        <p><b>💨 HIIT (entrenamiento de intervalos de alta intensidad):</b><br>Por qué: El HIIT es como hacer sprints cortos y rápidos. Estos intervalos intensos hacen que tu cuerpo trabaje duro y quemen muchas calorías, incluso después de terminar el entrenamiento!</p>
-                        <p><b>🕒 Ayuno intermitente:</b><br>Por qué: El ayuno intermitente es como darle un descanso a tu sistema digestivo. Al no comer durante un período, tu cuerpo entra en modo de ahorro de energía y comienza a utilizar la grasa almacenada como combustible. ¡Es como limpiar tu despensa y solo comer los alimentos más nutritivos!</p>
-                    </div></div>
+                        <p><b>🚫 Restricción severa de carbohidratos:</b><br>Por qué: Cuando reduce los carbohidratos, obliga a tu cuerpo a buscar otras fuentes de energía. Al no tener glucosa (proveniente de los carbohidratos) disponible, tu hígado comienza a convertir la grasa en cetonas, que son como un "combustible alternativo" para tu cuerpo. En términos más simples: Es como quitarle la gasolina a un coche y obligarlo a usar aceite.</p><p><b>🥑 Aumente la ingesta de grasas saludables:</b><br>Por qué: Al aumentar las grasas, proporcionan a tu cuerpo una fuente de energía abundante y de liberación lenta. Además, las grasas ayudan a mantenerte satisfecho por más tiempo. En otras palabras: Es como llenar el tanque de tu coche con un combustible de larga duración.</p><p><b>🧂 Electrolitos:</b><br>Por qué: Cuando reduce los carbohidratos, pierdes líquidos y electrolitos como sodio, potasio y magnesio. Reponerlos es crucial para prevenir calambres, fatiga y otros síntomas desagradables. Es como cambiar el aceite de tu coche: Necesitas cambiar los líquidos regularmente para que funcione correctamente.</p><p><b>💊 Suplementos:</b><br>Por qué: Algunos suplementos como el aceite MCT pueden proporcionar una fuente rápida de cetonas y facilitar la entrada en cetosis. Es como agregar un aditivo a tu combustible para mejorar el rendimiento de tu cuerpo.</p><p><b>💧 Hidratación:</b><br>Por qué: Beber suficiente agua ayuda a eliminar las toxinas ya mantener tus órganos funcionando correctamente. El mantener nuestro organismo hidratado es vital para nuestra existencia. el cuerpo no puede funcionar sin agua. Tenemos reservas para pasar meses sin comer, pero sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p><p><b>😴 Sueño:</b><br>Por qué: El sueño es esencial para la recuperación y la regulación hormonal. tu cuerpo necesita descanso para utilizar lo consumido en tus comidas para repararse: Necesita tiempo para recargar energías.</p><p><b>🧘‍♂️ Manejo del estrés:</b><br>Por qué: El estrés crónico puede aumentar los niveles de cortisol, una hormona que promueve el almacenamiento de grasa. busca actividades que te ayuden a reducir tus niveles de estrés. Baile, ejercicio, música, pintura, manualidades ...etc</p><p><b>🏋️‍♀️ Entrenamiento de fuerza:</b><br>Por qué: Al fortalecer tus músculos, aceleras tu metabolismo, aumentando el números de mitocondrias y por ende quemas más calorías incluso en reposo. ¡Es como tener un motor más potente en tu cuerpo!</p><p><b>🏃‍♂️ Ejercicios en ayunas:</b><br>Por qué: Entrenar en ayunas es como encender una fogata con leña seca. Tu cuerpo, al no tener glucosa (energía rápida) proveniente de los alimentos, recurre a la grasa almacenada (la leña) para obtener energía.</p><p><b>💨 HIIT (entrenamiento de intervalos de alta intensidad):</b><br>Por qué: El HIIT es como hacer sprints cortos y rápidos. Estos intervalos intensos hacen que tu cuerpo trabaje duro y quemen muchas calorías, incluso después de terminar el entrenamiento!</p><p><b>🕒 Ayuno intermitente:</b><br>Por qué: El ayuno intermitente es como darle un descanso a tu sistema digestivo. Al no comer durante un período, tu cuerpo entra en modo de ahorro de energía y comienza a utilizar la grasa almacenada como combustible. ¡Es como limpiar tu despensa y solo comer los alimentos más nutritivos!</p></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -679,16 +715,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🏆 Beneficios de la Alimentación Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                        <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas almacenadas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p>
-                        <p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p>
-                        <p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p>
-                        <p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p>
-                        <div class="pt-4 flex justify-center">
-                             <a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity">
-                                 ¡Más Beneficios!
-                            </a>
-                        </div>
-                    </div></div>
+                        <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas almacenadas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p><p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p><p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p><p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p><p><b>✨ Otras mejoras:</b> Reducción de la inflamación: La cetosis puede ayudar a reducir los marcadores inflamatorios en el cuerpo. Mejora en el acné: Algunas personas experimentan una reducción del acné al seguir una dieta cetogénica. Aumento de la energía: Muchas personas reportan sentirse más energéticas y mentalmente claras al seguir una dieta cetogénica.</p><div class="pt-4 flex justify-center"><a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity">¡Más Beneficios!</a></div></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -701,11 +728,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🥂 Estrategias Profesionales para Eventos Sociales y Comidas Fuera</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p>
-                        <h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p>
-                        <h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p>
-                        <h4 class="font-semibold text-white">3. 🍽️ Comiendo Fuera (Restaurantes): Tu Menú Bajo en Carbos</h4><p><b>Investiga el Menú Online:</b> Antes de llegar, revisa el menú del restaurante. Identifica platos que puedas adaptar o que naturalmente sean cetogénicos. Esto elimina la presión y la toma de decisiones impulsivas.<br><b>Comunica tus Requerimientos Claramente al Camarero:</b> No tengas miedo de pedir modificaciones; es común en la cocina actual. "¿Puedo cambiar las papas o el arroz por una porción doble de vegetales salteados (sin salsa) o una ensalada verde simple?"<br>"Por favor, mi carne/pescado a la plancha, sin salsas o marinadas azucaradas, o si es posible, la salsa aparte."<br>"¿Este plato contiene azúcares añadidos o harinas?" (Pregunta clave para salsas).<br>Pide que no te traigan pan o entradas con almidón a la mesa.<br><b>Opciones por Tipo de Cocina:</b><br>Restaurante de Carnes/Parrillada: Tu paraíso. Pide cortes de carne, aves o pescado. Acompaña con vegetales a la parrilla o al vapor.<br>Pescados y Mariscos: Excelente opción. Pide pescados a la plancha, al horno o mariscos sin rebozar ni freír.<br>Ensaladas: Pide ensaladas base (hojas verdes, proteína, aguacate, nueces) y siempre pide el aderezo aparte (aceite de oliva y vinagre es lo más seguro). Evita frutas o aderezos cremosos.<br>Comida Oriental (Japonesa/China): Cuidado extremo con las salsas (teriyaki, agridulce) y el arroz. Opta por sashimi, rollos sin arroz (Naruto, "protein style"), o platos de carne/pescado salteados con vegetales, pidiendo "sin salsa" o "salsa muy ligera".<br>Comida Italiana: Evita pasta y pizza. Busca carpaccios, antipastos de embutidos y quesos, o platos de carne/pescado con vegetales.</p>
-                    </div></div>
+                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p><h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p><h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p><h4 class="font-semibold text-white">3. 🍽️ Comiendo Fuera (Restaurantes): Tu Menú Bajo en Carbos</h4><p><b>Investiga el Menú Online:</b> Antes de llegar, revisa el menú del restaurante. Identifica platos que puedas adaptar o que naturalmente sean cetogénicos. Esto elimina la presión y la toma de decisiones impulsivas.<br><b>Comunica tus Requerimientos Claramente al Camarero:</b> No tengas miedo de pedir modificaciones; es común en la cocina actual. "¿Puedo cambiar las papas o el arroz por una porción doble de vegetales salteados (sin salsa) o una ensalada verde simple?"<br>"Por favor, mi carne/pescado a la plancha, sin salsas o marinadas azucaradas, o si es posible, la salsa aparte."<br>"¿Este plato contiene azúcares añadidos o harinas?" (Pregunta clave para salsas).<br>Pide que no te traigan pan o entradas con almidón a la mesa.<br><b>Opciones por Tipo de Cocina:</b><br>Restaurante de Carnes/Parrillada: Tu paraíso. Pide cortes de carne, aves o pescado. Acompaña con vegetales a la parrilla o al vapor.<br>Pescados y Mariscos: Excelente opción. Pide pescados a la plancha, al horno o mariscos sin rebozar ni freír.<br>Ensaladas: Pide ensaladas base (hojas verdes, proteína, aguacate, nueces) y siempre pide el aderezo aparte (aceite de oliva y vinagre es lo más seguro). Evita frutas o aderezos cremosos.<br>Comida Oriental (Japonesa/China): Cuidado extremo con las salsas (teriyaki, agridulce) y el arroz. Opta por sashimi, rollos sin arroz (Naruto, "protein style"), o platos de carne/pescado salteados con vegetales, pidiendo "sin salsa" o "salsa muy ligera".<br>Comida Italiana: Evita pasta y pizza. Busca carpaccios, antipastos de embutidos y quesos, o platos de carne/pescado con vegetales.</p></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -837,14 +860,13 @@
                         </div>
                         <div class="p-5 mt-4 flex flex-col md:flex-row flex-wrap gap-4 justify-center items-center">
                             <a href="https://ketoorigins-recetas.netlify.app/" target="_blank" class="recipe-button text-white font-bold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
-                                <div class="recipe-button-inner">
-                                    <div class="recipe-btn-img-wrapper">
-                                        <div class="recipe-btn-img-inner">
-                                            <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px.png" alt="Recetas" class="recipe-btn-img">
-                                        </div>
+                                <div class="recipe-btn-img-wrapper">
+                                    <div class="recipe-btn-img-inner">
+                                        <!-- Imagen de chef para el botón de recetas -->
+                                        <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px.png" alt="Recetas" class="recipe-btn-img">
                                     </div>
-                                    <span>RECETAS KETO Origins</span>
                                 </div>
+                                <span>RECETAS KETO Origins</span>
                             </a>
                              <a href="https://fisiosem.my.canva.site/que-comer-peso-normal" target="_blank" class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
                                  ¿Qué Comer?
@@ -918,6 +940,11 @@
             const accordionButtons = document.querySelectorAll('.accordion-button');
             const downloadBtn = document.getElementById('download-list-btn');
             const categoryTitles = document.querySelectorAll('.shopping-category h4');
+            const menuButton = document.getElementById('menu-button');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mainContent = document.getElementById('main-content');
+            const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
+
 
             // --- NUEVA FUNCIÓN PARA MOSTRAR MENSAJES ---
             function showMessage(text) {
@@ -944,14 +971,21 @@
                     activeLink.classList.add('active-link');
                 }
 
-                // Mostrar el contenido correspondiente
+                // Ocultar todas las secciones de contenido
                 contentSections.forEach(section => {
-                    if (section.id === targetId) {
-                        section.classList.remove('hidden');
-                    } else {
-                        section.classList.add('hidden');
-                    }
+                    section.classList.add('hidden');
                 });
+                
+                // Mostrar la sección de contenido correspondiente
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    // Desplazarse a la parte superior de la página para que el título sea visible
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
             }
 
             // Navegación con click
@@ -960,8 +994,11 @@
                     e.preventDefault();
                     const targetId = this.getAttribute('href').substring(1);
                     handleNavigation(targetId);
-                    // Opcional: cambiar la URL sin recargar la página
-                    window.history.pushState(null, '', `#${targetId}`);
+                    // Ocultar la barra de navegación en móviles después de hacer clic
+                    if (window.innerWidth < 768) {
+                        mobileNav.classList.remove('open');
+                        mainContent.classList.remove('menu-open');
+                    }
                 });
             });
 
@@ -1055,11 +1092,32 @@
                 doc.save('lista-de-compras-keto.pdf');
             });
 
+            // Lógica para el botón de menú móvil
+            menuButton.addEventListener('click', () => {
+                mobileNav.classList.toggle('open');
+                mainContent.classList.toggle('menu-open');
+            });
+
+            // Lógica para cerrar la navegación móvil al hacer clic en un enlace
+            navLinksMenu.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768) {
+                        mobileNav.classList.remove('open');
+                        mainContent.classList.remove('menu-open');
+                    }
+                });
+            });
 
             // Cargar contenido basado en el hash de la URL al cargar la página
-            const initialTargetId = window.location.hash.substring(1) || 'introduccion';
-            handleNavigation(initialTargetId);
-            
+            const initialTargetId = window.location.hash.substring(1);
+            if (initialTargetId) {
+                handleNavigation(initialTargetId);
+                // No abrir el acordeón por defecto, solo navegar a la sección
+            } else {
+                // Si no hay hash, mostrar la sección de introducción y mantener el acordeón cerrado
+                handleNavigation('introduccion');
+            }
+
             // Eliminar la lógica para abrir el primer acordeón por defecto
             // const activeSection = document.querySelector(`#${initialTargetId}`);
             // if(activeSection){
