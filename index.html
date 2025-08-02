@@ -75,9 +75,9 @@
             background-color: #332145;
             border-right: 1px solid #484f58;
             flex-shrink-0;
-            display: flex;
+            display: none; /* Oculta la barra de navegación por defecto */
             flex-direction: column;
-            position: fixed; /* Posición fija para móviles */
+            position: fixed;
             top: 0;
             left: 0;
             height: 100%;
@@ -93,6 +93,7 @@
             aside {
                 position: relative;
                 transform: translateX(0);
+                display: flex !important; /* Asegura que la barra lateral sea visible en escritorio */
             }
         }
         aside nav {
@@ -293,21 +294,60 @@
             opacity: 0.9;
         }
         .menu-button {
-            display: none;
+            display: flex; /* Visible por defecto en móvil */
+            align-items: center;
+            justify-content: center;
             position: fixed;
             top: 1rem;
             left: 1rem;
             z-index: 60;
-            background-color: #332145;
+            background: linear-gradient(to right, #581c87, #8a2be2); /* Color del botón de menú */
             color: white;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
+            padding: 0.75rem 1rem; /* Espaciado del botón */
+            border-radius: 0.5rem; /* Bordes redondeados */
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
         }
-        @media (max-width: 767px) {
+        .menu-button:hover {
+             transform: translateY(-1px) scale(1.02);
+             box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+        }
+        .menu-button svg {
+            margin-right: 0.5rem;
+        }
+        @media (min-width: 768px) {
             .menu-button {
-                display: block;
+                display: none; /* Oculta el botón en escritorio */
             }
+        }
+        aside {
+            background-color: #332145;
+            border-right: 1px solid #484f58;
+            flex-shrink-0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 288px;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            /* Agregamos una media query para pantallas pequeñas, para que se oculte por defecto */
+            display: none;
+            @media (min-width: 768px) {
+                display: flex;
+                position: relative;
+                transform: translateX(0);
+            }
+        }
+        aside.open {
+            transform: translateX(0);
+            display: flex;
         }
         .main-content-wrapper {
             margin-left: 0;
@@ -320,19 +360,16 @@
 </head>
 <body>
 
-    <!-- Contenedor para el mensaje de alerta -->
-    <div id="alert-message" class="fixed top-5 right-5 bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg z-50 hidden opacity-0 transition-opacity duration-500"></div>
-
     <!-- Botón de menú para móviles -->
-    <button id="menu-button" class="menu-button">
+    <button id="menu-button" class="menu-button md:hidden">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
+        Contenido
     </button>
-
-    <div class="flex min-h-screen">
+    <div id="main-container" class="flex min-h-screen">
         <!-- Barra de Navegación Lateral -->
-        <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 hidden md:flex flex-col">
+        <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 flex flex-col">
             <div class="h-36 flex items-center justify-center border-b border-gray-800 flex-shrink-0 p-4">
                 <!-- Logo -->
                 <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo de Keto Origins" class="h-full w-auto">
@@ -489,7 +526,7 @@
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>2️⃣ Ayuno 14/10: Dando un Paso Adelante</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                            <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p><p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p><p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Mayor Quema de Grasa: El cuerpo tiene más tiempo para acceder y movilizar las reservas de grasa como combustible.<br>Inicio de Flexibilidad Metabólica: Tu cuerpo se vuelve más eficiente alternando entre la quema de glucosa y la quema de grasa.<br>Primeros Indicios de Autofagia: Aunque la activación significativa de la autofagia ocurre más tarde, este ayuno puede empezar a iniciar algunos procesos leves de reciclaje celular.</p><p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p></div></div>
+                            <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p><p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p><p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Activación Profunda de la Autofagia: Permite a las células realizar una limpieza y reparación exhaustiva.<br>Mayor Producción de Cuerpos Cetónicos: El cerebro y el cuerpo utilizan eficientemente las grasas para obtener energía, lo que puede resultar en mayor claridad mental y energía sostenida.<br>Gran Descenso de Insulina: Permite una resensibilización muy efectiva a la insulina.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p><p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p></div></div>
                     </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>4️⃣ OMAD (One Meal A Day): El Reto Avanzado</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
@@ -910,6 +947,7 @@
             const mainContent = document.getElementById('main-content');
             const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
 
+
             // --- FUNCIÓN PARA MOSTRAR MENSAJES ---
             function showMessage(text) {
                 const messageBox = document.getElementById('alert-message');
@@ -1059,12 +1097,20 @@
             // Lógica para el botón de menú móvil
             menuButton.addEventListener('click', () => {
                 mobileNav.classList.toggle('open');
+                // Al abrir/cerrar el menú, también ajustamos el margen del contenido principal para que no quede debajo del menú
+                if (mobileNav.classList.contains('open')) {
+                    mainContent.style.marginLeft = '288px';
+                } else {
+                    mainContent.style.marginLeft = '0px';
+                }
             });
+
             // Lógica para cerrar la navegación móvil al hacer clic en un enlace
             navLinksMenu.forEach(link => {
                 link.addEventListener('click', () => {
                     if (window.innerWidth < 768) {
                         mobileNav.classList.remove('open');
+                        mainContent.style.marginLeft = '0px';
                     }
                 });
             });
@@ -1073,14 +1119,6 @@
             const initialTargetId = window.location.hash.substring(1) || 'introduccion';
             handleNavigation(initialTargetId);
             
-            // Eliminar la lógica para abrir el primer acordeón por defecto
-            // const activeSection = document.querySelector(`#${initialTargetId}`);
-            // if(activeSection){
-            //     const firstAccordionButton = activeSection.querySelector('.accordion-button');
-            //     if(firstAccordionButton){
-            //         firstAccordionButton.click();
-            //     }
-            // }
         });
     </script>
 </body>
