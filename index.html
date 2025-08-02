@@ -10,12 +10,10 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Fondo actualizado con un degradado lineal sutil de arriba hacia abajo */
             background: linear-gradient(to bottom, #26143c 0%, #341b3b 100%);
-            background-attachment: fixed; /* Para asegurar que el degradado cubra toda la página incluso al desplazarse */
+            background-attachment: fixed;
             color: #C9D1D9;
         }
-        /* Estilo para la barra de desplazamiento */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -29,7 +27,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #3a4252;
         }
-        /* Estilo para el borde degradado del menú activo */
         .active-link {
             position: relative;
             background-color: rgba(76, 147, 255, 0.1);
@@ -45,14 +42,13 @@
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
         }
-        /* Transición para el acordeón */
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.7s ease-out;
         }
         .accordion-content.open {
-            max-height: 15000px; /* Un valor alto para permitir cualquier contenido */
+            max-height: 15000px;
             transition: max-height 1.5s ease-in;
         }
         .accordion-button svg {
@@ -61,7 +57,6 @@
         .accordion-button.open svg {
             transform: rotate(180deg);
         }
-        /* --- NUEVO: Estilos para el hover del acordeón --- */
         .accordion-item {
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -69,15 +64,13 @@
             border-color: #4C93FF;
             box-shadow: 0 0 15px rgba(76, 147, 255, 0.25);
         }
-        /* --- FIN DE NUEVOS ESTILOS --- */
         aside {
-            /* Fondo de la barra lateral actualizado para que coincida con el modal de la imagen */
             background-color: #332145;
             border-right: 1px solid #484f58;
             flex-shrink-0;
-            display: flex;
+            display: none;
             flex-direction: column;
-            position: fixed; /* Posición fija para móviles */
+            position: fixed;
             top: 0;
             left: 0;
             height: 100%;
@@ -93,14 +86,14 @@
             aside {
                 position: relative;
                 transform: translateX(0);
-                display: flex !important; /* Asegura que la barra lateral sea visible en escritorio */
+                display: flex !important;
             }
         }
         aside nav {
             overflow-y: auto;
         }
         .consumo-info {
-            color: #DFFF00; /* Amarillo Neón */
+            color: #DFFF00;
             font-weight: 600;
             margin-top: 1rem;
             padding: 0.75rem;
@@ -108,7 +101,6 @@
             border-left: 3px solid #DFFF00;
             border-radius: 4px;
         }
-        /* Estilos para checkboxes personalizados */
         .shopping-item {
             display: flex;
             align-items: center;
@@ -151,20 +143,19 @@
         .footer-image-wrapper {
             display: flex;
             justify-content: center;
-            margin-top: 4rem; /* Aumentado para más espacio */
+            margin-top: 4rem;
         }
         .gradient-border {
-            padding: 3px; /* Grosor del borde */
-            border-radius: 9999px; /* full */
-            background: linear-gradient(to right, #f97316, #ec4899, #8b5cf6); /* Naranja, Rosa, Púrpura */
+            padding: 3px;
+            border-radius: 9999px;
+            background: linear-gradient(to right, #f97316, #ec4899, #8b5cf6);
         }
         .footer-image {
-            width: 18rem; /* Tamaño aumentado 3x */
-            height: 18rem; /* Tamaño aumentado 3x */
-            border-radius: 9999px; /* full */
+            width: 18rem;
+            height: 18rem;
+            border-radius: 9999px;
             object-fit: cover;
         }
-        /* --- NUEVOS ESTILOS PARA LA LISTA DE COMPRAS --- */
         #shopping-list-container {
             column-count: 1;
             column-gap: 2rem;
@@ -186,30 +177,26 @@
         .shopping-category h4 {
             cursor: pointer;
         }
-        /* --- ESTILOS PARA LA BIENVENIDA --- */
         .welcome-title {
-            /* Degradado de color del texto del título actualizado a celeste y fucsia */
-            background: linear-gradient(to right, #00FFFF, #FF00FF); /* Celeste a Fucsia */
+            background: linear-gradient(to right, #00FFFF, #FF00FF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
-            /* Eliminado el text-shadow para quitar el resplandor */
             text-shadow: none;
         }
-        /* --- ESTILOS PARA IMAGEN DEL BOTÓN DE RECETAS --- */
         .recipe-button {
             display: inline-flex;
             align-items: center;
-            justify-content: flex-start; /* Alinea los elementos a la izquierda para el ícono */
-            padding: 0.5rem 1.5rem; /* py-2 px-6 */
-            border-radius: 9999px; /* Botón redondeado */
-            font-weight: 700; /* font-bold */
+            justify-content: flex-start;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
             color: white;
-            background: linear-gradient(to right, #581c87, #8a2be2); /* Degradado actualizado de morado oscuro a púrpura */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2), 0 0 10px rgba(138, 43, 226, 0.5); /* Sombra y resplandor para efecto 3D */
+            background: linear-gradient(to right, #581c87, #8a2be2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), 0 0 10px rgba(138, 43, 226, 0.5);
             transition: all 0.2s ease-in-out;
-            text-decoration: none; /* Quita el subrayado del enlace */
+            text-decoration: none;
         }
         .recipe-button:hover {
             transform: translateY(-2px) scale(1.02);
@@ -219,13 +206,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 2px; /* Grosor del borde */
-            border-radius: 9999px; /* Asegura que el contenedor es redondo */
-            background: linear-gradient(to right, #d946ef, #8b5cf6); /* Degradado del borde */
+            padding: 2px;
+            border-radius: 9999px;
+            background: linear-gradient(to right, #d946ef, #8b5cf6);
             margin-right: 1rem;
             width: 72px;
             height: 72px;
-            box-shadow: 0 0 10px rgba(217, 70, 239, 0.5); /* Resplandor al borde */
+            box-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
         }
         .recipe-btn-img-inner {
             background-color: #2a1735;
@@ -233,17 +220,16 @@
             border-radius: 9999px;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* ¡Añadido para recortar el contenido dentro del borde redondeado! */
+            overflow: hidden;
         }
         .recipe-btn-img {
             display: block;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
-            border-radius: 9999px; /* Asegura que la imagen en sí sea redonda */
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Added a light glow to the icon */
+            object-fit: cover;
+            border-radius: 9999px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
-        /* --- ESTILOS PARA BOTÓN DE NAVEGACIÓN ASESORÍAS --- */
         .nav-button-asesorias {
             position: relative;
             z-index: 1;
@@ -251,13 +237,13 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             color: white !important;
             border: none;
-            padding: 2px; /* Espacio para el borde */
-            border-radius: 9999px; /* rounded-full */
+            padding: 2px;
+            border-radius: 9999px;
         }
         .nav-button-asesorias-inner {
-            background: linear-gradient(to bottom right, #3A1C71, #6D439A); /* Darker purple to lighter purple */
-            padding: 0.75rem; /* p-3 */
-            border-radius: 9999px; /* rounded-full */
+            background: linear-gradient(to bottom right, #3A1C71, #6D439A);
+            padding: 0.75rem;
+            border-radius: 9999px;
             width: 100%;
             height: 100%;
             display: flex;
@@ -268,25 +254,23 @@
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 8px 12px rgba(0,0,0,0.3);
         }
-        /* Eliminar la línea amarilla del costado izquierdo para el botón de asesorías cuando está activo */
         .nav-button-asesorias.active-link::before {
             width: 0;
             background: none;
         }
-        /* --- NUEVO ESTILO PARA BOTÓN DE ENLACE DE FISIOLOGÍA --- */
         .physiology-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.5rem; /* py-3 px-6 */
-            border-radius: 0.5rem; /* rounded-lg */
-            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
             color: white;
-            background: linear-gradient(to right, #007bff, #8a2be2); /* Degradado de azul a púrpura */
+            background: linear-gradient(to right, #007bff, #8a2be2);
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             transition: all 0.2s ease-in-out;
-            text-decoration: none; /* Quita el subrayado del enlace */
-            margin-top: 1.5rem; /* Espacio superior */
+            text-decoration: none;
+            margin-top: 1.5rem;
         }
         .physiology-button:hover {
             transform: translateY(-2px) scale(1.02);
@@ -294,17 +278,17 @@
             opacity: 0.9;
         }
         .menu-button {
-            display: flex; /* Visible por defecto en móvil */
+            display: flex;
             align-items: center;
             justify-content: center;
             position: fixed;
             top: 1rem;
             left: 1rem;
             z-index: 60;
-            background: linear-gradient(to right, #581c87, #8a2be2); /* Color del botón de menú */
+            background: linear-gradient(to right, #581c87, #8a2be2);
             color: white;
-            padding: 0.75rem 1rem; /* Espaciado del botón */
-            border-radius: 0.5rem; /* Bordes redondeados */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             font-weight: 600;
             border: none;
@@ -320,15 +304,13 @@
         }
         @media (min-width: 768px) {
             .menu-button {
-                display: none; /* Oculta el botón en escritorio */
+                display: none;
             }
         }
         aside {
             background-color: #332145;
             border-right: 1px solid #484f58;
             flex-shrink-0;
-            display: flex;
-            flex-direction: column;
             position: fixed;
             top: 0;
             left: 0;
@@ -337,17 +319,16 @@
             z-index: 50;
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
-            /* Agregamos una media query para pantallas pequeñas, para que se oculte por defecto */
-            display: none;
-            @media (min-width: 768px) {
-                display: flex;
-                position: relative;
-                transform: translateX(0);
-            }
         }
         aside.open {
             transform: translateX(0);
-            display: flex;
+        }
+        @media (min-width: 768px) {
+            aside {
+                position: relative;
+                transform: translateX(0);
+                display: flex !important;
+            }
         }
         .main-content-wrapper {
             margin-left: 0;
@@ -359,15 +340,17 @@
     </style>
 </head>
 <body>
-
-    <!-- Botón de menú para móviles -->
-    <button id="menu-button" class="menu-button md:hidden">
+    
+    <!-- Botón de menú para móviles con el texto "Contenido" -->
+    <button id="menu-button" class="menu-button">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
         Contenido
     </button>
-    <div id="main-container" class="flex min-h-screen">
+    
+    <!-- Contenedor principal para el contenido y el menú lateral -->
+    <div class="flex min-h-screen">
         <!-- Barra de Navegación Lateral -->
         <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 flex flex-col">
             <div class="h-36 flex items-center justify-center border-b border-gray-800 flex-shrink-0 p-4">
@@ -526,7 +509,7 @@
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>2️⃣ Ayuno 14/10: Dando un Paso Adelante</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                            <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p><p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p><p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Activación Profunda de la Autofagia: Permite a las células realizar una limpieza y reparación exhaustiva.<br>Mayor Producción de Cuerpos Cetónicos: El cerebro y el cuerpo utilizan eficientemente las grasas para obtener energía, lo que puede resultar en mayor claridad mental y energía sostenida.<br>Gran Descenso de Insulina: Permite una resensibilización muy efectiva a la insulina.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p><p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p></div></div>
+                            <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p><p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p></div></div>
                     </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>4️⃣ OMAD (One Meal A Day): El Reto Avanzado</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
@@ -587,7 +570,7 @@
                     </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💪 Creatina</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>La creatina es un compuesto nitrogenado que se encuentra principalmente en los músculos. Aumenta la disponibilidad de energía en forma de ATP (trifosfato de adenosina), lo que mejora el rendimiento físico, especialmente en actividades de alta intensidad y corta duración. También puede proteger las células musculares del daño y promover la recuperación después del ejercicio. 💪</p><div class="consumo-info">Cómo consumirlo: Se puede consumir en diferentes momentos del día, pero antes o durante la actividad física es más común para aprovechar su efecto en el rendimiento. Si no hay entrenamiento, idealmente junto con la 2 comida.</div></div></div>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>La creatina es un compuesto nitrogenado que se encuentra principalmente en los músculos. Aumenta la disponibilidad de energía en forma de ATP (trifosfato de adenosina), lo que mejora el rendimiento físico, especialmente en actividades de alta intensidad y corta duración. También puede proteger las células musculares del daño y promover la recuperación después del ejercicio. 💪</p><div class="consumo-info">Cómo consumirlo: Se puede consumir en diferentes momentos del día, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p></div></div>
                     </div>
                 </div>
                    <div class="footer-image-wrapper">
@@ -730,7 +713,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🥂 Estrategias Profesionales para Eventos Sociales y Comidas Fuera</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p><h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p><h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p><h4 class="font-semibold text-white">3. 🍽️ Comiendo Fuera (Restaurantes): Tu Menú Bajo en Carbos</h4><p><b>Investiga el Menú Online:</b> Antes de llegar, revisa el menú del restaurante. Identifica platos que puedas adaptar o que naturalmente sean cetogénicos. Esto elimina la presión y la toma de decisiones impulsivas.<br><b>Comunica tus Requerimientos Claramente al Camarero:</b> No tengas miedo de pedir modificaciones; es común en la cocina actual. "¿Puedo cambiar las papas o el arroz por una porción doble de vegetales salteados (sin salsa) o una ensalada verde simple?"<br>"Por favor, mi carne/pescado a la plancha, sin salsas o marinadas azucaradas, o si es posible, la salsa aparte."<br>"¿Este plato contiene azúcares añadidos o harinas?" (Pregunta clave para salsas).<br>Pide que no te traigan pan o entradas con almidón a la mesa.<br><b>Opciones por Tipo de Cocina:</b><br>Restaurante de Carnes/Parrillada: Tu paraíso. Pide cortes de carne, aves o pescado. Acompaña con vegetales a la parrilla o al vapor.<br>Pescados y Mariscos: Excelente opción. Pide pescados a la plancha, al horno o mariscos sin rebozar ni freír.<br>Ensaladas: Pide ensaladas base (hojas verdes, proteína, aguacate, nueces) y siempre pide el aderezo aparte (aceite de oliva y vinagre es lo más seguro). Evita frutas o aderezos cremosos.<br>Comida Oriental (Japonesa/China): Cuidado extremo con las salsas (teriyaki, agridulce) y el arroz. Opta por sashimi, rollos sin arroz (Naruto, "protein style"), o platos de carne/pescado salteados con vegetales, pidiendo "sin salsa" o "salsa muy ligera".<br>Comida Italiana: Evita pasta y pizza. Busca carpaccios, antipastos de embutidos y quesos, o platos de carne/pescado con vegetales.</p></div></div>
+                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p><h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p><h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -865,7 +848,7 @@
                                 <div class="recipe-btn-img-wrapper">
                                     <div class="recipe-btn-img-inner">
                                         <!-- Imagen de chef para el botón de recetas -->
-                                        <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px.png" alt="Recetas" class="recipe-btn-img">
+                                        <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px-4.png" alt="Recetas" class="recipe-btn-img">
                                     </div>
                                 </div>
                                 <span>RECETAS KETO Origins</span>
@@ -911,19 +894,17 @@
             <section id="asesorias" class="content-section hidden">
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💎 Nuestras Asesorías Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="accordion-content">
-                        <div class="p-5 border-t border-gray-700 text-gray-400 space-y-4 text-center">
-                            <h3 class="text-2xl font-bold text-white mb-4">✨ Transforma tu Salud con Nuestra Guía Experta ✨</h3>
-                            <p class="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                                ¿Estás listo para llevar tu viaje Keto al siguiente nivel? Nuestras asesorías personalizadas están diseñadas para darte el conocimiento, el apoyo y la motivación que necesitas para alcanzar tus metas de salud y bienestar de manera efectiva y sostenible. 💪
-                            </p>
-                            <div class="pt-6">
-                                <a href="https://fisiosem.my.canva.site/keto-origins-" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-10 rounded-lg hover:opacity-90 transition-opacity inline-block text-xl shadow-lg">
-                                    ¡Conoce Más Sobre las Asesorías!
-                                </a>
-                            </div>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4 text-center">
+                        <h3 class="text-2xl font-bold text-white mb-4">✨ Transforma tu Salud con Nuestra Guía Experta ✨</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                            ¿Estás listo para llevar tu viaje Keto al siguiente nivel? Nuestras asesorías personalizadas están diseñadas para darte el conocimiento, el apoyo y la motivación que necesitas para alcanzar tus metas de salud y bienestar de manera efectiva y sostenible. 💪
+                        </p>
+                        <div class="pt-6">
+                            <a href="https://fisiosem.my.canva.site/keto-origins-" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-10 rounded-lg hover:opacity-90 transition-opacity inline-block text-xl shadow-lg">
+                                ¡Conoce Más Sobre las Asesorías!
+                            </a>
                         </div>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -944,7 +925,6 @@
             const categoryTitles = document.querySelectorAll('.shopping-category h4');
             const menuButton = document.getElementById('menu-button');
             const mobileNav = document.getElementById('mobile-nav');
-            const mainContent = document.getElementById('main-content');
             const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
 
             // --- FUNCIÓN PARA MOSTRAR MENSAJES ---
@@ -1094,14 +1074,16 @@
 
             // Lógica para el botón de menú móvil
             menuButton.addEventListener('click', () => {
-                mobileNav.classList.toggle('open');
+                const nav = document.getElementById('mobile-nav');
+                nav.classList.toggle('open');
             });
 
             // Lógica para cerrar la navegación móvil al hacer clic en un enlace
             navLinksMenu.forEach(link => {
                 link.addEventListener('click', () => {
+                    const nav = document.getElementById('mobile-nav');
                     if (window.innerWidth < 768) {
-                        mobileNav.classList.remove('open');
+                        nav.classList.remove('open');
                     }
                 });
             });
@@ -1109,7 +1091,6 @@
             // Cargar contenido basado en el hash de la URL al cargar la página
             const initialTargetId = window.location.hash.substring(1) || 'introduccion';
             handleNavigation(initialTargetId);
-            
         });
     </script>
 </body>
