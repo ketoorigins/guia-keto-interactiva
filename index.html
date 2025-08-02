@@ -76,6 +76,7 @@
             z-index: 50;
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
+            display: none;
         }
         aside.open {
             transform: translateX(0);
@@ -276,6 +277,7 @@
             opacity: 0.9;
         }
         .mobile-header {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -283,13 +285,12 @@
             background: linear-gradient(to bottom, #26143c 0%, #341b3b 100%);
             z-index: 50;
             padding: 1rem;
-            display: flex;
             align-items: center;
             justify-content: flex-start;
         }
-        @media (min-width: 768px) {
+        @media (max-width: 767px) {
             .mobile-header {
-                display: none;
+                display: flex;
             }
         }
         .menu-button {
@@ -347,7 +348,7 @@
 </head>
 <body>
 
-    <!-- Encabezado fijo y botón de menú para móviles -->
+    <!-- Encabezado y botón de menú para móviles -->
     <header id="mobile-header" class="mobile-header md:hidden">
         <button id="menu-button" class="menu-button">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -389,9 +390,9 @@
                     <li><a href="#niveles-cetonas" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700">🧪 Niveles de Cetonas</a></li>
                     <li>
                         <a href="#asesorias" class="nav-link nav-button-asesorias rounded-full text-white font-bold mt-2">
-                           <div class="nav-button-asesorias-inner">
-                               <span class="mr-2">💎</span> Nuestras Asesorías Keto
-                           </div>
+                            <div class="nav-button-asesorias-inner">
+                                <span class="mr-2">💎</span> Nuestras Asesorías Keto
+                            </div>
                         </a>
                     </li>
                 </ul>
@@ -486,7 +487,7 @@
                         <h4 class="font-semibold text-white">🔗 Pilares de la Alimentación Keto.</h4>
                         <p><strong>Ayuno Intermitente.</strong></p>
                         <p>🤝 La combinación de ayuno intermitente y la alimentación keto ha ganado popularidad en los últimos años debido a sus potenciales beneficios para la salud y la pérdida de peso.Ambas prácticas actúan de manera sinérgica para acelerar el proceso de quema de grasas y promover la cetosis 🔥</p>
-                        <p>🕒 El ayuno intermitente consiste en alternar periodos de alimentación con periodos de ayuno. Existen diferentes protocolos de ayuno intermitente, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p>
+                        <p>🕒 El ayuno intermitente consiste en alternar periodos de alimentación con periodos de ayuno. Existen diferentes protocolos de ayuno intermitente, pero los más comunes son el 14/10 (14 horas de ayuno y 10 horas de alimentación) o 16/8 (16 horas de ayuno y 8 horas de alimentación) .</p>
                     </div>
                     <!-- Nuevo botón para Fisiología y Bioquímica -->
                     <div class="flex justify-center p-5 border-t border-gray-700">
@@ -496,7 +497,7 @@
                     </div>
                     </div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <div class="bg-[#161B22] p-2 rounded-full">
                              <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
@@ -512,20 +513,31 @@
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>1️⃣ Ayuno 12/12: La Puerta de Entrada Natural</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                            <p>Este es el ayuno más amable y el punto de partida ideal para cualquiera que desee explorar el ayuno intermitente. 😊</p><p><b>🧬 Fundamento Biológico:</b> Se alinea de forma muy natural con nuestros ritmos circadianos, el reloj interno del cuerpo que regula funciones como el sueño, la digestión y el metabolismo. Históricamente, antes de la electricidad y el acceso constante a alimentos, era la norma ayunar durante la noche. 🌙</p><p><b>🎯 ¿Para quién es ideal?</b><br>Principiantes absolutos: Si nunca has ayunado antes, esta es tu mejor opción para empezar.<br>Personas con sensibilidad digestiva: Permite un descanso digestivo adecuado durante la noche, lo que puede mejorar la digestión y reducir la hinchazón.<br>Mejora del sueño: Terminar de comer antes de acostarse puede favorecer un sueño más profundo y reparador, ya que tu cuerpo no está activamente digiriendo mientras intentas descansar.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p></div></div>
+                            <p>Este es el ayuno más amable y el punto de partida ideal para cualquiera que desee explorar el ayuno intermitente. 😊</p><p><b>🧬 Fundamento Biológico:</b> Se alinea de forma muy natural con nuestros ritmos circadianos, el reloj interno del cuerpo que regula funciones como el sueño, la digestión y el metabolismo. Históricamente, antes de la electricidad y el acceso constante a alimentos, era la norma ayunar durante la noche. 🌙</p><p><b>🎯 ¿Para quién es ideal?</b><br>Principiantes absolutos: Si nunca has ayunado antes, esta es tu mejor opción para empezar.<br>Personas con sensibilidad digestiva: Permite un descanso digestivo adecuado durante la noche, lo que puede mejorar la digestión y reducir la hinchazón.<br>Mejora del sueño: Terminar de comer antes de acostarse puede favorecer un sueño más profundo y reparador, ya que tu cuerpo no está activamente digiriendo mientras intentas descansar.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p><p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Descanso Digestivo: Permite que tu sistema gastrointestinal se recupere y se repare.<br>Optimización Circadiana: Refuerza los ciclos naturales de tu cuerpo, mejorando la eficiencia metabólica general.<br>Introducción a la flexibilidad metabólica: Aunque de forma leve, tu cuerpo empieza a acostumbrarse a depender de sus propias reservas para un período.</p><p><b>💡 Consejo de Implementación Clave:</b> La clave aquí es la regularidad. Intenta mantener tu ventana de alimentación y ayuno consistente cada día para que tu cuerpo se adapte. Por ejemplo, si cenas a las 7 PM, tu primera comida al día siguiente sería a las 7 AM. Asegúrate de que tu cena sea balanceada y nutritiva para que te sientas saciado durante el ayuno.</p></div></div>
                     </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>2️⃣ Ayuno 14/10: Dando un Paso Adelante</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
                             <p>Este protocolo representa una progresión cómoda desde el 12/12, añadiendo un poco más de tiempo al estado de ayuno. 👍</p><p><b>🧬 Fundamento Biológico:</b> Al extender el ayuno a 14 horas, se prolonga el tiempo que el cuerpo pasa en un estado de baja insulina. Esto facilita que el cuerpo comience a depender más de las grasas almacenadas para obtener energía.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Intermedios: Aquellos que ya se sienten cómodos con el 12/12 y quieren explorar beneficios más pronunciados.<br>Quienes buscan pérdida de peso inicial: Puede ser efectivo para una pérdida de peso gradual al incentivar la quema de grasa.<br>Mejora de la energía matutina: Muchas personas notan mayor claridad mental y energía al acostumbrarse a no desayunar inmediatamente.<br>Estabilización del azúcar en sangre: Aunque sutil, las 12 horas sin ingesta pueden ayudar a dar un respiro al páncreas y mejorar la respuesta a la insulina.</p></div></div>
                     </div>
+                    <!-- NUEVO ACORDEÓN 16/8 -->
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>3️⃣ Ayuno 16/8: El Estándar de Oro para la Autofagia y la Quema de Grasa</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
+                            <p>Este es, quizás, el protocolo más popular y estudiado, a menudo considerado el punto óptimo para activar beneficios metabólicos significativos. ✨</p>
+                            <p><b>🧬 Fundamento Biológico:</b> La duración de 16 horas es el tiempo en el que, como hemos visto, el cuerpo ha agotado la mayor parte de sus reservas de glucógeno y se sumerge completamente en la quema de grasa (cetosis leve). Es en esta ventana donde la autofagia se activa de manera robusta. La disminución de la insulina y el aumento de AMPK y hormona de crecimiento son claves aquí. 🔬</p>
+                            <p><b>🎯 ¿Para quién es ideal?</b><br>Personas que buscan pérdida de peso constante: Muy efectivo para la gestión del peso y la reducción de grasa corporal. ⚖️<br>Mejora de la sensibilidad a la insulina: Al dar un descanso prolongado al páncreas, las células se vuelven más receptivas a la insulina. 💖<br>Beneficios de la autofagia: Ideal para aquellos interesados en los efectos antienvejecimiento y de limpieza celular. 🧖‍♀️<br>Atletas que buscan optimizar la composición corporal: Puede ayudar a preservar la masa muscular mientras se reduce la grasa. 💪</p>
+                            <p><b>🏆 Beneficios Metabólicos Específicos:</b><br>Activación Profunda de la Autofagia: Permite a las células realizar una limpieza y reparación exhaustiva. 🔄<br>Mayor Producción de Cuerpos Cetónicos: El cerebro y el cuerpo utilizan eficientemente las grasas para obtener energía, lo que puede resultar en mayor claridad mental y energía sostenida. 🧠⚡<br>Optimización Hormonal: Mejora la sensibilidad a la insulina y puede aumentar la hormona de crecimiento, lo que es beneficioso para la preservación muscular.📈</p>
+                            <p><b>💡 Consejo de Implementación Clave:</b> La calidad de tus comidas en la ventana de 8 horas es crucial. No es una licencia para comer cualquier cosa. Enfócate en proteínas de alta calidad, grasas saludables, carbohidratos complejos vegetales de hojas verdes y fibra. Si te sientes mareado o con poca energía, asegúrate de beber suficiente agua con electrolitos (sal y limón) y considera ajustar tu ventana si es necesario. Es común que la primera semana sea un poco más difícil mientras tu cuerpo se adapta. 💧🍋</p>
+                        </div></div>
+                    </div>
                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>4️⃣ OMAD (One Meal A Day): El Reto Avanzado</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                            <p>Este es el protocolo más intenso y avanzado de los cuatro, reservado para aquellos con experiencia en ayuno y un metabolismo bien adaptado. 💪</p><p><b>🧬 Fundamento Biológico:</b> Al ayunar aproximadamente 23 horas, el cuerpo pasa un período muy prolongado en un estado de cetosis profunda y autofagia máxima. Esto maximiza los beneficios de la quema de grasa y la limpieza celular. También significa que el sistema digestivo tiene un descanso muy extenso.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Ayunos experimentados: No es para principiantes. Requiere una adaptación gradual.<br>Pérdida de peso significativa: Puede ser muy efectivo para la pérdida de peso y la gestión de la grasa corporal.<br>Control de azúcar en sangre muy estricto: Beneficioso para la diabetes tipo 2 (siempre bajo supervisión médica).<br>Maximizar la autofagia: Para quienes buscan los mayores beneficios de renovación celular.</p></div></div>
+                            <p>Este es el protocolo más intenso y avanzado de los cuatro, reservado para aquellos con experiencia en ayuno y un metabolismo bien adaptado. 💪</p><p><b>🧬 Fundamento Biológico:</b> Al ayunar aproximadamente 23 horas, el cuerpo pasa un período muy prolongado en un estado de cetosis profunda y autofagia máxima. Esto maximiza los beneficios de la quema de grasa y la limpieza celular. También significa que el sistema digestivo tiene un descanso muy extenso.</p><p><b>🎯 ¿Para quién es ideal?</b><br>Ayunos experimentados: No es para principiantes. Requiere una adaptación gradual.<br>Pérdida de peso significativa: Puede ser muy efectivo para la pérdida de peso y la gestión de la grasa corporal.<br>Control de azúcar en sangre muy estricto: Beneficioso para la diabetes tipo 2 (siempre bajo supervisión médica).<br>Maximizar la autofagia: Para quienes buscan los mayores beneficios de renovación celular.<br>Simplificación de la Vida: Reduce el tiempo dedicado a preparar y comer comidas.</p><p><b>💡 Consejo de Implementación Clave:</b><br>Calidad sobre Cantidad: La única comida del día DEBE ser nutricionalmente densa. Piensa en una gran cantidad de verduras, una porción generosa de proteína (carne, pescado, huevos), grasas saludables (aguacate, aceite de oliva, frutos secos) y quizás algunos carbohidratos complejos. La insuficiencia nutricional puede llevar a deficiencias y problemas de salud.<br>Hidratación y Electrolitos son NO NEGOCIABLES: Es aún más crítico que en otros ayunos. Si no mantienes tus electrolitos balanceados, experimentarás fatiga, dolores de cabeza y calambres. La mezcla de agua, sal y limón es tu mejor amiga.<br>Adaptación Gradual: No pases del 16/8 a OMAD de la noche a la mañana. Puedes hacer ayunos de 18 o 20 horas primero para acostumbrar a tu cuerpo.<br>Escucha a tu Cuerpo: Si experimentas mareos severos, debilidad extrema o cualquier otro síntoma preocupante, rompe el ayuno y reevalúa. OMAD no es para todos y puede no ser sostenible a largo plazo para algunas personas.</p></div></div>
                     </div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -538,7 +550,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p>🐢 <b>No reduzcas las comidas desechables de la noche a la mañana:</b> Hazlo de forma gradual para que tu cuerpo se adapte.</p><p>🔋 <b>Monitorea tus niveles de energía:</b> Si te sientes débil o mareado, es posible que necesites ajustar tu ingesta de alimentos.</p><p>💧 <b>Complementa con electrolitos:</b> La pérdida de líquidos y electrolitos es común en la alimentación cetogénica. Asegúrese de consumir suficiente sal, potasio y magnesio.</p><p>💊 <b>Considere suplementos:</b> En algunos casos, los suplementos pueden ser beneficiosos para complementar su dieta.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -548,7 +560,7 @@
             <section id="suplementos" class="content-section hidden">
                 <h2 class="text-2xl font-bold text-white mb-4">💊 Suplementos Recomendados</h2>
                 <div class="space-y-4">
-                     <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
+                    <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                         <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>☀️ Vitamina D</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>Más que huesos fuertes. La vitamina D, más que una simple vitamina, actúa como una hormona que regula la absorción de calcio y fósforo, esenciales para la salud ósea. Sin embargo, sus funciones trascienden el sistema esquelético. La vitamina D interviene en: Sistema inmunológico, Salud cardiovascular, Salud mental, Función muscular. Desde una perspectiva metabólica, la vitamina D influye en la expresión de miles de genes. La mejor fuente de vitamina D, es y siempre será EL SOL. ☀️</p></div></div>
                     </div>
@@ -581,7 +593,7 @@
                         <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3"><p>La creatina es un compuesto nitrogenado que se encuentra principalmente en los músculos. Aumenta la disponibilidad de energía en forma de ATP (trifosfato de adenosina), lo que mejora el rendimiento físico, especialmente en actividades de alta intensidad y corta duración. También puede proteger las células musculares del daño y promover la recuperación después del ejercicio. 💪</p><div class="consumo-info">Cómo consumirlo: Se puede consumir en diferentes momentos del día, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p></div></div>
                     </div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -593,7 +605,7 @@
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>💧 Hidratación y Electrolitos</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>💧 La pérdida de electrolitos, especialmente sodio, potasio y magnesio, es común al iniciar una dieta cetogénica. El sodio y el potasio son cruciales para mantener el equilibrio hídrico y la función nerviosa y muscular. El magnesio, por su parte, interviene en cientos de reacciones enzimáticas en el organismo.</p><p>⚡ Es fundamental reponer estos minerales a través de la alimentación o suplementos. El citrato de potasio es una forma especialmente beneficiosa de potasio, ya que además de regular los niveles de potasio, ayuda a alcalinizar la orina y puede mejorar la absorción de otros minerales. 💪</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -616,7 +628,7 @@
                         <p><b>🤔 ¿Qué cantidad de agua debe beber?</b> La cantidad de agua que necesitas varía según factores como la edad, el peso, el nivel de actividad física, la temperatura ambiente y la humedad. si quieres conocer tu cantidad ideal ocupa tu calculadora para saberlo. 💧</p>
                     </div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -629,7 +641,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p>La alimentación keto puede ser efectiva para tratar y mejorar diversas condiciones de salud. Aquí te explicamos cómo puede ayudar en cada caso: ❤️</p><p><b>📉 Resistencia a la Insulina y Diabetes Tipo 2</b><br>Reduciendo los niveles de insulina, la alimentación keto mejora la sensibilidad a la insulina y puede contribuir al control y, en algunos casos, la reversión de la diabetes tipo 2. Estudios han demostrado que una dieta baja en carbohidratos puede reducir significativamente los niveles de glucosa en sangre.</p><p><b>🩺 Hígado Graso.</b><br>La reducción en el consumo de carbohidratos y la quema de grasa ayuda a reducir la grasa acumulada en el hígado, mejorando la función hepática. Esto se debe a la disminución de la producción de triglicéridos hepáticos.</p><p><b>🦋 Hipotiroidismo.</b><br>Aunque la alimentación keto no es un tratamiento directo para el hipotiroidismo, una alimentación balanceada y baja en carbohidratos puede mejorar la energía y el metabolismo en personas con esta condición. Es importante trabajar junto a un profesional de la salud para ajustar la dieta según las necesidades individuales.</p><p><b>⚖️ Sobrepeso y Obesidad.</b><br>Al inducir la quema de grasa, la alimentación keto puede ser una herramienta efectiva para la pérdida de peso sostenida. La cetosis permite al cuerpo utilizar las reservas de grasa como fuente de energía primaria, lo cual es eficiente para la reducción de peso.</p><p><b>💓 Hipertensión Arterial y Síndrome Metabólico.</b><br>Al mejorar la salud metabólica, la alimentación keto puede contribuir a la reducción de la presión arterial y la mejora de los indicadores de síndrome metabólico. Esto incluye la mejora del perfil lipídico y la reducción de la inflamación sistémica.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -642,7 +654,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p>🍽️ Comer máximo tres veces al día, permite a tu cuerpo utilizar de manera eficiente los alimentos ingeridos y facilita el mantenimiento de niveles bajos de insulina, promoviendo la quema de grasa.</p><p>📉 Necesitamos controlar la liberación de insulina, al comer 3 veces al día, tu cuerpo tiene el horario perfecto para trabajar correctamente, manteniendo tus niveles de azúcar en sangre, totalmente bajo control.</p><p>🥪 Cuando hablamos de tres comidas, nos referimos a 3 platos de comida, Osea, un té o un café con algún sándwich, no es una comida completa, y el hambre aparecerá pronto.</p><p>😋 Saltarse comidas también puede ayudar a mantener la cetosis y mejorar el control del apetito.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -655,7 +667,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p><b>🍽️ Aumenta el tamaño de las porciones:</b> En lugar de comer muchas veces al día, aumenta el tamaño de tus comidas principales para mantenerte satisfecho por más tiempo.</p><p><b>🥑 Prioriza las grasas saludables:</b> Las grasas saludables te sacian más y te proporcionan energía de forma sostenida. Incluye aguacate o palta, aceite de oliva, frutos secos y semillas en tus comidas.</p><p><b>🥩 Asegura una buena cantidad de proteínas:</b> Las proteínas también ayudan a mantener la sensación de saciedad. Incorpora carnes, pescados, huevos y frutos secos en tus platos.</p><p><b>🥦 Come alimentos fibrosos:</b> Las verduras bajas en carbohidratos, como las espinacas, brócoli y coliflor, añaden volumen a tus comidas y te hacen sentir lleno.</p><p><b>💧 Bebe suficiente agua:</b> A veces, la sed se confunde con el hambre. Asegúrese de estar muy bien hidratado.</p><p><b>🕒 Introduzca el ayuno intermitente:</b> Esta práctica puede ayudar a reducir la frecuencia de comidas y acelerar la pérdida de peso.</p><p><b>👂 Escucha a tu cuerpo:</b> Presta atención a las señales de hambre y saciedad. No comas por aburrimiento o por costumbre.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -668,7 +680,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p>🐢 <b>No reduzcas las comidas desechables de la noche a la mañana:</b> Hazlo de forma gradual para que tu cuerpo se adapte.</p><p>🔋 <b>Monitorea tus niveles de energía:</b> Si te sientes débil o mareado, es posible que necesites ajustar tu ingesta de alimentos.</p><p>💧 <b>Complementa con electrolitos:</b> La pérdida de líquidos y electrolitos es común en la alimentación cetogénica. Asegúrese de consumir suficiente sal, potasio y magnesio.</p><p>💊 <b>Considere suplementos:</b> En algunos casos, los suplementos pueden ser beneficiosos para complementar su dieta.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -684,7 +696,7 @@
                         <div><h4 class="font-semibold text-lg text-white mb-2">😋 Mejor control del apetito</h4><p>Comer constantemente, incluso snacks saludables, puede mantener el sistema digestivo siempre activo y generar un ciclo de hambre. Al espaciar tus comidas, le das a tu cuerpo un descanso digestivo y permites que tus hormonas del hambre y la saciedad (grelina y leptina) se regulen de manera más efectiva. Con el tiempo, te sorprenderá sentir menos antojos y tener un control mucho mayor sobre cuándo y cuánto comes.</p></div>
                     </div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -697,7 +709,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
                         <p><b>🚫 Restricción severa de carbohidratos:</b><br>Por qué: Cuando reduce los carbohidratos, obliga a tu cuerpo a buscar otras fuentes de energía. Al no tener glucosa (proveniente de los carbohidratos) disponible, tu hígado comienza a convertir la grasa en cetonas, que son como un "combustible alternativo" para tu cuerpo. En términos más simples: Es como quitarle la gasolina a un coche y obligarlo a usar aceite.</p><p><b>🥑 Aumente la ingesta de grasas saludables:</b><br>Por qué: Al aumentar las grasas, proporcionan a tu cuerpo una fuente de energía abundante y de liberación lenta. Además, las grasas ayudan a mantenerte satisfecho por más tiempo. En otras palabras: Es como llenar el tanque de tu coche con un combustible de larga duración.</p><p><b>🧂 Electrolitos:</b><br>Por qué: Cuando reduce los carbohidratos, pierdes líquidos y electrolitos como sodio, potasio y magnesio. Reponerlos es crucial para prevenir calambres, fatiga y otros síntomas desagradables. Es como cambiar el aceite de tu coche: Necesitas cambiar los líquidos regularmente para que funcione correctamente.</p><p><b>💊 Suplementos:</b><br>Por qué: Algunos suplementos como el aceite MCT pueden proporcionar una fuente rápida de cetonas y facilitar la entrada en cetosis. Es como agregar un aditivo a tu combustible para mejorar el rendimiento de tu cuerpo.</p><p><b>💧 Hidratación:</b><br>Por qué: Beber suficiente agua ayuda a eliminar las toxinas ya mantener tus órganos funcionando correctamente. El mantener nuestro organismo hidratado es vital para nuestra existencia. el cuerpo no puede funcionar sin agua. Tenemos reservas para pasar meses sin comer, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p><p><b>😴 Sueño:</b><br>Por qué: El sueño es esencial para la recuperación y la regulación hormonal. tu cuerpo necesita descanso para utilizar lo consumido en tus comidas para repararse: Necesita tiempo para recargar energías.</p><p><b>🧘‍♂️ Manejo del estrés:</b><br>Por qué: El estrés crónico puede aumentar los niveles de cortisol, una hormona que promueve el almacenamiento de grasa. busca actividades que te ayuden a reducir tus niveles de estrés. Baile, ejercicio, música, pintura, manualidades ...etc</p><p><b>🏋️‍♀️ Entrenamiento de fuerza:</b><br>Por qué: Al fortalecer tus músculos, aceleras tu metabolismo, aumentando el números de mitocondrias y por ende quemas más calorías incluso en reposo. ¡Es como tener un motor más potente en tu cuerpo!</p><p><b>🏃‍♂️ Ejercicios en ayunas:</b><br>Por qué: Entrenar en ayunas es como encender una fogata con leña seca. Tu cuerpo, al no tener glucosa (energía rápida) proveniente de los alimentos, recurre a la grasa almacenada (la leña) para obtener energía.</p><p><b>💨 HIIT (entrenamiento de intervalos de alta intensidad):</b><br>Por qué: El HIIT es como hacer sprints cortos y rápidos. Estos intervalos intensos hacen que tu cuerpo trabaje duro y quemen muchas calorías, incluso después de terminar el entrenamiento!</p><p><b>🕒 Ayuno intermitente:</b><br>Por qué: El ayuno intermitente es como darle un descanso a tu sistema digestivo. Al no comer durante un período, tu cuerpo entra en modo de ahorro de energía y comienza a utilizar la grasa almacenada como combustible. ¡Es como limpiar tu despensa y solo comer los alimentos más nutritivos!</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -710,7 +722,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
                         <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p><p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p><p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p><p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p><p><b>✨ Otras mejoras:</b> Reducción de la inflamación: La cetosis puede ayudar a reducir los marcadores inflamatorios en el cuerpo. Mejora en el acné: Algunas personas experimentan una reducción del acné al seguir una dieta cetogénica. Aumento de la energía: Muchas personas reportan sentirse más energéticas y mentalmente claras al seguir una dieta cetogénica.</p><div class="pt-4 flex justify-center"><a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">¡Más Beneficios!</a></div></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -721,9 +733,9 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🥂 Estrategias Profesionales para Eventos Sociales y Comidas Fuera</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p><h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p><h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p></div></div>
+                        <p>La clave para mantenerte en cetosis en situaciones sociales es una combinación de preparación proactiva, elección informada y manejo discreto. Aquí te presento una hoja de ruta contundente: 🥂</p><h4 class="font-semibold text-white">1. 🛡️ Preparación Pre-Evento: Tu Defensa Metabólica</h4><p><b>Ayuno Estratégico ("Front-Loading" el Ayuno):</b> Si sabes que tendrás un evento o una comida significativa por la tarde o noche, extiende tu ayuno matutino. Por ejemplo, si normalmente haces 16/8, ese día apunta a un 18/6 o incluso 20/4. Esto te dará un "margen de carbohidhidratos" y calórico más amplio en tu ventana de alimentación, facilitando la inclusión de alguna elección menos estricta sin salir de cetosis.<br><b>Comida Previa Rica en Grasas y Proteínas:</b> Si el evento no cae dentro de tu ventana de ayuno extendido, asegúrate de que tu última comida antes de salir sea altamente saciante y cetogénica. Piensa en una buena porción de proteínas (salmón graso, carne roja) y grasas saludables (aguacate, aceite de oliva virgen extra, frutos secos). Esto minimiza el hambre y los antojos una vez que estés en el evento.<br><b>Hidratación con Electrolitos: Tu Columna Vertebral:</b> Antes de salir, consume una cantidad generosa de tu mezcla de agua mineral, sal de mar y limón. La deshidratación y el desequilibrio electrolítico pueden simular hambre o antojos. Mantenerte hidratado y con electrolitos balanceados te da una base sólida de energía y claridad mental para tomar mejores decisiones.</p><h4 class="font-semibold text-white">2. 🕵️‍♂️ Navegando Eventos Sociales (Fiestas, Reuniones)</h4><p><b>Escaneo Estratégico del Buffet/Mesa:</b> Antes de servirte, haz un reconocimiento rápido de todas las opciones disponibles. Identifica las proteínas puras, las grasas obvias y los vegetales bajos en carbohidratos.<br><b>Prioriza Proteínas y Grasas sin Carb.</b><br><b>Carnes y Pescados:</b> Opta por cortes de carne, pollo o pescado asados, a la parrilla o al horno sin salsas dulces. Si hay embutidos o quesos, son excelentes opciones.<br><b>Grasas Saludables:</b> Aceitunas, aguacate (si disponible), frutos secos (con moderación por su conteo neto de carbohidratos).<br><b>Vegetales Inteligentes:</b> Busca vegetales de hoja verde (espinacas, lechugas) y vegetales crucíferos (brócoli, coliflor). Evita: Vegetales con almidón (papa, maíz, zanahoria cocida en exceso) y ensaladas con frutas, crutones o aderezos azucarados. Pide siempre aderezos simples como aceite de oliva y vinagre.<br><b>Gestión de Salsas y Aderezos:</b> Asume que la mayoría de las salsas y marinadas contienen azúcar o almidón. Sé cauteloso. Si no estás seguro, pídelas aparte o evita directamente los platos que parezcan muy "salseados".<br><b>Bebidas: Tu Zona de Control:</b> La Opción Primaria: Agua mineral (pura o con gas y un chorrito de limón/lima). Café/Té: Negros, sin azúcar ni leche. Alcohol (con Precaución Extrema): Si optas por beber, elige destilados puros (vodka, gin, tequila, whisky) con mezcladores sin azúcar (agua con gas, soda dietética) o vinos secos (tinto o blanco, limitando la cantidad). Evita cervezas, cócteles dulces y licores con jarabes. Ten en cuenta que el alcohol interrumpe temporalmente la quema de grasa y puede bajar tus inhibiciones, llevando a peores elecciones alimentarias. Hidrátate con agua entre cada bebida alcohólica.<br><b>Estrategia Social Discreta:</b> No tienes que dar explicaciones detalladas. Un simple "No, gracias", o "Estoy bien así" es suficiente. Cambia de posición si estás cerca de tentaciones constantes.</p></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -783,11 +795,11 @@
                                  <div class="shopping-item"><input type="checkbox" id="item35"><label for="item35">Tocino</label></div>
                                  <div class="shopping-item"><input type="checkbox" id="item36"><label for="item36">Pollo</label></div>
                                  <div class="shopping-item"><input type="checkbox" id="item37"><label for="item37">Res</label></div>
-                                 <div class="shopping-item"><input type="checkbox" id="item38"><label for="item38">Pavo</slabel></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item38"><label for="item38">Pavo</label></div>
                                  <div class="shopping-item"><input type="checkbox" id="item39"><label for="item39">Cerdo</label></div>
                                  <div class="shopping-item"><input type="checkbox" id="item40"><label for="item40">Cordero</label></div>
                                  <p class="font-medium text-gray-300 mt-2 mb-1">Otros:</p>
-                                  <div class="shopping-item"><input type="checkbox" id="item41"><label for="item41">Huevos (idealmente de campo)</label></div>
+                                 <div class="shopping-item"><input type="checkbox" id="item41"><label for="item41">Huevos (idealmente de campo)</label></div>
                                  <div class="shopping-item"><input type="checkbox" id="item42"><label for="item42">Caldo de huesos</label></div>
                             </div>
                             <div class="shopping-category">
@@ -855,14 +867,13 @@
                             <a href="https://ketoorigins-recetas.netlify.app/" target="_blank" class="recipe-button text-white font-bold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
                                 <div class="recipe-btn-img-wrapper">
                                     <div class="recipe-btn-img-inner">
-                                        <!-- Imagen de chef para el botón de recetas -->
                                         <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px-4.png" alt="Recetas" class="recipe-btn-img">
                                     </div>
                                 </div>
                                 <span>RECETAS KETO Origins</span>
                             </a>
                              <a href="https://fisiosem.my.canva.site/que-comer-peso-normal" target="_blank" class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
-                                 ¿Qué Comer?
+                                ¿Qué Comer?
                             </a>
                             <button id="download-list-btn" class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity text-lg">
                                 Descargar Selección
@@ -873,7 +884,7 @@
                         </div>
                     </div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -885,7 +896,7 @@
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🧪 Entendiendo tus Niveles de Cetonas (mmol/L)</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-4 rounded-lg bg-gray-700/50 border border-gray-500"><p class="font-bold text-white">⚪️🤷‍♂️ &lt;0.5: Fuera de Cetosis</p><p>El nivel de cetonas en sangre está por debajo de 0.5 mmol/L, que es el nivel de cetona en sangre habitual con una dieta que incluye carbohidratos, grasas y proteínas. En esta situación, el cuerpo obtiene la energía en base principalmente al uso de azúcar y carbohidratos, y está lejos de quemar grasa.</p></div><div class="p-4 rounded-lg bg-blue-900/50 border border-blue-700"><p class="font-bold text-white">🔵👍 0.5 a 1.5: Cetosis Leve</p><p>Nivel de cetona en sangre entre 0.5-1.5 mmol/L se llama cetosis vegetativa leve, y con estas concentraciones de cetonas en sangre se considera que las grasas también son utilizadas en el proceso de obtención de energía; el peso corporal se controla lentamente, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p></div><div class="p-4 rounded-lg bg-green-900/50 border border-green-600"><p class="font-bold text-white">🟢🏆 1.5 a 3.0: Cetosis Óptima</p><p>Aproximadamente 1.5-3.0 mmol/L de cetonas en sangre lo que puede considerarse un nivel de cetosis óptima, siendo el nivel de cetonas que tienen como objetivo aqueles que realizan una dieta cetogénica. Se recomienda aumentar el entrenamiento mental y físico, para quemar la grasa de la manera más eficiente y perder peso; este nivel de cetonas implica un alto consumo de grasa por lo que el resultado de la dieta cetogénica está siendo muy bueno.</p></div><div class="p-4 rounded-lg bg-yellow-900/50 border border-yellow-600"><p class="font-bold text-white">🟡⚠️ &lt; 3.0: Cetosis Profunda (Atención)</p><p>El nivel de cetona superior a 3 mmol/L supera el objetivo de la persona que realiza una dieta cetogénica y no consigue el mismo efecto de utilización de grasa en la formación de energía que se consigue con un nivel de cetonas en sangre que se encuentra en el rango de 1.5-3.0 mMol/l. Un nivel más alto de cetonas puede ser también indicativo de que el organismo no está suficientemente hidratado, o que el aporte de comida es insuficiente. Si este elevado nivel de cetonas se encuentra en pacientes con diabetes tipo 1, su interpretación debe ir ligada al nivel de glucemia; se debe prestar más atención al control de la insulina y debe consultarse la situación con su médico.</p></div><div class="p-4 rounded-lg bg-red-900/50 border border-red-700"><p class="font-bold text-white">🔴☠️ &lt; 8.0: Cetoacidosis (Peligro)</p><p>El nivel de cetona superior a 8 mmol/L es un nivel peligroso. El texto proporcionado para este nivel es idéntico al de >3.0, but es crucial entender que este rango es indicativo de cetoacidosis diabética, una emergencia médica que requiere atención inmediata, especialmente en diabéticos tipo 1.</p></div></div></div>
                 </div>
-                   <div class="footer-image-wrapper">
+                <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -930,8 +941,10 @@
             const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
 
             function showMessage(text) {
-                const messageBox = document.getElementById('alert-message');
-                if (!messageBox) return;
+                const messageBox = document.createElement('div');
+                messageBox.id = 'alert-message';
+                messageBox.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg bg-red-600 text-white transition-opacity duration-500 opacity-0 hidden z-[100]';
+                document.body.appendChild(messageBox);
                 messageBox.textContent = text;
                 messageBox.classList.remove('hidden', 'opacity-0');
                 messageBox.classList.add('opacity-100');
@@ -939,7 +952,8 @@
                     messageBox.classList.remove('opacity-100');
                     messageBox.classList.add('opacity-0');
                     setTimeout(() => {
-                           messageBox.classList.add('hidden');
+                            messageBox.classList.add('hidden');
+                            messageBox.remove();
                     }, 500);
                 }, 3000);
             }
