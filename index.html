@@ -75,9 +75,9 @@
             background-color: #332145;
             border-right: 1px solid #484f58;
             flex-shrink-0;
-            display: none; /* Oculta la barra de navegación por defecto */
+            display: flex;
             flex-direction: column;
-            position: fixed;
+            position: fixed; /* Posición fija para móviles */
             top: 0;
             left: 0;
             height: 100%;
@@ -664,7 +664,7 @@
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
                         <p><b>🍽️ Aumenta el tamaño de las porciones:</b> En lugar de comer muchas veces al día, aumenta el tamaño de tus comidas principales para mantenerte satisfecho por más tiempo.</p><p><b>🥑 Prioriza las grasas saludables:</b> Las grasas saludables te sacian más y te proporcionan energía de forma sostenida. Incluye aguacate o palta, aceite de oliva, frutos secos y semillas en tus comidas.</p><p><b>🥩 Asegura una buena cantidad de proteínas:</b> Las proteínas también ayudan a mantener la sensación de saciedad. Incorpora carnes, pescados, huevos y frutos secos en tus platos.</p><p><b>🥦 Come alimentos fibrosos:</b> Las verduras bajas en carbohidratos, como las espinacas, brócoli y coliflor, añaden volumen a tus comidas y te hacen sentir lleno.</p><p><b>💧 Bebe suficiente agua:</b> A veces, la sed se confunde con el hambre. Asegúrese de estar muy bien hidratado.</p><p><b>🕒 Introduzca el ayuno intermitente:</b> Esta práctica puede ayudar a reducir la frecuencia de comidas y acelerar la pérdida de peso.</p><p><b>👂 Escucha a tu cuerpo:</b> Presta atención a las señales de hambre y saciedad. No comas por aburrimiento o por costumbre.</p></div></div>
                 </div>
-                <div class="footer-image-wrapper">
+                   <div class="footer-image-wrapper">
                     <div class="gradient-border">
                         <img src="https://i.ibb.co/1VDjThy/Copia-de-Copia-de-Copia-de-Logo-500-x-500-px-4.png" alt="Logo Keto Origins" class="footer-image">
                     </div>
@@ -947,7 +947,6 @@
             const mainContent = document.getElementById('main-content');
             const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
 
-
             // --- FUNCIÓN PARA MOSTRAR MENSAJES ---
             function showMessage(text) {
                 const messageBox = document.getElementById('alert-message');
@@ -999,7 +998,6 @@
                     // Ocultar la barra de navegación en móviles después de hacer clic
                     if (window.innerWidth < 768) {
                         mobileNav.classList.remove('open');
-                        mainContent.classList.remove('menu-open');
                     }
                 });
             });
@@ -1097,12 +1095,6 @@
             // Lógica para el botón de menú móvil
             menuButton.addEventListener('click', () => {
                 mobileNav.classList.toggle('open');
-                // Al abrir/cerrar el menú, también ajustamos el margen del contenido principal para que no quede debajo del menú
-                if (mobileNav.classList.contains('open')) {
-                    mainContent.style.marginLeft = '288px';
-                } else {
-                    mainContent.style.marginLeft = '0px';
-                }
             });
 
             // Lógica para cerrar la navegación móvil al hacer clic en un enlace
@@ -1110,7 +1102,6 @@
                 link.addEventListener('click', () => {
                     if (window.innerWidth < 768) {
                         mobileNav.classList.remove('open');
-                        mainContent.style.marginLeft = '0px';
                     }
                 });
             });
