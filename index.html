@@ -68,8 +68,6 @@
             background-color: #332145;
             border-right: 1px solid #484f58;
             flex-shrink-0;
-            display: none;
-            flex-direction: column;
             position: fixed;
             top: 0;
             left: 0;
@@ -78,6 +76,7 @@
             z-index: 50;
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
+            display: none;
         }
         aside.open {
             transform: translateX(0);
@@ -277,14 +276,24 @@
             box-shadow: 0 8px 12px rgba(0,0,0,0.3);
             opacity: 0.9;
         }
-        .menu-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .mobile-header {
+            display: none;
             position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 60;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, #26143c 0%, #341b3b 100%);
+            z-index: 50;
+            padding: 1rem;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        @media (max-width: 767px) {
+            .mobile-header {
+                display: flex;
+            }
+        }
+        .menu-button {
             background: linear-gradient(to right, #581c87, #8a2be2);
             color: white;
             padding: 0.75rem 1rem;
@@ -294,6 +303,8 @@
             border: none;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
         }
         .menu-button:hover {
              transform: translateY(-1px) scale(1.02);
@@ -301,11 +312,6 @@
         }
         .menu-button svg {
             margin-right: 0.5rem;
-        }
-        @media (min-width: 768px) {
-            .menu-button {
-                display: none;
-            }
         }
         aside {
             background-color: #332145;
@@ -330,29 +336,32 @@
                 display: flex !important;
             }
         }
-        .main-content-wrapper {
-            margin-left: 0;
-            transition: margin-left 0.3s ease-in-out;
+        main {
+            margin-top: 0;
         }
-        .main-content-wrapper.menu-open {
-            margin-left: 288px;
+        @media (max-width: 767px) {
+            main {
+                margin-top: 5rem;
+            }
         }
     </style>
 </head>
 <body>
-    
-    <!-- Botón de menú para móviles con el texto "Contenido" -->
-    <button id="menu-button" class="menu-button">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-        Contenido
-    </button>
-    
+
+    <!-- Encabezado y botón de menú para móviles -->
+    <header id="mobile-header" class="mobile-header md:hidden">
+        <button id="menu-button" class="menu-button">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            Contenido
+        </button>
+    </header>
+
     <!-- Contenedor principal para el contenido y el menú lateral -->
     <div class="flex min-h-screen">
         <!-- Barra de Navegación Lateral -->
-        <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 flex flex-col">
+        <aside id="mobile-nav" class="w-72 bg-[#161B22] border-r border-gray-800 flex-shrink-0 flex-col">
             <div class="h-36 flex items-center justify-center border-b border-gray-800 flex-shrink-0 p-4">
                 <!-- Logo -->
                 <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo de Keto Origins" class="h-full w-auto">
@@ -440,7 +449,7 @@
             <section id="como-funciona" class="content-section hidden">
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>⚙️ Cómo Funciona la Alimentación Keto?</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>⚙️ El cuerpo humano tiende a utilizar los carbohidratos (glucosa), como fuente principal de energía. Sin embargo, en ausencia de insulina, el cuerpo logra tener acceso a la grasa almacenada, Convirtiéndose en una máquina de quemar grasas. 🔥 produciendo cetonas como subproducto de este proceso. Estas cetonas son utilizadas por el cuerpo y el cerebro como una eficiente fuente de energía. ⚡</p></div></div>
+                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4"><p>⚙️ El cuerpo humano tiende a utilizar los carbohidratos (glucosa), como fuente principal de energía. Sin embargo, en una dieta cetogénica, al limitar los carbohidratos, el hígado comienza a descomponer las grasas almacenadas para producir corpos cetónicos. Estos cuerpos cetónicos se convierten en una fuente de energía alternativa para el cerebro y otros tejidos. 💪</p></div></div>
                 </div>
                 <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -700,7 +709,7 @@
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🏆 Beneficios de la Alimentación Keto</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
                     <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-3">
-                        <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas almacenadas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p><p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p><p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p><p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p><p><b>✨ Otras mejoras:</b> Reducción de la inflamación: La cetosis puede ayudar a reducir los marcadores inflamatorios en el cuerpo. Mejora en el acné: Algunas personas experimentan una reducción del acné al seguir una dieta cetogénica. Aumento de la energía: Muchas personas reportan sentirse más energéticas y mentalmente claras al seguir una dieta cetogénica.</p><div class="pt-4 flex justify-center"><a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity">¡Más Beneficios!</a></div></div></div>
+                        <p><b>⚖️ Pérdida de peso:</b> Movilización de grasas: Al restringir los carbohidratos, el cuerpo se ve obligado a utilizar las grasas como principal fuente de energía, lo que conduce a una pérdida de peso más rápida y sostenida.</p><p><b>📉 Mejora en el control de la glucemia:</b> Reducción de la resistencia a la insulina: La dieta cetogénica puede mejorar la sensibilidad a la insulina, lo que es beneficioso para personas con diabetes tipo 2 o resistencia a la insulina.</p><p><b>❤️ Salud cardiovascular:</b> Reducción de triglicéridos: La cetosis puede ayudar a disminuir los niveles de triglicéridos, un tipo de grasa en la sangre asociado a enfermedades del corazón. Tambien limpia las arterias de las calcificaciones (ateromas) acumuiladas por los años. Aumento del colesterol HDL: El colesterol HDL, aumenta en personas que siguen una dieta cetogénica.</p><p><b>🧠 Salud cerebral:</b> Aumento de la producción de cetonas: Las cetonas pueden servir como fuente de energía alternativa para el cerebro, lo que que puede ser beneficioso en ciertas condiciones neurológicas como la epilepsia. Mejora de la función cognitiva: Algunos estudios sugieren que la dieta cetogénica podría mejorar la memoria y la concentración en quienes la practican.</p><p><b>✨ Otras mejoras:</b> Reducción de la inflamación: La cetosis puede ayudar a reducir los marcadores inflamatorios en el cuerpo. Mejora en el acné: Algunas personas experimentan una reducción del acné al seguir una dieta cetogénica. Aumento de la energía: Muchas personas reportan sentirse más energéticas y mentalmente claras al seguir una dieta cetogénica.</p><div class="pt-4 flex justify-center"><a href="https://fisiosem.my.canva.site/beneficios" target="_blank" class="bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center text-lg">¡Más Beneficios!</a></div></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -847,7 +856,6 @@
                             <a href="https://ketoorigins-recetas.netlify.app/" target="_blank" class="recipe-button text-white font-bold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center text-lg">
                                 <div class="recipe-btn-img-wrapper">
                                     <div class="recipe-btn-img-inner">
-                                        <!-- Imagen de chef para el botón de recetas -->
                                         <img src="https://i.ibb.co/xtWMQ9mm/Copia-de-Logo-500-x-500-px-4.png" alt="Recetas" class="recipe-btn-img">
                                     </div>
                                 </div>
@@ -875,13 +883,7 @@
             <section id="niveles-cetonas" class="content-section hidden">
                 <div class="accordion-item bg-[#161B22] rounded-lg border border-gray-800">
                     <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-white"><span>🧪 Entendiendo tus Niveles de Cetonas (mmol/L)</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="accordion-content"><div class="p-5 border-t border-gray-700 text-gray-400 space-y-4">
-                        <div class="p-4 rounded-lg bg-gray-700/50 border border-gray-500"><p class="font-bold text-white">⚪️🤷‍♂️ &lt;0.5: Fuera de Cetosis</p><p>El nivel de cetonas en sangre está por debajo de 0.5 mmol/L, que es el nivel de cetona en sangre habitual con una dieta que incluye carbohidratos, grasas y proteínas. En esta situación, el cuerpo obtiene la energía en base principalmente al uso de azúcar y carbohidratos, y está lejos de quemar grasa.</p></div>
-                        <div class="p-4 rounded-lg bg-blue-900/50 border border-blue-700"><p class="font-bold text-white">🔵👍 0.5 a 1.5: Cetosis Leve</p><p>Nivel de cetona en sangre entre 0.5-1.5 mmol/L se llama cetosis vegetativa leve, y con estas concentraciones de cetonas en sangre se considera que las grasas también son utilizadas en el proceso de obtención de energía; el peso corporal se controla lentamente, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p></div>
-                        <div class="p-4 rounded-lg bg-green-900/50 border border-green-600"><p class="font-bold text-white">🟢🏆 1.5 a 3.0: Cetosis Óptima</p><p>Aproximadamente 1.5-3.0 mmol/L de cetonas en sangre lo que puede considerarse un nivel de cetosis óptima, siendo el nivel de cetonas que tienen como objetivo aqueles que realizan una dieta cetogénica. Se recomienda aumentar el entrenamiento mental y físico, para quemar la grasa de la manera más eficiente y perder peso; este nivel de cetonas implica un alto consumo de grasa por lo que el resultado de la dieta cetogénica está siendo muy bueno.</p></div>
-                        <div class="p-4 rounded-lg bg-yellow-900/50 border border-yellow-600"><p class="font-bold text-white">🟡⚠️ &lt; 3.0: Cetosis Profunda (Atención)</p><p>El nivel de cetona superior a 3 mmol/L supera el objetivo de la persona que realiza una dieta cetogénica y no consigue el mismo efecto de utilización de grasa en la formación de energía que se consigue con un nivel de cetonas en sangre que se encuentra en el rango de 1.5-3.0 mMol/l. Un nivel más alto de cetonas puede ser también indicativo de que el organismo no está suficientemente hidratado, o que el aporte de comida es insuficiente. Si este elevado nivel de cetonas se encuentra en pacientes con diabetes tipo 1, su interpretación debe ir ligada al nivel de glucemia; se debe prestar más atención al control de la insulina y debe consultarse la situación con su médico.</p></div>
-                        <div class="p-4 rounded-lg bg-red-900/50 border border-red-700"><p class="font-bold text-white">🔴☠️ &lt; 8.0: Cetoacidosis (Peligro)</p><p>El nivel de cetona superior a 8 mmol/L es un nivel peligroso. El texto proporcionado para este nivel es idéntico al de >3.0, but es crucial entender que este rango es indicativo de cetoacidosis diabética, una emergencia médica que requiere atención inmediata, especialmente en diabéticos tipo 1.</p></div>
-                    </div></div>
+                    <div class="accordion-content"><div class="p-4 rounded-lg bg-gray-700/50 border border-gray-500"><p class="font-bold text-white">⚪️🤷‍♂️ &lt;0.5: Fuera de Cetosis</p><p>El nivel de cetonas en sangre está por debajo de 0.5 mmol/L, que es el nivel de cetona en sangre habitual con una dieta que incluye carbohidratos, grasas y proteínas. En esta situación, el cuerpo obtiene la energía en base principalmente al uso de azúcar y carbohidratos, y está lejos de quemar grasa.</p></div><div class="p-4 rounded-lg bg-blue-900/50 border border-blue-700"><p class="font-bold text-white">🔵👍 0.5 a 1.5: Cetosis Leve</p><p>Nivel de cetona en sangre entre 0.5-1.5 mmol/L se llama cetosis vegetativa leve, y con estas concentraciones de cetonas en sangre se considera que las grasas también son utilizadas en el proceso de obtención de energía; el peso corporal se controla lentamente, but no sin agua máximo podríamos aguantar 3 días, y nuestro cuerpo dejaría de existir.</p></div><div class="p-4 rounded-lg bg-green-900/50 border border-green-600"><p class="font-bold text-white">🟢🏆 1.5 a 3.0: Cetosis Óptima</p><p>Aproximadamente 1.5-3.0 mmol/L de cetonas en sangre lo que puede considerarse un nivel de cetosis óptima, siendo el nivel de cetonas que tienen como objetivo aqueles que realizan una dieta cetogénica. Se recomienda aumentar el entrenamiento mental y físico, para quemar la grasa de la manera más eficiente y perder peso; este nivel de cetonas implica un alto consumo de grasa por lo que el resultado de la dieta cetogénica está siendo muy bueno.</p></div><div class="p-4 rounded-lg bg-yellow-900/50 border border-yellow-600"><p class="font-bold text-white">🟡⚠️ &lt; 3.0: Cetosis Profunda (Atención)</p><p>El nivel de cetona superior a 3 mmol/L supera el objetivo de la persona que realiza una dieta cetogénica y no consigue el mismo efecto de utilización de grasa en la formación de energía que se consigue con un nivel de cetonas en sangre que se encuentra en el rango de 1.5-3.0 mMol/l. Un nivel más alto de cetonas puede ser también indicativo de que el organismo no está suficientemente hidratado, o que el aporte de comida es insuficiente. Si este elevado nivel de cetonas se encuentra en pacientes con diabetes tipo 1, su interpretación debe ir ligada al nivel de glucemia; se debe prestar más atención al control de la insulina y debe consultarse la situación con su médico.</p></div><div class="p-4 rounded-lg bg-red-900/50 border border-red-700"><p class="font-bold text-white">🔴☠️ &lt; 8.0: Cetoacidosis (Peligro)</p><p>El nivel de cetona superior a 8 mmol/L es un nivel peligroso. El texto proporcionado para este nivel es idéntico al de >3.0, but es crucial entender que este rango es indicativo de cetoacidosis diabética, una emergencia médica que requiere atención inmediata, especialmente en diabéticos tipo 1.</p></div></div></div>
                 </div>
                    <div class="footer-image-wrapper">
                     <div class="gradient-border">
@@ -927,7 +929,6 @@
             const mobileNav = document.getElementById('mobile-nav');
             const navLinksMenu = document.querySelectorAll('#mobile-nav .nav-link');
 
-            // --- FUNCIÓN PARA MOSTRAR MENSAJES ---
             function showMessage(text) {
                 const messageBox = document.getElementById('alert-message');
                 if (!messageBox) return;
@@ -939,29 +940,23 @@
                     messageBox.classList.add('opacity-0');
                     setTimeout(() => {
                            messageBox.classList.add('hidden');
-                    }, 500); // Coincide con la duración de la transición
-                }, 3000); // El mensaje es visible por 3 segundos
+                    }, 500);
+                }, 3000);
             }
 
-            // Función para manejar la navegación
             function handleNavigation(targetId) {
-                // Manejar clase activa en el menú
                 navLinks.forEach(l => l.classList.remove('active-link'));
                 const activeLink = document.querySelector(`a[href="#${targetId}"]`);
                 if (activeLink) {
                     activeLink.classList.add('active-link');
                 }
-
-                // Ocultar todas las secciones de contenido
                 contentSections.forEach(section => {
                     section.classList.add('hidden');
                 });
                 
-                // Mostrar la sección de contenido correspondiente
                 const targetSection = document.getElementById(targetId);
                 if (targetSection) {
                     targetSection.classList.remove('hidden');
-                    // Desplazarse a la parte superior de la página para que el título sea visible
                     window.scrollTo({
                         top: 0,
                         behavior: 'smooth'
@@ -969,20 +964,17 @@
                 }
             }
 
-            // Navegación con click
             navLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
                     const targetId = this.getAttribute('href').substring(1);
                     handleNavigation(targetId);
-                    // Ocultar la barra de navegación en móviles después de hacer clic
                     if (window.innerWidth < 768) {
                         mobileNav.classList.remove('open');
                     }
                 });
             });
 
-            // Acordeones
             accordionButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const content = this.nextElementSibling;
@@ -991,13 +983,10 @@
                 });
             });
             
-            // Funcionalidad para seleccionar/deseleccionar toda una categoría
             categoryTitles.forEach(title => {
                 title.addEventListener('click', function() {
                     const category = this.parentElement;
                     const checkboxes = category.querySelectorAll('input[type="checkbox"]');
-                    // Determinar si vamos a seleccionar o deseleccionar
-                    // Si al menos uno no está marcado, marcamos todos. Si todos están marcados, desmarcamos todos.
                     const shouldCheck = Array.from(checkboxes).some(cb => !cb.checked);
                     checkboxes.forEach(checkbox => {
                         checkbox.checked = shouldCheck;
@@ -1005,21 +994,19 @@
                 });
             });
 
-            // Funcionalidad del botón de descarga
             downloadBtn.addEventListener('click', function() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
                 const checkedItems = document.querySelectorAll('#shopping-list-container input[type="checkbox"]:checked');
                 if (checkedItems.length === 0) {
-                    // --- CAMBIO: USAR showMessage EN LUGAR DE alert ---
                     showMessage("Por favor, selecciona al menos un artículo para descargar.");
                     return; 
                 }
 
-                let y = 20; // Posición Y inicial
+                let y = 20;
                 const lineHeight = 7;
-                const pageHeight = 280; // Margen inferior
+                const pageHeight = 280;
                 const leftMargin = 15;
 
                 doc.setFontSize(20);
@@ -1035,7 +1022,6 @@
                     if (parent) {
                         const categoryTitleElement = parent.querySelector('h4, p');
                         if (categoryTitleElement) {
-                            // Limpiar emojis y espacios extra para el PDF
                             categoryTitle = categoryTitleElement.textContent.replace(/[^\x00-\x7F]/g, "").trim();
                         }
                     }
@@ -1066,19 +1052,17 @@
                         doc.text(`- ${item}`, leftMargin + 5, y);
                         y += lineHeight;
                     });
-                    y += 5; // Espacio extra entre categorías
+                    y += 5;
                 }
 
                 doc.save('lista-de-compras-keto.pdf');
             });
-
-            // Lógica para el botón de menú móvil
+            
             menuButton.addEventListener('click', () => {
                 const nav = document.getElementById('mobile-nav');
                 nav.classList.toggle('open');
             });
 
-            // Lógica para cerrar la navegación móvil al hacer clic en un enlace
             navLinksMenu.forEach(link => {
                 link.addEventListener('click', () => {
                     const nav = document.getElementById('mobile-nav');
@@ -1088,7 +1072,6 @@
                 });
             });
 
-            // Cargar contenido basado en el hash de la URL al cargar la página
             const initialTargetId = window.location.hash.substring(1) || 'introduccion';
             handleNavigation(initialTargetId);
         });
