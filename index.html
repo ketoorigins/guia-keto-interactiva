@@ -2489,7 +2489,7 @@ function translateValue(key, value) {
  */
 function sendDataToGoogleSheet() {
     // IMPORTANT: This URL is now hardcoded with the user's provided script URL.
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlNmAXwvgy2AgjmvkIGjWichIUeYUjAgmA0YLBwT_IiKPs8C9U9Bk5DXi5tbkhdLecmA/exec';
 
     if (SCRIPT_URL.includes('PEGA_AQUÍ')) {
         console.warn("Google Sheet URL is not set. Data will not be saved.");
@@ -2537,11 +2537,11 @@ function sendDataToGoogleSheet() {
 
 // --- NEW FUNCTION to send TRACKING data ---
 function sendTrackingDataToSheet(data) {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlNmAXwvgy2AgjmvkIGjWichIUeYUjAgmA0YLBwT_IiKPs8C9U9Bk5DXi5tbkhdLecmA/exec';
     
     const payload = {
         recordType: 'tracking', // This tells our script to use the "Seguimiento" sheet
-        userId: appState.userId, // <-- SE AÑADE EL ID DE USUARIO AL SEGUIMIENTO
+        UserID: appState.userId, // CORREGIDO: Se usa 'UserID' con mayúscula para consistencia
         ...data
     };
 
@@ -2573,4 +2573,6 @@ document.addEventListener('DOMContentLoaded', main);
 </script>
 </body>
 </html>
+
+
 
