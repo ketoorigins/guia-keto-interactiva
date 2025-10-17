@@ -463,6 +463,7 @@ function cleanupAndReset() {
 
     // 3. Reset the main application state object.
     appState = {
+        userId: '', // Para identificar al usuario en esta sesión
         currentStepIndex: 0,
         wizardFlow: [],
         userData: {
@@ -674,7 +675,7 @@ const pathologyExplanations = {
     insulin_resistance: {
         title: "Punto de Enfoque: Resistencia a la Insulina / Diabetes tipo 2",
         cause: "Piensa en tus células como casas y en la insulina como el cartero que entrega el paquete de energía (glucosa). Cuando hay resistencia, es como si las casas dejaran de abrirle la puerta al cartero. La energía se queda 'dando vueltas en la calle' (tu sangre), sin poder ser usada y generando problemas.",
-        action: "Este plan cambia las reglas del juego. En vez de depender del 'cartero', le enseñamos a tu cuerpo a usar su propia reserva de combustible: la grasa. Al bajar los carbohidratos, la insulina se toma un descanso, permitiendo que las 'casas' vuelvan a ser receptivas. Es un reinicio metabético para que tu cuerpo use la energía de forma eficiente."
+        action: "Este plan cambia las reglas del juego. En vez de depender del 'cartero', le enseñamos a tu cuerpo a usar su propia reserva de combustible: la grasa. Al bajar los carbohidratos, la insulina se toma un descanso, permitiendo que las 'casas' vuelvan a ser receptivas. Es un reinicio metabólico para que tu cuerpo use la energía de forma eficiente."
     },
     hypertension: {
         title: "Punto de Enfoque: Hipertensión",
@@ -1239,89 +1240,6 @@ function calculateIMC(height, weight) {
     return (height > 0 && weight > 0) ? (weight / ((height / 100) ** 2)) : 0;
 }
 
-// --- NEW FUNCTION TO SEND DATA ---
-/**
- * Gathers user data from the appState and sends it to a Google Apps Script endpoint.
- */
-function sendDataToGoogleSheet() {
-    // IMPORTANT: Paste the Web App URL you get from Google Apps Script here.
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
-
-    if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT_WEB_APP') {
-        console.warn("Google Sheet URL is not set. Data will not be saved.");
-        return;
-    }
-
-    /**
-     * Helper function to translate internal answer values (e.g., 'loss') 
-     * to their user-facing Spanish text (e.g., '📉 Perder peso...').
-     * @param {string} key - The key of the question (e.g., 'main_goal').
-     * @param {string|string[]} value - The stored answer value or values.
-     * @returns {string} - The translated text.
-     */
-    const translateValue = (key, value) => {
-        if (!value) return '';
-        // Find the original step definition to access its options.
-        const step = baseWizardSteps.find(s => s.key === key);
-        if (!step || !step.options) return Array.isArray(value) ? value.join(', ') : value;
-
-        if (Array.isArray(value)) {
-            // Handle multiple-choice answers
-            return value.map(v => {
-                const option = step.options.find(o => o.value === v);
-                return option ? option.text : v;
-            }).join(', ');
-        } else {
-            // Handle single-choice answers
-            const option = step.options.find(o => o.value === value);
-            return option ? option.text : value;
-        }
-    };
-
-    // Map the answers from appState, translating them to Spanish before sending.
-    const data = {
-        'Genero': translateValue('gender', appState.answers.gender),
-        'ObjetivoPrincipal': translateValue('main_goal', appState.answers.main_goal),
-        'HistoriaPeso': translateValue('weight_history', appState.answers.weight_history),
-        'Habitos': translateValue('habits', appState.answers.habits),
-        'HambreEmocional': translateValue('emotional_eating', appState.answers.emotional_eating),
-        'FrecuenciaComidaChatarra': translateValue('junk_food_freq', appState.answers.junk_food_freq),
-        'FrecuenciaComerFuera': translateValue('eat_out_freq', appState.answers.eat_out_freq),
-        'NivelCocina': translateValue('cooking_skill', appState.answers.cooking_skill),
-        'BebidasDiarias': translateValue('daily_drinks', appState.answers.daily_drinks),
-        'ConsumoAgua': translateValue('water_intake', appState.answers.water_intake),
-        'ConsumoAlcohol': translateValue('alcohol_intake', appState.answers.alcohol_intake),
-        'NivelActividad': translateValue('activity_level', appState.answers.activity_level),
-        'CondicionesSalud': translateValue('health_conditions', appState.answers.health_conditions),
-        'NivelEstres': translateValue('stress_level', appState.answers.stress_level),
-        'Edad': appState.answers.measurements.age,
-        'Altura': appState.answers.measurements.height,
-        'Peso': appState.answers.measurements.weight,
-        'NivelGlucosa': appState.answers.glucose_level || '',
-        'PresionArterial': appState.answers.blood_pressure || '',
-        'Lipidos': appState.answers.lipids ? `TG: ${appState.answers.lipids.triglycerides || 'N/A'}, HDL: ${appState.answers.lipids.hdl || 'N/A'}, LDL: ${appState.answers.lipids.ldl || 'N/A'}` : ''
-    };
-
-    // Send the data using Fetch API
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Important for cross-origin requests to Apps Script
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        console.log('Data sent to Google Sheet successfully.');
-        showToast('Tus resultados han sido guardados.', 'success');
-    })
-    .catch(error => {
-        console.error('Error sending data to Google Sheet:', error);
-        showToast('Error al guardar los resultados.', 'error');
-    });
-}
-
-
 function getIMCCategory(imc) {
     return imcCategories.find(cat => imc >= cat.range[0] && imc <= cat.range[1]) || { name: 'N/A', definition: '' };
 }
@@ -1422,10 +1340,10 @@ function initializeApp() {
 
     isAppInitialized = true;
     console.log("App initialized. User data:", appState.userData);
+    sendDataToGoogleSheet(); // Send initial data to the sheet
     renderDashboard();
     setupEventListeners(); // Setup general event listeners for the main app
     setActiveNavLink();
-    sendDataToGoogleSheet(); // <<< ADD THIS LINE to send data when the app initializes
 }
 
 // --- Dashboard Rendering ---
@@ -1828,7 +1746,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/mrnDR0CS/PROYECCION-DE-PESO.png" alt="Gráfico de Proyección de Peso" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                    <span class="help-icon" data-tooltip-key="projection">?</span>
+                     <span class="help-icon" data-tooltip-key="projection">?</span>
                 <h3 class="font-bold text-white mb-2">Proyección de Peso</h3>
                 <p class="text-sm text-gray-300 leading-relaxed">${weightProjectionText}</p>
             </div>
@@ -1836,7 +1754,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/20mMD59q/Tu-IMC-actual.png" alt="Gráfico de IMC" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                    <span class="help-icon" data-tooltip-key="imc">?</span>
+                     <span class="help-icon" data-tooltip-key="imc">?</span>
                 <h3 class="font-bold text-white mb-2">Tu IMC actual</h3>
                 <p class="text-5xl font-extrabold text-cyan-400">${imc.toFixed(1)}</p>
                 <p class="text-md font-semibold text-gray-300">${imcCategory.name}</p>
@@ -1846,7 +1764,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/GvFVvJPM/Copia-de-Copia-de-Logo-500-x-500-px-1.png" alt="Gráfico de Consumo de agua" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                    <span class="help-icon" data-tooltip-key="water">?</span>
+                     <span class="help-icon" data-tooltip-key="water">?</span>
                 <h3 class="font-bold text-white">Consumo de agua</h3>
                 <p class="text-5xl font-bold text-cyan-400 my-2">${waterIntake !== null ? waterIntake.toFixed(1) : 'N/A'} L</p>
                 <p class="text-xs text-gray-400">El cuerpo pierde 1.5-2.5L de agua al día (respiración, sudor, orina, etc.). Usamos la fórmula de Holliday-Segar para tu recomendación.</p>
@@ -1855,7 +1773,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/S4hTHgbj/Copia-de-Copia-de-Logo-500-x-500-px-3.png" alt="Gráfico de Recetas Keto" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                    <span class="help-icon" data-tooltip-key="recipes">?</span>
+                     <span class="help-icon" data-tooltip-key="recipes">?</span>
                 <h3 class="font-bold text-white mb-2">Tus Recetas Keto</h3>
                 <p class="text-sm text-gray-300 leading-relaxed">Deliciosos platos, inspirados en los alimentos que más te gustan y tus hábitos.</p>
             </div>
@@ -2222,26 +2140,6 @@ function setActiveNavLink() {
 }
 
 
-// --- NEW FUNCTION to send TRACKING data ---
-function sendTrackingDataToSheet(data) {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
-    
-    const payload = {
-        recordType: 'tracking', // This tells our script to use the "Seguimiento" sheet
-        ...data
-    };
-
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(() => console.log('Tracking data sent successfully:', payload))
-    .catch(error => console.error('Error sending tracking data:', error));
-}
-
-
 // --- Health Tracking Functions ---
 function setupHealthTracking() {
     console.log("Setting up health tracking (charts and input listeners)...");
@@ -2569,10 +2467,102 @@ function showToast(message, type = 'success', duration = 3000) {
     }, duration);
 }
 
+
+// --- Functions to send data to Google Sheet ---
+
+function translateValue(key, value) {
+    if (!value) return '';
+    if (Array.isArray(value)) {
+        return value.map(v => translateValue(key, v)).join(', ');
+    }
+
+    const step = baseWizardSteps.find(s => s.key === key);
+    if (step && step.options) {
+        const option = step.options.find(o => o.value === value);
+        return option ? option.text : value;
+    }
+    return value;
+}
+
+/**
+ * Gathers user data from the appState and sends it to a Google Apps Script endpoint.
+ */
+function sendDataToGoogleSheet() {
+    // IMPORTANT: This URL is now hardcoded with the user's provided script URL.
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
+
+    if (SCRIPT_URL.includes('PEGA_AQUÍ')) {
+        console.warn("Google Sheet URL is not set. Data will not be saved.");
+        return;
+    }
+    
+    const { measurements, ...otherAnswers } = appState.answers;
+    const flatAnswers = { ...otherAnswers, ...measurements };
+
+    // Map the answers from appState, translating them to Spanish before sending.
+    const data = {
+        'UserID': appState.userId,
+        'Genero': translateValue('gender', flatAnswers.gender),
+        'ObjetivoPrincipal': translateValue('main_goal', flatAnswers.main_goal),
+        'HistoriaPeso': translateValue('weight_history', flatAnswers.weight_history),
+        'Habitos': translateValue('habits', flatAnswers.habits),
+        'HambreEmocional': translateValue('emotional_eating', flatAnswers.emotional_eating),
+        'FrecuenciaComidaChatarra': translateValue('junk_food_freq', flatAnswers.junk_food_freq),
+        'FrecuenciaComerFuera': translateValue('eat_out_freq', flatAnswers.eat_out_freq),
+        'NivelCocina': translateValue('cooking_skill', flatAnswers.cooking_skill),
+        'BebidasDiarias': translateValue('daily_drinks', flatAnswers.daily_drinks),
+        'ConsumoAgua': translateValue('water_intake', flatAnswers.water_intake),
+        'ConsumoAlcohol': translateValue('alcohol_intake', flatAnswers.alcohol_intake),
+        'NivelActividad': translateValue('activity_level', flatAnswers.activity_level),
+        'CondicionesSalud': translateValue('health_conditions', flatAnswers.health_conditions),
+        'NivelEstres': translateValue('stress_level', flatAnswers.stress_level),
+        'Edad': flatAnswers.age,
+        'Altura': flatAnswers.height,
+        'Peso': flatAnswers.weight,
+        'NivelGlucosa': flatAnswers.glucose_level || '',
+        'PresionArterial': flatAnswers.blood_pressure || '',
+        'Lipidos': flatAnswers.lipids ? `TG: ${flatAnswers.lipids.triglycerides || 'N/A'}, HDL: ${flatAnswers.lipids.hdl || 'N/A'}, LDL: ${flatAnswers.lipids.ldl || 'N/A'}` : '',
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(() => console.log('Initial data sent successfully:', data))
+    .catch(error => console.error('Error sending initial data:', error));
+}
+
+
+// --- NEW FUNCTION to send TRACKING data ---
+function sendTrackingDataToSheet(data) {
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
+    
+    const payload = {
+        recordType: 'tracking', // This tells our script to use the "Seguimiento" sheet
+        userId: appState.userId, // <-- SE AÑADE EL ID DE USUARIO AL SEGUIMIENTO
+        ...data
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Tracking data sent successfully:', payload))
+    .catch(error => console.error('Error sending tracking data:', error));
+}
+
+
 // --- Main App Execution ---
 function main() {
     console.log("Main function started. Cleaning up and resetting.");
     cleanupAndReset(); // Always start from a clean slate.
+    // Genera un UserID único para esta sesión
+    appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    console.log("Generated session UserID:", appState.userId);
     addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
     console.log("Initial 'Comenzar mi Plan' button listener added.");
 }
@@ -2583,10 +2573,4 @@ document.addEventListener('DOMContentLoaded', main);
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
