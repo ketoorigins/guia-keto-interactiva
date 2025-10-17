@@ -1245,7 +1245,7 @@ function calculateIMC(height, weight) {
  */
 function sendDataToGoogleSheet() {
     // IMPORTANT: Paste the Web App URL you get from Google Apps Script here.
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2XfNsFEx56ely6U33mf2gZchiixzlVhAICmjE2S87MyrrBRk_XgW4RFGix6l-gs9TBA/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
 
     if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT_WEB_APP') {
         console.warn("Google Sheet URL is not set. Data will not be saved.");
@@ -2222,6 +2222,26 @@ function setActiveNavLink() {
 }
 
 
+// --- NEW FUNCTION to send TRACKING data ---
+function sendTrackingDataToSheet(data) {
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu8JPHh2Y04xLbwaRilSbYKaQv1boua3P-LKClxmXlAI-a7nFrYrwhKRmnFNNJHuUXDg/exec';
+    
+    const payload = {
+        recordType: 'tracking', // This tells our script to use the "Seguimiento" sheet
+        ...data
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Tracking data sent successfully:', payload))
+    .catch(error => console.error('Error sending tracking data:', error));
+}
+
+
 // --- Health Tracking Functions ---
 function setupHealthTracking() {
     console.log("Setting up health tracking (charts and input listeners)...");
@@ -2238,6 +2258,8 @@ function registerNewWeight() {
         weightInput.value = '';
         showToast('Peso registrado con éxito.', 'success');
         renderWeightChart();
+        // Send the new weight to the tracking sheet
+        sendTrackingDataToSheet({ type: 'Peso', value1: parsedWeight });
     } else {
         showToast('Por favor, ingresa un valor de peso válido.', 'error');
     }
@@ -2255,6 +2277,8 @@ function registerNewMeasurement() {
         appState.userData.historialGlucosa.push({ fecha: today, valor: parseFloat(newGlucose) });
         glucoseInput.value = '';
         registered = true;
+        // Send the new glucose measurement to the tracking sheet
+        sendTrackingDataToSheet({ type: 'Glucosa (mg/dL)', value1: parseFloat(newGlucose) });
     }
     if (newPressure) {
         const [sistolica, diastolica] = newPressure.split('/').map(Number);
@@ -2262,6 +2286,8 @@ function registerNewMeasurement() {
             appState.userData.historialPresion.push({ fecha: today, sistolica, diastolica });
             pressureInput.value = '';
             registered = true;
+            // Send the new blood pressure measurement to the tracking sheet
+            sendTrackingDataToSheet({ type: 'Presión Arterial', value1: `${sistolica}/${diastolica}` });
         } else if (newPressure.trim() !== '') {
             showToast('Formato de presión incorrecto. Usa "120/80".', 'error');
             return;
@@ -2296,6 +2322,13 @@ function registerNewLipidMeasurement() {
         ldlInput.value = '';
         showToast('Perfil lipídico registrado.', 'success');
         renderLipidChart();
+        // Send the new lipid profile to the tracking sheet
+        sendTrackingDataToSheet({ 
+            type: 'Perfil Lipídico', 
+            value1: `TG: ${newTriglycerides}`,
+            value2: `HDL: ${newHdl}`,
+            value3: `LDL: ${newLdl}`
+        });
     } else {
         showToast('Por favor, completa los tres campos de lípidos.', 'error');
     }
@@ -2550,6 +2583,8 @@ document.addEventListener('DOMContentLoaded', main);
 </script>
 </body>
 </html>
+
+
 
 
 
