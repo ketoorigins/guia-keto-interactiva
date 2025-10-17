@@ -1249,27 +1249,51 @@ function sendDataToGoogleSheet() {
 
     if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT_WEB_APP') {
         console.warn("Google Sheet URL is not set. Data will not be saved.");
-        // You might want to show a toast here in a real app, but for now, we'll just log it.
-        // showToast('Configuración pendiente: URL de guardado no establecida.', 'error');
         return;
     }
 
-    // Map the answers from appState to the column names in your Google Sheet.
+    /**
+     * Helper function to translate internal answer values (e.g., 'loss') 
+     * to their user-facing Spanish text (e.g., '📉 Perder peso...').
+     * @param {string} key - The key of the question (e.g., 'main_goal').
+     * @param {string|string[]} value - The stored answer value or values.
+     * @returns {string} - The translated text.
+     */
+    const translateValue = (key, value) => {
+        if (!value) return '';
+        // Find the original step definition to access its options.
+        const step = baseWizardSteps.find(s => s.key === key);
+        if (!step || !step.options) return Array.isArray(value) ? value.join(', ') : value;
+
+        if (Array.isArray(value)) {
+            // Handle multiple-choice answers
+            return value.map(v => {
+                const option = step.options.find(o => o.value === v);
+                return option ? option.text : v;
+            }).join(', ');
+        } else {
+            // Handle single-choice answers
+            const option = step.options.find(o => o.value === value);
+            return option ? option.text : value;
+        }
+    };
+
+    // Map the answers from appState, translating them to Spanish before sending.
     const data = {
-        'Genero': appState.answers.gender,
-        'ObjetivoPrincipal': appState.answers.main_goal,
-        'HistorialPeso': appState.answers.weight_history,
-        'Habitos': Array.isArray(appState.answers.habits) ? appState.answers.habits.join(', ') : appState.answers.habits,
-        'HambreEmocional': appState.answers.emotional_eating,
-        'FrecuenciaComidaChatarra': appState.answers.junk_food_freq,
-        'FrecuenciaComerFuera': appState.answers.eat_out_freq,
-        'NivelCocina': appState.answers.cooking_skill,
-        'BebidasDiarias': Array.isArray(appState.answers.daily_drinks) ? appState.answers.daily_drinks.join(', ') : appState.answers.daily_drinks,
-        'ConsumoAgua': appState.answers.water_intake,
-        'ConsumoAlcohol': appState.answers.alcohol_intake,
-        'NivelActividad': appState.answers.activity_level,
-        'CondicionesSalud': Array.isArray(appState.answers.health_conditions) ? appState.answers.health_conditions.join(', ') : appState.answers.health_conditions,
-        'NivelEstres': appState.answers.stress_level,
+        'Genero': translateValue('gender', appState.answers.gender),
+        'ObjetivoPrincipal': translateValue('main_goal', appState.answers.main_goal),
+        'HistorialPeso': translateValue('weight_history', appState.answers.weight_history),
+        'Habitos': translateValue('habits', appState.answers.habits),
+        'HambreEmocional': translateValue('emotional_eating', appState.answers.emotional_eating),
+        'FrecuenciaComidaChatarra': translateValue('junk_food_freq', appState.answers.junk_food_freq),
+        'FrecuenciaComerFuera': translateValue('eat_out_freq', appState.answers.eat_out_freq),
+        'NivelCocina': translateValue('cooking_skill', appState.answers.cooking_skill),
+        'BebidasDiarias': translateValue('daily_drinks', appState.answers.daily_drinks),
+        'ConsumoAgua': translateValue('water_intake', appState.answers.water_intake),
+        'ConsumoAlcohol': translateValue('alcohol_intake', appState.answers.alcohol_intake),
+        'NivelActividad': translateValue('activity_level', appState.answers.activity_level),
+        'CondicionesSalud': translateValue('health_conditions', appState.answers.health_conditions),
+        'NivelEstres': translateValue('stress_level', appState.answers.stress_level),
         'Edad': appState.answers.measurements.age,
         'Altura': appState.answers.measurements.height,
         'Peso': appState.answers.measurements.weight,
@@ -2526,6 +2550,7 @@ document.addEventListener('DOMContentLoaded', main);
 </script>
 </body>
 </html>
+
 
 
 
