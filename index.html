@@ -387,6 +387,12 @@
                 <a href="#dashboard" class="nav-link dashboard-special-button block font-semibold py-3 px-4 rounded-lg transition duration-200 text-white">Dashboard</a>
                 <a href="#herramientas" class="nav-link locked-content hidden block font-semibold py-3 px-4 rounded-lg transition duration-200 text-white mt-4">Herramientas</a>
             </nav>
+             <!-- NUEVO: Botón de Reinicio -->
+            <div class="mt-auto pt-4 border-t border-gray-700">
+                <button id="reset-app-btn" class="w-full text-center text-sm text-gray-400 hover:text-red-400 transition py-2 px-4 rounded-lg hover:bg-red-500/10">
+                    Borrar mis datos y empezar de nuevo
+                </button>
+            </div>
         </aside>
 
         <!-- Sidebar Toggle for Mobile -->
@@ -1091,7 +1097,8 @@ function createActionPlan() {
             appContainer.classList.add('flex');
             console.log("Main app container displayed.");
         }
-        initializeApp();
+        // MODIFICADO: Se pasa 'false' para indicar que es el primer guardado
+        initializeApp(false);
     }, 500);
 }
 
@@ -1298,51 +1305,63 @@ function renderImcDetails(container, height, weight) {
 
 
 // --- Main App Initialization ---
-function initializeApp() {
-    console.log("Initializing app...");
+// MODIFICADO: La función ahora acepta un parámetro para saber si está recargando datos
+function initializeApp(isReloading = false) {
+    console.log(`Initializing app... (Reloading: ${isReloading})`);
     if (isAppInitialized) {
         console.log("App already initialized, re-rendering dashboard.");
         renderDashboard();
         return;
     }
-
-    const { measurements, glucose_level, blood_pressure, lipids } = appState.answers;
     
-    appState.userData.altura = measurements.height;
-    appState.userData.pesoInicial = measurements.weight;
-    appState.userData.pesoActual = measurements.weight;
-    // Always push initial weight, as per new "data point" logic
-    appState.userData.historialPeso.push({ fecha: new Date().toISOString().split('T')[0], peso: measurements.weight });
-    
-    // Initialize these as empty arrays, they will be populated by conditional inputs or user entries
-    appState.userData.historialGlucosa = [];
-    appState.userData.historialPresion = [];
-    appState.userData.historialLipidico = [];
+    // Si no está recargando, se procesan los datos del cuestionario
+    if (!isReloading) {
+        const { measurements, glucose_level, blood_pressure, lipids } = appState.answers;
+        
+        appState.userData.altura = measurements.height;
+        appState.userData.pesoInicial = measurements.weight;
+        appState.userData.pesoActual = measurements.weight;
+        appState.userData.historialPeso.push({ fecha: new Date().toISOString().split('T')[0], peso: measurements.weight });
+        
+        appState.userData.historialGlucosa = [];
+        appState.userData.historialPresion = [];
+        appState.userData.historialLipidico = [];
 
-    // Populate initial conditional data from onboarding if available
-    if (glucose_level) {
-        appState.userData.historialGlucosa.push({ fecha: new Date().toISOString().split('T')[0], valor: parseFloat(glucose_level) });
-    }
-    if (blood_pressure) {
-        const [sistolica, diastolica] = blood_pressure.split('/').map(Number);
-        if(sistolica && diastolica) {
-            appState.userData.historialPresion.push({ fecha: new Date().toISOString().split('T')[0], sistolica: sistolica, diastolica: diastolica });
+        if (glucose_level) {
+            appState.userData.historialGlucosa.push({ fecha: new Date().toISOString().split('T')[0], valor: parseFloat(glucose_level) });
         }
-    }
-    if (lipids && Object.keys(lipids).length > 0) {
-        appState.userData.historialLipidico.push({
-            fecha: new Date().toISOString().split('T')[0],
-            triglycerides: parseFloat(lipids.triglycerides) || null,
-            hdl: parseFloat(lipids.hdl) || null,
-            ldl: parseFloat(lipids.ldl) || null
-        });
+        if (blood_pressure) {
+            const [sistolica, diastolica] = blood_pressure.split('/').map(Number);
+            if(sistolica && diastolica) {
+                appState.userData.historialPresion.push({ fecha: new Date().toISOString().split('T')[0], sistolica: sistolica, diastolica: diastolica });
+            }
+        }
+        if (lipids && Object.keys(lipids).length > 0) {
+            appState.userData.historialLipidico.push({
+                fecha: new Date().toISOString().split('T')[0],
+                triglycerides: parseFloat(lipids.triglycerides) || null,
+                hdl: parseFloat(lipids.hdl) || null,
+                ldl: parseFloat(lipids.ldl) || null
+            });
+        }
     }
 
     isAppInitialized = true;
     console.log("App initialized. User data:", appState.userData);
-    sendDataToGoogleSheet(); // Send initial data to the sheet
+
+    // NUEVO: Solo se guarda en Google Sheet y localStorage si es la primera vez (no es recarga)
+    if (!isReloading) {
+        sendDataToGoogleSheet();
+        try {
+            localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
+            console.log("App state saved to localStorage.");
+        } catch (e) {
+            console.error("Error saving to localStorage:", e);
+        }
+    }
+
     renderDashboard();
-    setupEventListeners(); // Setup general event listeners for the main app
+    setupEventListeners();
     setActiveNavLink();
 }
 
@@ -2078,8 +2097,34 @@ function setupEventListeners() {
             hideInfoModal();
         }
     });
+
+    // NUEVO: Listener para el botón de reseteo
+    addTrackedListener(document.getElementById('reset-app-btn'), 'click', resetAppAndData);
+
     console.log("Global event listeners set up.");
 }
+
+// NUEVO: Función para resetear la app y borrar datos locales
+function resetAppAndData() {
+    // Usamos un modal custom en vez de confirm()
+    const confirmation = window.prompt("¿Estás seguro de que quieres borrar todos tus datos y empezar de nuevo? Esta acción no se puede deshacer. Escribe 'BORRAR' para confirmar.");
+    if (confirmation === 'BORRAR') {
+        try {
+            localStorage.removeItem('ketoOriginsData');
+            console.log("localStorage data cleared.");
+            showToast('Datos borrados. La aplicación se reiniciará.', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (e) {
+            console.error("Error clearing localStorage:", e);
+            showToast('No se pudieron borrar los datos.', 'error');
+        }
+    } else {
+        showToast('Acción cancelada.', 'success');
+    }
+}
+
 
 function showInfoModal(key) {
     const modal = document.getElementById('info-modal');
@@ -2153,10 +2198,11 @@ function registerNewWeight() {
     const parsedWeight = parseFloat(weightInput.value);
     if (!isNaN(parsedWeight) && parsedWeight > 0) {
         appState.userData.historialPeso.push({ fecha: new Date().toISOString().split('T')[0], peso: parsedWeight });
+        // NUEVO: Guardar el estado actualizado en localStorage
+        localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
         weightInput.value = '';
         showToast('Peso registrado con éxito.', 'success');
         renderWeightChart();
-        // Send the new weight to the tracking sheet
         sendTrackingDataToSheet({ type: 'Peso', value1: parsedWeight });
     } else {
         showToast('Por favor, ingresa un valor de peso válido.', 'error');
@@ -2170,12 +2216,13 @@ function registerNewMeasurement() {
     const newPressure = pressureInput.value;
     const today = new Date().toISOString().split('T')[0]; 
     let registered = false;
+    let stateChanged = false;
 
     if (newGlucose && !isNaN(parseFloat(newGlucose)) && parseFloat(newGlucose) > 0) {
         appState.userData.historialGlucosa.push({ fecha: today, valor: parseFloat(newGlucose) });
         glucoseInput.value = '';
         registered = true;
-        // Send the new glucose measurement to the tracking sheet
+        stateChanged = true;
         sendTrackingDataToSheet({ type: 'Glucosa (mg/dL)', value1: parseFloat(newGlucose) });
     }
     if (newPressure) {
@@ -2184,7 +2231,7 @@ function registerNewMeasurement() {
             appState.userData.historialPresion.push({ fecha: today, sistolica, diastolica });
             pressureInput.value = '';
             registered = true;
-            // Send the new blood pressure measurement to the tracking sheet
+            stateChanged = true;
             sendTrackingDataToSheet({ type: 'Presión Arterial', value1: `${sistolica}/${diastolica}` });
         } else if (newPressure.trim() !== '') {
             showToast('Formato de presión incorrecto. Usa "120/80".', 'error');
@@ -2194,6 +2241,10 @@ function registerNewMeasurement() {
     
     if(registered) {
         showToast('Medición registrada con éxito.', 'success');
+        if (stateChanged) {
+            // NUEVO: Guardar el estado actualizado en localStorage
+            localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
+        }
         renderHealthChart();
     } else {
         showToast('Ingresa al menos un valor válido.', 'error');
@@ -2215,12 +2266,13 @@ function registerNewLipidMeasurement() {
             hdl: newHdl,
             ldl: newLdl
         });
+        // NUEVO: Guardar el estado actualizado en localStorage
+        localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
         tgInput.value = '';
         hdlInput.value = '';
         ldlInput.value = '';
         showToast('Perfil lipídico registrado.', 'success');
         renderLipidChart();
-        // Send the new lipid profile to the tracking sheet
         sendTrackingDataToSheet({ 
             type: 'Perfil Lipídico', 
             value1: `TG: ${newTriglycerides}`,
@@ -2329,6 +2381,7 @@ function renderLipidChart() {
 // --- Reset Chart Data Functions ---
 function resetWeightChartData() {
     appState.userData.historialPeso = [];
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
     showToast('Gráfico de Peso Reiniciado.', 'success');
     renderWeightChart();
 }
@@ -2336,12 +2389,14 @@ function resetWeightChartData() {
 function resetHealthChartData() {
     appState.userData.historialGlucosa = [];
     appState.userData.historialPresion = [];
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
     showToast('Gráfico de Salud Metabólica Reiniciado.', 'success');
     renderHealthChart();
 }
 
 function resetLipidChartData() {
     appState.userData.historialLipidico = [];
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
     showToast('Gráfico de Perfil Lipídico Reiniciado.', 'success');
     renderLipidChart();
 }
@@ -2560,11 +2615,35 @@ function sendTrackingDataToSheet(data) {
 function main() {
     console.log("Main function started. Cleaning up and resetting.");
     cleanupAndReset(); // Always start from a clean slate.
-    // Genera un UserID único para esta sesión
-    appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    console.log("Generated session UserID:", appState.userId);
-    addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
-    console.log("Initial 'Comenzar mi Plan' button listener added.");
+
+    // NUEVO: Lógica para cargar datos guardados
+    try {
+        const savedStateJSON = localStorage.getItem('ketoOriginsData');
+        if (savedStateJSON) {
+            console.log("Found saved data in localStorage. Loading dashboard...");
+            const savedState = JSON.parse(savedStateJSON);
+            appState = savedState;
+
+            // Ocultar pantalla de bienvenida y mostrar la app
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+
+            // Inicializar la app en modo "recarga"
+            initializeApp(true);
+        } else {
+            console.log("No saved data found. Starting fresh.");
+            // Genera un UserID único para esta nueva sesión
+            appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            console.log("Generated session UserID:", appState.userId);
+            addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
+            console.log("Initial 'Comenzar mi Plan' button listener added.");
+        }
+    } catch (e) {
+        console.error("Error reading from localStorage. Starting fresh.", e);
+        // Si hay un error, empezar de cero
+        appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
+    }
 }
 
 // Run the main function once the DOM is fully loaded.
@@ -2573,6 +2652,4 @@ document.addEventListener('DOMContentLoaded', main);
 </script>
 </body>
 </html>
-
-
 
