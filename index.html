@@ -1841,7 +1841,7 @@ function populateToolsContent() {
         </div>
         <div class="text-center mt-12 border-t-2 border-gray-700 pt-8">
              <button id="download-full-report-btn" class="btn-glow text-white font-bold py-4 px-16 rounded-full text-xl">Descargar Reporte Completo en PDF</button>
-             <button id="full-guide-btn" class="btn-glow text-white font-bold py-4 px-16 rounded-full text-xl mt-4">Guía Completa KETO Origins</button>
+             <a href="https://guia-completa-herramientas.netlify.app/" target="_blank" class="btn-glow text-white font-bold py-4 px-16 rounded-full text-xl mt-4 inline-block text-center">Guía Completa KETO Origins</a>
         </div>
     `;
     setTimeout(() => {
@@ -1905,9 +1905,7 @@ function attachToolsEventListeners() {
     
     addTrackedListener(document.getElementById('download-full-report-btn'), 'click', downloadFullReportPDF);
     
-    addTrackedListener(document.getElementById('full-guide-btn'), 'click', () => {
-        window.open('https://guia-completa-herramientas.netlify.app/', '_blank');
-    });
+    // El listener para 'full-guide-btn' ya no es necesario aquí.
 
     console.log("Tools specific event listeners attached.");
 }
