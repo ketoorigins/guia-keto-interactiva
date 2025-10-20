@@ -337,13 +337,24 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Welcome Screen -->
-    <div id="welcome-screen" class="welcome-screen fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center">
+    <!-- Access Code Screen (New Welcome Screen) -->
+    <div id="access-screen" class="welcome-screen fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center">
         <div class="logo-gradient-border mb-8 shadow-2xl">
             <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo Keto Origins" class="w-48 h-48 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/192x192/1e1b2e/ffffff?text=Logo';">
         </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-6 max-w-2xl">Guía paso a paso de como llevar una alimentación Keto de manera efectiva</h1>
-        <button id="start-btn" class="text-white font-bold py-4 px-16 rounded-full text-xl btn-glow mt-4">Comenzar mi Plan</button>
+        <div class="w-full max-w-sm">
+            <h1 class="text-3xl font-extrabold text-white mb-6">Bienvenido a Keto Origins</h1>
+            <label for="access-code-input" class="block text-gray-300 mb-2">Ingresa tu código de acceso para comenzar</label>
+            <input type="text" id="access-code-input" placeholder="Tu Código Aquí" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-4 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none transition">
+            <button id="submit-code-btn" class="text-white font-bold py-4 px-16 rounded-full text-xl btn-glow mt-6 w-full">Validar Código</button>
+            <div id="loading-spinner" class="hidden mt-4">
+                <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+            <p id="code-error-message" class="text-red-400 mt-4 font-semibold h-6"></p>
+        </div>
     </div>
 
     <!-- Onboarding Wizard -->
@@ -425,51 +436,40 @@
 
 <script>
 // --- Global State & Config ---
-// Encapsulate state to avoid global scope pollution and allow for clean resets.
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSBjpr3iNusaGeYbdjKmTnz1I6rA35HZm1XbYAop1keBUPPSTgAWLzqwtHL-ScdkrBug/exec';
 let appState = {};
 let weightChartInstance = null;
 let healthChartInstance = null;
 let lipidChartInstance = null;
 let isAppInitialized = false;
-let eventListeners = []; // Array to keep track of listeners for easy removal
+let eventListeners = []; 
 
 // --- App Cleanup Function ---
-/**
- * Resets the entire application state to its initial condition.
- * This is crucial for environments where the script might be re-executed without a full page reload.
- * It destroys charts, resets state variables, and clears dynamic HTML content.
- */
 function cleanupAndReset() {
     console.log("Cleaning up and resetting app state...");
-    // 1. Destroy any existing Chart.js instances to prevent memory leaks and rendering errors.
     if (weightChartInstance) {
         weightChartInstance.destroy();
         weightChartInstance = null;
-        console.log("Weight chart destroyed.");
     }
     if (healthChartInstance) {
         healthChartInstance.destroy();
         healthChartInstance = null;
-        console.log("Health chart destroyed.");
     }
     if (lipidChartInstance) {
         lipidChartInstance.destroy();
         lipidChartInstance = null;
-        console.log("Lipid chart destroyed.");
     }
 
-    // 2. Remove all manually added event listeners to prevent duplicates.
     eventListeners.forEach(({ element, type, handler }) => {
-        if (element) { // Check if element exists before trying to remove listener
+        if (element) {
             element.removeEventListener(type, handler);
         }
     });
-    eventListeners = []; // Clear the tracking array.
+    eventListeners = [];
     console.log("Event listeners cleared.");
 
-    // 3. Reset the main application state object.
     appState = {
-        userId: '', // Para identificar al usuario en esta sesión
+        userId: '',
         currentStepIndex: 0,
         wizardFlow: [],
         userData: {
@@ -485,10 +485,8 @@ function cleanupAndReset() {
     };
     console.log("App state reset to initial values.");
 
-    // 4. Reset initialization flag.
     isAppInitialized = false;
 
-    // 5. Clear the HTML content of dynamic containers.
     const containersToClear = ['#dashboard', '#herramientas', '#wizard-steps-container', '#toast-container'];
     containersToClear.forEach(selector => {
         const el = document.querySelector(selector);
@@ -496,8 +494,7 @@ function cleanupAndReset() {
     });
     console.log("Dynamic containers cleared.");
 
-    // 6. Reset visibility of main containers to initial state.
-    document.getElementById('welcome-screen')?.classList.remove('hidden');
+    document.getElementById('access-screen')?.classList.remove('hidden');
     document.getElementById('onboarding-wizard')?.classList.add('hidden');
     document.getElementById('app-container')?.classList.add('hidden');
     console.log("Main container visibility reset.");
@@ -964,9 +961,9 @@ const imcCategories = [
 // --- App Start & Wizard Logic ---
 function startQuestionnaire() {
     console.log("Starting questionnaire...");
-    const welcomeScreen = document.getElementById('welcome-screen');
+    const accessScreen = document.getElementById('access-screen');
     const wizard = document.getElementById('onboarding-wizard');
-    if (welcomeScreen) welcomeScreen.classList.add('hidden');
+    if (accessScreen) accessScreen.classList.add('hidden');
     
     if (wizard) {
         appState.wizardFlow = [...baseWizardSteps, { id: 'action_plan', type: 'action_plan' }];
@@ -1055,8 +1052,6 @@ function nextStep() {
 
 function prevStep() {
     if (appState.currentStepIndex > 0) {
-        // FIX: No longer aggressively removes conditional steps.
-        // The insertConditionalSteps function already prevents duplicates, so this is safe.
         appState.currentStepIndex--;
         renderCurrentStep();
         console.log(`Moved to previous step: ${appState.wizardFlow[appState.currentStepIndex].id}`);
@@ -1097,7 +1092,6 @@ function createActionPlan() {
             appContainer.classList.add('flex');
             console.log("Main app container displayed.");
         }
-        // MODIFICADO: Se pasa 'false' para indicar que es el primer guardado
         initializeApp(false);
     }, 500);
 }
@@ -1132,7 +1126,6 @@ function createInfoCardStep(stepData) {
 }
 
 function createFinalStep(stepData) {
-    // --- REMOVED "Peso Objetivo" field ---
     return `<div class="w-full max-w-md text-white">
                 <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">${stepData.question}</h2>
                 <div class="space-y-4 text-left bg-gray-800 bg-opacity-50 p-6 rounded-lg border border-gray-700">
@@ -1148,7 +1141,6 @@ function createConditionalInputStep(stepData) {
     if (stepData.multiple) {
         inputsHtml = stepData.fields.map(field => `<div><label for="cond-input-${field.key}" class="block text-sm font-medium text-gray-300 mb-1">${field.placeholder}</label><input type="${field.inputType || 'text'}" id="cond-input-${field.key}" data-key="${field.key}" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="${field.placeholder}"></div>`).join('');
     } else {
-        // Corrected: Directly use stepData.placeholder for single input
         inputsHtml = `<div><label for="cond-input-${stepData.key}" class="block text-sm font-medium text-gray-300 mb-1">${stepData.placeholder}</label><input type="${stepData.inputType || 'text'}" id="cond-input-${stepData.key}" data-key="${stepData.key}" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="${stepData.placeholder}"></div>`;
     }
     return `<div class="w-full max-w-md text-white"><h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">${stepData.question}</h2><div class="space-y-4 text-left bg-gray-800 bg-opacity-50 p-6 rounded-lg border border-gray-700">${inputsHtml}</div></div>`;
@@ -1159,12 +1151,10 @@ function saveFinalMeasures() {
     const age = document.getElementById('final-age').value;
     const height = document.getElementById('final-altura').value;
     const weight = document.getElementById('final-peso').value;
-    // --- REMOVED "goal" from here ---
     if (!age || !height || !weight) {
         showToast('Por favor, completa edad, altura y peso.', 'error');
         return false;
     }
-    // --- REMOVED "goal" from here ---
     appState.answers.measurements = { age: parseInt(age), height: parseFloat(height), weight: parseFloat(weight) };
     console.log("App State after final measures:", appState.answers);
     return true;
@@ -1251,7 +1241,6 @@ function getIMCCategory(imc) {
     return imcCategories.find(cat => imc >= cat.range[0] && imc <= cat.range[1]) || { name: 'N/A', definition: '' };
 }
 
-// --- NEW FUNCTION to calculate healthy weight ---
 function calculateHealthyWeightRange(height) {
     if (!height || height <= 0) return null;
     const heightInMeters = height / 100;
@@ -1267,10 +1256,9 @@ function calculateHealthyWeightRange(height) {
 
 
 function calculateWaterIntake(weight, height, age, gender, activity_level) {
-    // Ensure all parameters are numbers and valid
     if (isNaN(weight) || weight <= 0 || isNaN(height) || height <= 0 || isNaN(age) || age <= 0 || !gender || !activity_level) {
         console.warn("Invalid input for calculateWaterIntake. Returning null.");
-        return null; // Return null if inputs are invalid
+        return null;
     }
 
     let bmr = (10 * weight) + (6.25 * height) - (5 * age);
@@ -1305,7 +1293,6 @@ function renderImcDetails(container, height, weight) {
 
 
 // --- Main App Initialization ---
-// MODIFICADO: La función ahora acepta un parámetro para saber si está recargando datos
 function initializeApp(isReloading = false) {
     console.log(`Initializing app... (Reloading: ${isReloading})`);
     if (isAppInitialized) {
@@ -1314,9 +1301,8 @@ function initializeApp(isReloading = false) {
         return;
     }
     
-    // Si no está recargando, se procesan los datos del cuestionario
     if (!isReloading) {
-        const { measurements, glucose_level, blood_pressure, lipids } = appState.answers;
+        const { measurements, glucose_level, blood_pressure, lipids, accessCode } = appState.answers;
         
         appState.userData.altura = measurements.height;
         appState.userData.pesoInicial = measurements.weight;
@@ -1344,21 +1330,19 @@ function initializeApp(isReloading = false) {
                 ldl: parseFloat(lipids.ldl) || null
             });
         }
-    }
 
-    isAppInitialized = true;
-    console.log("App initialized. User data:", appState.userData);
-
-    // NUEVO: Solo se guarda en Google Sheet y localStorage si es la primera vez (no es recarga)
-    if (!isReloading) {
         sendDataToGoogleSheet();
         try {
             localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
-            console.log("App state saved to localStorage.");
+            localStorage.setItem('ketoOriginsSession', JSON.stringify({ code: accessCode, userId: appState.userId }));
+            console.log("App state and session saved to localStorage.");
         } catch (e) {
             console.error("Error saving to localStorage:", e);
         }
     }
+
+    isAppInitialized = true;
+    console.log("App initialized. User data:", appState.userData);
 
     renderDashboard();
     setupEventListeners();
@@ -1418,150 +1402,89 @@ function generatePersonalizedAdvice(answers) {
         `;
     };
 
-    // --- Lógica para el acordeón de hábitos ---
     const selectedHabits = answers.habits;
     if (selectedHabits && Array.isArray(selectedHabits) && selectedHabits.length > 0 && !selectedHabits.includes('none')) {
-        
         let combinedText = selectedHabits.map(habitKey => {
             const advice = habitAdviceLibrary[habitKey];
             return advice ? `<p class="mb-3"><strong>${advice.title}:</strong> ${advice.text}</p>` : '';
         }).join('');
-
-        const stormAccordion = {
-            emoji: '⚠️',
-            title: 'Análisis Crítico: La Tormenta Metabólica Perfecta',
-            text: combinedText
-        };
+        const stormAccordion = { emoji: '⚠️', title: 'Análisis Crítico: La Tormenta Metabólica Perfecta', text: combinedText };
         adviceHtml += createAccordionHtml(stormAccordion);
     }
 
-    // --- Lógica Psico-Metabólica Entrelazada ---
     const emotionalResponse = answers.emotional_eating;
     const stressResponse = answers.stress_level;
-
-    if (emotionalResponse && stressResponse) {
-        if (psicologiaCombinada[emotionalResponse] && psicologiaCombinada[emotionalResponse][stressResponse]) {
-            const adviceData = psicologiaCombinada[emotionalResponse][stressResponse];
-            const combinedText = `<p class="mb-3">${adviceData.enfoquePsicologico}</p><p><strong>Tu primer paso práctico:</strong> ${adviceData.consejoAntiEstres}</p>`;
-            
-            const psychoAccordion = {
-                emoji: '❤️‍🩹',
-                title: 'Sanando la Relación con la Comida',
-                text: combinedText
-            };
-            adviceHtml += createAccordionHtml(psychoAccordion);
-            handledKeys.add('emotional_eating'); 
-        }
+    if (emotionalResponse && stressResponse && psicologiaCombinada[emotionalResponse] && psicologiaCombinada[emotionalResponse][stressResponse]) {
+        const adviceData = psicologiaCombinada[emotionalResponse][stressResponse];
+        const combinedText = `<p class="mb-3">${adviceData.enfoquePsicologico}</p><p><strong>Tu primer paso práctico:</strong> ${adviceData.consejoAntiEstres}</p>`;
+        const psychoAccordion = { emoji: '❤️‍🩹', title: 'Sanando la Relación con la Comida', text: combinedText };
+        adviceHtml += createAccordionHtml(psychoAccordion);
+        handledKeys.add('emotional_eating'); 
     }
 
-    // --- Lógica de Análisis de Hidratación ---
     const waterIntakeResponse = answers.water_intake;
     if (waterIntakeResponse) {
-        const waterGoal = calculateWaterIntake(
-            appState.answers.measurements.weight,
-            appState.answers.measurements.height,
-            appState.answers.measurements.age,
-            appState.answers.gender,
-            appState.answers.activity_level
-        );
-        let hydrationText = '';
-        let userIntakeLiters = 0;
-
+        const waterGoal = calculateWaterIntake(answers.measurements.weight, answers.measurements.height, answers.measurements.age, answers.gender, answers.activity_level);
+        let hydrationText = '', userIntakeLiters = 0;
         switch (waterIntakeResponse) {
-            case 'less_2': userIntakeLiters = 0.25; break; // Approx 1 glass
-            case '2-4': userIntakeLiters = 0.75;  break;  // Approx 3 glasses
-            case '4-6': userIntakeLiters = 1.25; break;  // Approx 5 glasses
-            case 'more_6': userIntakeLiters = 1.75; break; // Approx 7+ glasses
+            case 'less_2': userIntakeLiters = 0.25; break;
+            case '2-4': userIntakeLiters = 0.75;  break;
+            case '4-6': userIntakeLiters = 1.25; break;
+            case 'more_6': userIntakeLiters = 1.75; break;
         }
-
-        if (waterGoal === null) { // Handle case where calculateWaterIntake returns null due to invalid input
+        if (waterGoal === null) {
             hydrationText = `<p class="text-gray-400">Datos insuficientes o inválidos para calcular tu meta de hidratación.</p>`;
         } else if (waterIntakeResponse === 'less_2') {
             hydrationText = `Gracias por tu honestidad. Aquí hemos detectado un foco rojo de alto riesgo para tu salud. Tu meta diaria de hidratación es de <strong>${waterGoal.toFixed(1)} litros</strong>, pero actualmente tu ingesta es mínima. Esto es una emergencia metabética silenciosa. La deshidratación crónica, incluso si no sientes sed, tiene consecuencias graves:
 <ul class="list-disc list-inside mt-2 space-y-1">
-    <li><strong>Estrés Cardiovascular:</strong> Tu volumen sanguíneo disminuye, lo que obliga a tu corazón a bombear con más fuerza y eleva tu presión arterial.</li>
+    <li><strong>Estrés Cardiovascular:</strong> Tu volumen sanguíneo disminuye, lo que obliga a tu corazón a bombear com más fuerza y eleva tu presión arterial.</li>
     <li><strong>Toxicidad Acumulada:</strong> Tus riñones no tienen suficiente líquido para filtrar y eliminar las toxinas de tu cuerpo, lo que lleva a una acumulación interna.</li>
     <li><strong>Niebla Mental y Fatiga:</strong> La entrega de oxígeno a tu cerebro se ve drásticamente reducida, causando confusión, falta de concentración y un cansancio que ningún café puede solucionar.</li>
 </ul>
 <p class="mt-2">Tu misión más importante, que no es negociable, es comenzar a hidratarte correctamente desde hoy. Tu primera meta es simplemente beber más agua, y la forma ideal de hacerlo es con la combinación perfecta: Agua Mineral (nunca purificada ni de la llave, por su contenido de flúor y cloro) con una pizca de sal de mar y el jugo de medio limón. Esto no solo hidrata, sino que repone los minerales esenciales para que el agua pueda entrar a tus células.</p>`;
-        } else if ((waterIntakeResponse === '2-4' || waterIntakeResponse === '4-6') && userIntakeLiters < waterGoal) {
+        } else if (userIntakeLiters < waterGoal) {
             hydrationText = `¡Excelente que ya tengas el hábito de beber agua! Estás en camino y muy cerca del objetivo. Tu meta de hidratación es de <strong>${waterGoal.toFixed(1)} litros</strong>, y actualmente estás consumiendo alrededor de <strong>${userIntakeLiters.toFixed(1)} litros</strong>. Estás a solo unos vasos de diferencia. Ese último tramo es el que marca la diferencia entre simplemente 'funcionar' y 'prosperar'. Ese extra de agua potenciará la quema de grasa, mejorará drásticamente la apariencia de tu piel y aumentará tu claridad mental. Para optimizar tu esfuerzo, recuerda siempre la combinación perfecta: Agua Mineral con sal de mar y limón.`;
-        } else { // Covers 'more_6' and cases where '2-4' or '4-6' meet the goal
+        } else {
             hydrationText = `¡Felicidades! Este es uno de los hábitos más importantes para el éxito en Keto y ya lo tienes dominado. Tu ingesta de agua cumple o supera tu meta de <strong>${waterGoal.toFixed(1)} litros</strong>. Esto significa que estás apoyando activamente la desintoxicación de tu cuerpo, manteniendo tus células energizadas y optimizando cada proceso metabólico. Recuerda siempre la combinación perfecta para potenciar aún más los resultados: Agua Mineral + Sal de Mar + Limón.`;
         }
-
-        const hydrationAccordion = {
-            emoji: '💧📈',
-            title: 'Análisis de tu Hidratación',
-            text: hydrationText
-        };
+        const hydrationAccordion = { emoji: '💧📈', title: 'Análisis de tu Hidratación', text: hydrationText };
         adviceHtml += createAccordionHtml(hydrationAccordion);
     }
 
-    // --- Lógica para los OTROS consejos personalizados ---
     for (const key in personalizedAdviceLibrary) {
-        if (handledKeys.has(key)) {
-            continue;
-        }
-
+        if (handledKeys.has(key)) continue;
         const userResponse = answers[key];
         if (userResponse) {
             const processResponse = (responseValue) => {
-                if (personalizedAdviceLibrary[key] && personalizedAdviceLibrary[key][responseValue]) {
-                    const advice = personalizedAdviceLibrary[key][responseValue];
-                    adviceHtml += createAccordionHtml(advice);
+                if (personalizedAdviceLibrary[key]?.[responseValue]) {
+                    adviceHtml += createAccordionHtml(personalizedAdviceLibrary[key][responseValue]);
                 }
             };
-            
-            if (Array.isArray(userResponse)) {
-                userResponse.forEach(processResponse);
-            } else {
-                processResponse(userResponse);
-            }
+            Array.isArray(userResponse) ? userResponse.forEach(processResponse) : processResponse(userResponse);
         }
     }
     
-    // --- Lógica para Comida Chatarra ---
     const junkFoodResponse = answers.junk_food_freq;
     if (junkFoodResponse && junkFoodAdviceLibrary[junkFoodResponse]) {
-        const junkFoodAccordion = {
-            emoji: '🍔🍕',
-            title: 'La Verdad Oculta en la Comida Rápida',
-            text: junkFoodAdviceLibrary[junkFoodResponse].text
-        };
+        const junkFoodAccordion = { emoji: '🍔🍕', title: 'La Verdad Oculta en la Comida Rápida', text: junkFoodAdviceLibrary[junkFoodResponse].text };
         adviceHtml += createAccordionHtml(junkFoodAccordion);
     }
 
-    // --- Lógica de Bebidas ---
     const selectedDrinks = answers.daily_drinks;
     if (selectedDrinks && Array.isArray(selectedDrinks) && selectedDrinks.length > 0 && !selectedDrinks.includes('none')) {
         let drinksText = '';
-        const hasWater = selectedDrinks.includes('water');
-        const hasStimulant = selectedDrinks.includes('coffee') || selectedDrinks.includes('tea');
-
+        const hasWater = selectedDrinks.includes('water'), hasStimulant = selectedDrinks.includes('coffee') || selectedDrinks.includes('tea');
         if (hasWater && hasStimulant) {
             drinksText = `<p class="mb-3"><strong>${drinksAdviceLibrary.smart_combo.title}:</strong> ${drinksAdviceLibrary.smart_combo.text}</p>`;
-            const otherDrinks = selectedDrinks.filter(d => d !== 'water' && d !== 'coffee' && d !== 'tea');
-            otherDrinks.forEach(drinkKey => {
-                const advice = drinksAdviceLibrary[drinkKey];
-                if (advice) {
-                    drinksText += `<p class="mb-3"><strong>${advice.title}:</strong> ${advice.text}</p>`;
-                }
+            selectedDrinks.filter(d => d !== 'water' && d !== 'coffee' && d !== 'tea').forEach(drinkKey => {
+                if (drinksAdviceLibrary[drinkKey]) drinksText += `<p class="mb-3"><strong>${drinksAdviceLibrary[drinkKey].title}:</strong> ${drinksAdviceLibrary[drinkKey].text}</p>`;
             });
         } else {
             selectedDrinks.forEach(drinkKey => {
-                const advice = drinksAdviceLibrary[drinkKey];
-                if (advice) {
-                    drinksText += `<p class="mb-3"><strong>${advice.title}:</strong> ${advice.text}</p>`;
-                }
+                if (drinksAdviceLibrary[drinkKey]) drinksText += `<p class="mb-3"><strong>${drinksAdviceLibrary[drinkKey].title}:</strong> ${drinksAdviceLibrary[drinkKey].text}</p>`;
             });
         }
-        
-        const drinksAccordion = {
-            emoji: '🥛🥤',
-            title: 'Lo que Bebes Importa',
-            text: drinksText
-        };
+        const drinksAccordion = { emoji: '🥛🥤', title: 'Lo que Bebes Importa', text: drinksText };
         adviceHtml += createAccordionHtml(drinksAccordion);
     }
 
@@ -1580,42 +1503,25 @@ function renderDashboard() {
     const { measurements, health_conditions = [], glucose_level, blood_pressure, main_goal, weight_history, lipids } = appState.answers;
     const imc = calculateIMC(measurements.height, measurements.weight);
     const imcCategory = getIMCCategory(imc);
-    const waterIntake = calculateWaterIntake(
-        measurements.weight,
-        measurements.height,
-        measurements.age,
-        appState.answers.gender,
-        appState.answers.activity_level
-    );
+    const waterIntake = calculateWaterIntake(measurements.weight, measurements.height, measurements.age, appState.answers.gender, appState.answers.activity_level);
     const healthyWeight = calculateHealthyWeightRange(measurements.height);
     const diferenciaPeso = measurements.weight - healthyWeight.ideal;
 
     let weightGoalCardHtml = '';
     if (diferenciaPeso > 0) {
-        weightGoalCardHtml = `
-        <div class="dashboard-card flex flex-col justify-center items-center text-center border-amber-400/50">
-            <p class="text-4xl font-bold text-amber-400">${diferenciaPeso.toFixed(1)}</p>
-            <p class="text-sm text-amber-400/80 mt-1">Kg a Perder</p>
-        </div>`;
+        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-amber-400/50"><p class="text-4xl font-bold text-amber-400">${diferenciaPeso.toFixed(1)}</p><p class="text-sm text-amber-400/80 mt-1">Kg a Perder</p></div>`;
     } else if (diferenciaPeso < 0) {
-        weightGoalCardHtml = `
-        <div class="dashboard-card flex flex-col justify-center items-center text-center border-green-400/50">
-            <p class="text-4xl font-bold text-green-400">${Math.abs(diferenciaPeso).toFixed(1)}</p>
-            <p class="text-sm text-green-400/80 mt-1">Kg a Ganar</p>
-        </div>`;
+        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-green-400/50"><p class="text-4xl font-bold text-green-400">${Math.abs(diferenciaPeso).toFixed(1)}</p><p class="text-sm text-green-400/80 mt-1">Kg a Ganar</p></div>`;
     }
-
 
     let weightProjectionText = '';
     if (diferenciaPeso > 0) {
-        const daysToLose = Math.round((diferenciaPeso * 1000) / 143);
-        const monthsToLose = (daysToLose / 30).toFixed(1);
-        weightProjectionText = `Basado en una pérdida de grasa saludable y sostenible, podrías alcanzar tu peso ideal en aproximadamente <strong>${monthsToLose} meses</strong>. ¡Vamos paso a paso, sin prisa pero sin pausa!`;
+        const monthsToLose = ((diferenciaPeso * 1000) / 143 / 30).toFixed(1);
+        weightProjectionText = `Basado en una pérdida de grasa saludable y sostenible, podrías alcanzar tu peso ideal en aproximadamente <strong>${monthsToLose} meses</strong>.`;
     } else if (diferenciaPeso < 0) {
-        weightProjectionText = `Tu peso está por debajo del rango saludable. Este plan te ayudará a ganar masa muscular y peso de forma saludable, no solo a 'engordar'. ¡Vamos a construir un cuerpo más fuerte!`;
-    }
-    else {
-        weightProjectionText = `¡Felicidades! Estás en tu peso ideal. El plan se enfocará en la recomposición corporal y optimización de tu energía y salud metabética.`;
+        weightProjectionText = `Tu peso está por debajo del rango saludable. Este plan te ayudará a ganar masa muscular y peso de forma saludable.`;
+    } else {
+        weightProjectionText = `¡Felicidades! Estás en tu peso ideal. El plan se enfocará en optimizar tu energía y salud.`;
     }
 
     const goalTitles = {
@@ -1625,22 +1531,19 @@ function renderDashboard() {
         muscle: 'Tu Hoja de Ruta para Tonificar tu Cuerpo y Aumentar Masa Muscular'
     };
     const mainTitle = goalTitles[main_goal] || 'Tu Hoja de Ruta Personalizada';
-
     const mainGoalAccordionHtml = generateMainGoalAccordion(main_goal);
 
     let introParagraph = '';
     if (weight_history === 'ideal_weight') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">¡Felicitaciones por estar en tu peso ideal! Eso demuestra una gran disciplina. Este plan no se trata de perder peso, sino de llevar tu bienestar al siguiente nivel, optimizando tu energía y claridad mental para que te sientas mejor que nunca.</p>`;
+        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">¡Felicitaciones por estar en tu peso ideal! Este plan optimizará tu bienestar.</p>`;
     } else if (weight_history === 'less_than_year') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Estás en el momento perfecto para actuar. Como los cambios son recientes, tu cuerpo responderá rápidamente a las señales correctas. Con este plan, podemos revertir eficientemente esos cambios y devolverle a tu metabolismo su equilibrio natural.</p>`;
-    } else if (weight_history === 'more_than_year') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Entendemos que llevas tiempo luchando con tu peso. No te preocupes, esto es completamente reversible. Tu cuerpo tiene una 'memoria' metabética, y este plan está diseñado para hacer un 'reseteo' profundo y construir nuevos hábitos sobre cimientos sólidos. ¡Vamos a hacerlo bien esta vez!</p>`;
-    } else if (weight_history === 'cant_remember') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Gracias por tu honestidad. El hecho de que no recuerdes tu peso ideal nos indica que tu cuerpo ha estado en un estado de estrés metabólico por un tiempo considerable. El tiempo sí importa, porque el daño es acumulativo, pero la gran noticia es que tu cuerpo es increíblemente resiliente. Hoy es el día uno para revertir ese proceso. Este plan está diseñado para darte las herramientas y la esperanza de recuperar el control. ¡Vamos a empezar!</p>`;
+        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Estás en el momento perfecto para actuar. Tu cuerpo responderá rápidamente.</p>`;
+    } else if (weight_history === 'more_than_year' || weight_history === 'cant_remember') {
+        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Entendemos que llevas tiempo luchando. Este plan es un 'reseteo' profundo. ¡Vamos a hacerlo bien!</p>`;
     }
 
     const personalizedAdviceHtml = generatePersonalizedAdvice(appState.answers);
-
+    
     const topMetricsHtml = `
         <div class="dashboard-card flex flex-col justify-center items-center text-center"><p class="text-4xl font-bold text-cyan-400">${measurements.age}</p><p class="text-sm text-gray-400 mt-1">Años</p></div>
         <div class="dashboard-card flex flex-col justify-center items-center text-center"><p class="text-4xl font-bold text-cyan-400">${measurements.height}</p><p class="text-sm text-gray-400 mt-1">Altura (cm)</p></div>
@@ -1655,7 +1558,6 @@ function renderDashboard() {
             <p class="text-sm text-gray-400 mt-2">Un punto ideal de referencia, con un IMC de 21.75, es alrededor de <strong class="text-green-300">${healthyWeight.ideal} kg</strong>. ¡Esa es una excelente meta a largo plazo!</p>
         </div>
     `;
-
 
     let healthFocusHtml = '';
     if (health_conditions.length > 0 && !health_conditions.includes('none')) {
@@ -1689,7 +1591,6 @@ function renderDashboard() {
         healthFocusHtml += `</div>`;
     }
 
-    // --- NEW: Lipid Profile Analysis Card ---
     let lipidProfileHtml = '';
     if (lipids && (lipids.triglycerides || lipids.hdl || lipids.ldl)) {
         const tg = parseFloat(lipids.triglycerides);
@@ -1700,38 +1601,36 @@ function renderDashboard() {
 
         let interpretationText = '';
         let interpretationClass = '';
-        let medicalAdviceLipids = ''; // New variable for lipid-specific medical advice
-
+        let medicalAdviceLipids = '';
         if (ratio !== 'N/A') {
              if (gender === 'male') {
                  if (ratio <= 3.5) {
-                    interpretationClass = 'interpretation-good';
-                    interpretationText = `<strong>Interpretación (Hombre):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango deseable (menor a 3.5). Esto es un potente indicador de buena salud metabética y bajo riesgo cardiovascular, sugiriendo que tus partículas LDL son mayormente grandes y saludables.`;
+                     interpretationClass = 'interpretation-good';
+                     interpretationText = `<strong>Interpretación (Hombre):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango deseable (menor a 3.5).`;
                  } else if (ratio > 5.0) {
-                    interpretationClass = 'interpretation-warning';
-                    interpretationText = `<strong>Interpretación (Hombre):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 5.0), lo que se asocia con un mayor riesgo cardiovascular y sugiere resistencia a la insulina. Nuestro plan se enfocará en reducir tus triglicéridos y aumentar tu HDL para corregir este indicador.`;
-                    medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico para una evaluación más profunda.</p>`;
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación (Hombre):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 5.0).`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico.</p>`;
                  } else {
-                    interpretationClass = 'interpretation-warning';
-                    interpretationText = `<strong>Interpretación (Hombre):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 3.5 y 5.0). Es un buen momento para tomar acción y mejorar este importante marcador de salud.`;
-                    medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación (Hombre):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 3.5 y 5.0).`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
                  }
              } else { // female
                  if (ratio <= 2.5) {
-                    interpretationClass = 'interpretation-good';
-                    interpretationText = `<strong>Interpretación (Mujer):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango ideal (menor a 2.5). Este es el mejor indicador de una salud metabética óptima y un muy bajo riesgo cardiovascular.`;
+                     interpretationClass = 'interpretation-good';
+                     interpretationText = `<strong>Interpretación (Mujer):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango ideal (menor a 2.5).`;
                  } else if (ratio > 3.5) {
-                    interpretationClass = 'interpretation-warning';
-                    interpretationText = `<strong>Interpretación (Mujer):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 3.5), lo que se asocia con un mayor riesgo cardiovascular y sugiere resistencia a la insulina. Nuestro plan se enfocará en reducir tus triglicéridos y aumentar tu HDL para corregir este indicador.`;
-                    medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico para una evaluación más profunda.</p>`;
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación (Mujer):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 3.5).`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico.</p>`;
                  } else {
-                    interpretationClass = 'interpretation-warning';
-                    interpretationText = `<strong>Interpretación (Mujer):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 2.5 y 3.5). Es un buen momento para tomar acción y mejorar este importante marcador de salud.`;
-                    medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación (Mujer):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 2.5 y 3.5).`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
                  }
              }
         }
-
         lipidProfileHtml = `
         <div class="dashboard-card p-4 lipid-analysis-card">
             <h3 class="font-bold text-xl mb-4 text-pink-300">🔬 Análisis de tu Perfil Lipídico</h3>
@@ -1755,17 +1654,16 @@ function renderDashboard() {
             <div class="interpretation-box ${interpretationClass}">
                 ${interpretationText}
             </div>
-            ${medicalAdviceLipids} <!-- Added medical advice here -->
-            <p class="mt-4 text-xs italic">El objetivo es: <strong>Triglicéridos bajos</strong> (el cuerpo quema grasa), <strong>HDL alto</strong> (buen sistema de limpieza) y un <strong>LDL "contextualizado"</strong>, donde la calidad de la partícula (inferida por el ratio) es más importante que su cantidad total. Recuerda que estos rangos pueden variar con la edad, consulta siempre a tu médico.</p>
+            ${medicalAdviceLipids}
+            <p class="mt-4 text-xs italic">El objetivo es: <strong>Triglicéridos bajos</strong> (el cuerpo quema grasa), <strong>HDL alto</strong> (buen sistema de limpieza) y un <strong>LDL "contextualizado"</strong>, donde la calidad de la partícula (inferida por el ratio) es más importante que su cantidad total. Recuerda que estos rangos pueden variar com la edad, consulta siempre a tu médico.</p>
         </div>`;
     }
-
-
+    
     const otherCardsHtml = `
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/mrnDR0CS/PROYECCION-DE-PESO.png" alt="Gráfico de Proyección de Peso" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                     <span class="help-icon" data-tooltip-key="projection">?</span>
+                         <span class="help-icon" data-tooltip-key="projection">?</span>
                 <h3 class="font-bold text-white mb-2">Proyección de Peso</h3>
                 <p class="text-sm text-gray-300 leading-relaxed">${weightProjectionText}</p>
             </div>
@@ -1773,7 +1671,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/20mMD59q/Tu-IMC-actual.png" alt="Gráfico de IMC" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                     <span class="help-icon" data-tooltip-key="imc">?</span>
+                         <span class="help-icon" data-tooltip-key="imc">?</span>
                 <h3 class="font-bold text-white mb-2">Tu IMC actual</h3>
                 <p class="text-5xl font-extrabold text-cyan-400">${imc.toFixed(1)}</p>
                 <p class="text-md font-semibold text-gray-300">${imcCategory.name}</p>
@@ -1783,7 +1681,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/GvFVvJPM/Copia-de-Copia-de-Logo-500-x-500-px-1.png" alt="Gráfico de Consumo de agua" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                     <span class="help-icon" data-tooltip-key="water">?</span>
+                         <span class="help-icon" data-tooltip-key="water">?</span>
                 <h3 class="font-bold text-white">Consumo de agua</h3>
                 <p class="text-5xl font-bold text-cyan-400 my-2">${waterIntake !== null ? waterIntake.toFixed(1) : 'N/A'} L</p>
                 <p class="text-xs text-gray-400">El cuerpo pierde 1.5-2.5L de agua al día (respiración, sudor, orina, etc.). Usamos la fórmula de Holliday-Segar para tu recomendación.</p>
@@ -1792,7 +1690,7 @@ function renderDashboard() {
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/S4hTHgbj/Copia-de-Copia-de-Logo-500-x-500-px-3.png" alt="Gráfico de Recetas Keto" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
-                     <span class="help-icon" data-tooltip-key="recipes">?</span>
+                         <span class="help-icon" data-tooltip-key="recipes">?</span>
                 <h3 class="font-bold text-white mb-2">Tus Recetas Keto</h3>
                 <p class="text-sm text-gray-300 leading-relaxed">Deliciosos platos, inspirados en los alimentos que más te gustan y tus hábitos.</p>
             </div>
@@ -1805,25 +1703,13 @@ function renderDashboard() {
         ${introParagraph}
         <h2 class="text-2xl font-bold text-white text-center mb-2 mt-8">Tus Métricas Clave</h2>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">${topMetricsHtml}</div>
-        
-        <div class="grid grid-cols-1 gap-4 mb-6">
-            ${healthyWeightCardHtml}
-        </div>
+        <div class="grid grid-cols-1 gap-4 mb-6">${healthyWeightCardHtml}</div>
         ${healthFocusHtml ? `<div class="grid grid-cols-1 gap-4 mb-6">${healthFocusHtml}</div>` : ''}
         ${lipidProfileHtml ? `<div class="grid grid-cols-1 gap-4 mb-6">${lipidProfileHtml}</div>` : ''}
-
         <h2 class="text-2xl font-bold text-white text-center mb-4 mt-8">Tus Consejos Personalizados</h2>
-        <div id="personalized-advice-container" class="space-y-4 mb-6">
-            ${personalizedAdviceHtml}
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            ${otherCardsHtml}
-        </div>
-
-        <div id="unlock-button-container" class="text-center mt-8">
-            <button id="unlock-app-btn" class="btn-glow text-white font-bold py-3 px-12 rounded-full text-xl">VER MIS HERRAMIENTAS</button>
-        </div>
+        <div id="personalized-advice-container" class="space-y-4 mb-6">${personalizedAdviceHtml}</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">${otherCardsHtml}</div>
+        <div id="unlock-button-container" class="text-center mt-8"><button id="unlock-app-btn" class="btn-glow text-white font-bold py-3 px-12 rounded-full text-xl">VER MIS HERRAMIENTAS</button></div>
     `;
     
     addTrackedListener(document.getElementById('unlock-app-btn'), 'click', unlockAppContent);
@@ -1958,23 +1844,14 @@ function populateToolsContent() {
              <button id="full-guide-btn" class="btn-glow text-white font-bold py-4 px-16 rounded-full text-xl mt-4">Guía Completa KETO Origins</button>
         </div>
     `;
-    // Add a small delay to ensure canvas elements are rendered before Chart.js tries to find them
-    // and to ensure event listeners are attached to the newly created elements.
     setTimeout(() => {
-        attachToolsEventListeners(); // Call the new function to attach listeners to tools
-        setupHealthTracking(); // Re-initialize charts and their specific input listeners
+        attachToolsEventListeners(); 
+        setupHealthTracking(); 
         console.log("setupHealthTracking and attachToolsEventListeners called after a short delay.");
-    }, 100); // 100ms delay
+    }, 100);
 }
 
 
-// --- Event Listener Management ---
-/**
- * A helper function to add event listeners and keep track of them for later removal.
- * @param {EventTarget} element The DOM element to attach the listener to.
- * @param {string} type The event type (e.g., 'click').
- * @param {Function} handler The function to execute when the event fires.
- */
 function addTrackedListener(element, type, handler) {
     if (!element) {
         console.warn(`Attempted to add listener to non-existent element for type: ${type}`);
@@ -1984,7 +1861,6 @@ function addTrackedListener(element, type, handler) {
     eventListeners.push({ element, type, handler });
 }
 
-// Function to attach event listeners specific to the tools section
 function attachToolsEventListeners() {
     console.log("Attaching tools specific event listeners...");
 
@@ -2027,12 +1903,10 @@ function attachToolsEventListeners() {
     addTrackedListener(document.getElementById('reset-health-chart-btn'), 'click', resetHealthChartData);
     addTrackedListener(document.getElementById('reset-lipid-chart-btn'), 'click', resetLipidChartData);
     
-    // Listener for the new consolidated PDF button
     addTrackedListener(document.getElementById('download-full-report-btn'), 'click', downloadFullReportPDF);
     
-    // Listener for the new guide button
     addTrackedListener(document.getElementById('full-guide-btn'), 'click', () => {
-        window.open('https://chimerical-crisp-7e6749.netlify.app/', '_blank');
+        window.open('https://guia-completa-herramientas.netlify.app/', '_blank');
     });
 
     console.log("Tools specific event listeners attached.");
@@ -2041,7 +1915,6 @@ function attachToolsEventListeners() {
 
 function setupEventListeners() {
     console.log("Setting up global event listeners...");
-    // Accordion functionality (delegated to body)
     const accordionHandler = function(event) {
         const button = event.target.closest('.accordion-button');
         if (button) {
@@ -2057,7 +1930,6 @@ function setupEventListeners() {
         document.body.__accordionListenerAdded = true;
     }
 
-    // Sidebar toggle for mobile
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
     
@@ -2074,16 +1946,13 @@ function setupEventListeners() {
     };
     addTrackedListener(document, 'click', documentClickHandler);
 
-    // Navigation link handling
     document.querySelectorAll('.nav-link').forEach(link => {
         addTrackedListener(link, 'click', handleNavClick);
     });
 
-    // Main content scroll for active nav link
     const mainContent = document.getElementById('main-content');
     addTrackedListener(mainContent, 'scroll', setActiveNavLink);
 
-    // Modal listeners (delegated)
     addTrackedListener(document.body, 'click', function(event) {
         const icon = event.target.closest('.help-icon');
         if (icon) {
@@ -2098,30 +1967,26 @@ function setupEventListeners() {
         }
     });
 
-    // NUEVO: Listener para el botón de reseteo
     addTrackedListener(document.getElementById('reset-app-btn'), 'click', resetAppAndData);
 
     console.log("Global event listeners set up.");
 }
 
-// NUEVO: Función para resetear la app y borrar datos locales
 function resetAppAndData() {
-    // Usamos un modal custom en vez de confirm()
-    const confirmation = window.prompt("¿Estás seguro de que quieres borrar todos tus datos y empezar de nuevo? Esta acción no se puede deshacer. Escribe 'BORRAR' para confirmar.");
-    if (confirmation === 'BORRAR') {
+    const confirmation = confirm("¿Estás seguro de que quieres borrar todos tus datos y empezar de nuevo? Esta acción no se puede deshacer.");
+    if (confirmation) {
         try {
             localStorage.removeItem('ketoOriginsData');
+            localStorage.removeItem('ketoOriginsSession'); // Clear session too
             console.log("localStorage data cleared.");
             showToast('Datos borrados. La aplicación se reiniciará.', 'success');
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            setTimeout(() => window.location.reload(), 2000);
         } catch (e) {
             console.error("Error clearing localStorage:", e);
             showToast('No se pudieron borrar los datos.', 'error');
         }
     } else {
-        showToast('Acción cancelada.', 'success');
+        showToast('Acción cancelada.', 'info');
     }
 }
 
@@ -2198,7 +2063,6 @@ function registerNewWeight() {
     const parsedWeight = parseFloat(weightInput.value);
     if (!isNaN(parsedWeight) && parsedWeight > 0) {
         appState.userData.historialPeso.push({ fecha: new Date().toISOString().split('T')[0], peso: parsedWeight });
-        // NUEVO: Guardar el estado actualizado en localStorage
         localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
         weightInput.value = '';
         showToast('Peso registrado con éxito.', 'success');
@@ -2242,7 +2106,6 @@ function registerNewMeasurement() {
     if(registered) {
         showToast('Medición registrada con éxito.', 'success');
         if (stateChanged) {
-            // NUEVO: Guardar el estado actualizado en localStorage
             localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
         }
         renderHealthChart();
@@ -2266,7 +2129,6 @@ function registerNewLipidMeasurement() {
             hdl: newHdl,
             ldl: newLdl
         });
-        // NUEVO: Guardar el estado actualizado en localStorage
         localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
         tgInput.value = '';
         hdlInput.value = '';
@@ -2540,113 +2402,197 @@ function translateValue(key, value) {
 }
 
 /**
+ * NEW: Generic function to communicate with the Google Apps Script.
+ * It handles errors and expects a JSON response.
+ */
+async function sendApiRequest(payload) {
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8' // Workaround for Apps Script CORS
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API response not OK:', response.status, errorText);
+            throw new Error(`Error del servidor (${response.status}).`);
+        }
+
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error("Failed to parse API response as JSON. Raw response:", text);
+            throw new Error("Respuesta del servidor no válida.");
+        }
+    } catch (error) {
+        console.error(`Error in sendApiRequest for action ${payload.action}:`, error);
+        return { status: 'error', message: error.message || 'Error de red.' };
+    }
+}
+
+/**
  * Gathers user data from the appState and sends it to a Google Apps Script endpoint.
  */
 function sendDataToGoogleSheet() {
-    // IMPORTANT: This URL is now hardcoded with the user's provided script URL.
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlNmAXwvgy2AgjmvkIGjWichIUeYUjAgmA0YLBwT_IiKPs8C9U9Bk5DXi5tbkhdLecmA/exec';
-
-    if (SCRIPT_URL.includes('PEGA_AQUÍ')) {
-        console.warn("Google Sheet URL is not set. Data will not be saved.");
-        return;
-    }
-    
-    const { measurements, ...otherAnswers } = appState.answers;
+    const { measurements, accessCode, ...otherAnswers } = appState.answers;
     const flatAnswers = { ...otherAnswers, ...measurements };
+    
+    const translatedData = Object.keys(flatAnswers).reduce((acc, key) => {
+        const headerMap = {
+            gender: 'Genero', main_goal: 'ObjetivoPrincipal', weight_history: 'HistoriaPeso', habits: 'Habitos',
+            emotional_eating: 'HambreEmocional', junk_food_freq: 'FrecuenciaComidaChatarra', eat_out_freq: 'FrecuenciaComerFuera',
+            cooking_skill: 'NivelCocina', daily_drinks: 'BebidasDiarias', water_intake: 'ConsumoAgua', alcohol_intake: 'ConsumoAlcohol',
+            activity_level: 'NivelActividad', health_conditions: 'CondicionesSalud', stress_level: 'NivelEstres',
+            age: 'Edad', height: 'Altura', weight: 'Peso', glucose_level: 'NivelGlucosa', blood_pressure: 'PresionArterial', lipids: 'Lipidos'
+        };
+        const header = headerMap[key];
+        if (header && flatAnswers[key] !== undefined) {
+             let value = flatAnswers[key];
+            if (key === 'lipids' && value) {
+                value = `TG: ${value.triglycerides || 'N/A'}, HDL: ${value.hdl || 'N/A'}, LDL: ${value.ldl || 'N/A'}`;
+            }
+            acc[header] = translateValue(key, value);
+        }
+        return acc;
+    }, {});
 
-    // Map the answers from appState, translating them to Spanish before sending.
-    const data = {
-        'UserID': appState.userId,
-        'Genero': translateValue('gender', flatAnswers.gender),
-        'ObjetivoPrincipal': translateValue('main_goal', flatAnswers.main_goal),
-        'HistoriaPeso': translateValue('weight_history', flatAnswers.weight_history),
-        'Habitos': translateValue('habits', flatAnswers.habits),
-        'HambreEmocional': translateValue('emotional_eating', flatAnswers.emotional_eating),
-        'FrecuenciaComidaChatarra': translateValue('junk_food_freq', flatAnswers.junk_food_freq),
-        'FrecuenciaComerFuera': translateValue('eat_out_freq', flatAnswers.eat_out_freq),
-        'NivelCocina': translateValue('cooking_skill', flatAnswers.cooking_skill),
-        'BebidasDiarias': translateValue('daily_drinks', flatAnswers.daily_drinks),
-        'ConsumoAgua': translateValue('water_intake', flatAnswers.water_intake),
-        'ConsumoAlcohol': translateValue('alcohol_intake', flatAnswers.alcohol_intake),
-        'NivelActividad': translateValue('activity_level', flatAnswers.activity_level),
-        'CondicionesSalud': translateValue('health_conditions', flatAnswers.health_conditions),
-        'NivelEstres': translateValue('stress_level', flatAnswers.stress_level),
-        'Edad': flatAnswers.age,
-        'Altura': flatAnswers.height,
-        'Peso': flatAnswers.weight,
-        'NivelGlucosa': flatAnswers.glucose_level || '',
-        'PresionArterial': flatAnswers.blood_pressure || '',
-        'Lipidos': flatAnswers.lipids ? `TG: ${flatAnswers.lipids.triglycerides || 'N/A'}, HDL: ${flatAnswers.lipids.hdl || 'N/A'}, LDL: ${flatAnswers.lipids.ldl || 'N/A'}` : '',
+    const payload = { 
+        action: 'saveInitialData',
+        userId: appState.userId,
+        data: { UserID: appState.userId, ...translatedData },
+        appStateJSON: JSON.stringify(appState) // Include the full state
     };
 
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(() => console.log('Initial data sent successfully:', data))
-    .catch(error => console.error('Error sending initial data:', error));
+    sendApiRequest(payload).then(res => {
+        console.log("Response from saveInitialData:", res);
+        if (res.status !== 'success' && res.result !== 'success') { // Check both possible success keys
+            showToast('Error al guardar datos iniciales.', 'error');
+        }
+    });
 }
 
 
 // --- NEW FUNCTION to send TRACKING data ---
 function sendTrackingDataToSheet(data) {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlNmAXwvgy2AgjmvkIGjWichIUeYUjAgmA0YLBwT_IiKPs8C9U9Bk5DXi5tbkhdLecmA/exec';
-    
     const payload = {
-        recordType: 'tracking', // This tells our script to use the "Seguimiento" sheet
-        UserID: appState.userId, // CORREGIDO: Se usa 'UserID' con mayúscula para consistencia
-        ...data
+        action: 'saveTrackingData',
+        userId: appState.userId,
+        data: { UserID: appState.userId, ...data },
+        appStateJSON: JSON.stringify(appState) // Include the updated state
     };
 
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(() => console.log('Tracking data sent successfully:', payload))
-    .catch(error => console.error('Error sending tracking data:', error));
+    sendApiRequest(payload).then(res => {
+        console.log("Response from saveTrackingData:", res);
+         if (res.status !== 'success' && res.result !== 'success') {
+            showToast('Error al guardar seguimiento.', 'error');
+        }
+    });
+}
+
+// --- NEW Access Control Functions ---
+async function handleCodeValidation() {
+    const codeInput = document.getElementById('access-code-input');
+    const code = codeInput.value.trim().toUpperCase();
+    const errorEl = document.getElementById('code-error-message');
+    const spinner = document.getElementById('loading-spinner');
+    const submitBtn = document.getElementById('submit-code-btn');
+
+    if (!code) {
+        errorEl.textContent = 'Por favor, ingresa un código.';
+        return;
+    }
+    
+    errorEl.textContent = '';
+    spinner.classList.remove('hidden');
+    submitBtn.disabled = true;
+
+    const payload = { action: 'validateCode', code: code };
+    const result = await sendApiRequest(payload);
+
+    spinner.classList.add('hidden');
+    submitBtn.disabled = false;
+        
+    if (result.status === 'success') {
+        if (result.data) { // Returning user with existing data
+            console.log("Returning user validated. Loading data...");
+            try {
+                // Data from Apps Script is expected to be a stringified JSON
+                appState = JSON.parse(result.data);
+                // Save the valid session info
+                localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
+                localStorage.setItem('ketoOriginsSession', JSON.stringify({ code: code, userId: appState.userId }));
+                
+                document.getElementById('access-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                initializeApp(true); // Initialize in "reloading" mode
+            } catch (e) {
+                console.error("Failed to parse user data from server:", e);
+                errorEl.textContent = "Error al procesar los datos del usuario.";
+            }
+        } else { // New user, validation was successful
+            console.log("New user validated. Proceeding to questionnaire.");
+            appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            appState.answers.accessCode = code; // Save code to link user later
+            
+            // Assign user ID to the code in the background
+            const assignPayload = { action: 'assignUser', code: code, userId: appState.userId };
+            sendApiRequest(assignPayload).then(assignRes => {
+                console.log("User ID assignment response:", assignRes);
+            });
+
+            startQuestionnaire();
+        }
+    } else {
+        errorEl.textContent = result.message || 'Código no válido o expirado.';
+    }
 }
 
 
 // --- Main App Execution ---
 function main() {
     console.log("Main function started. Cleaning up and resetting.");
-    cleanupAndReset(); // Always start from a clean slate.
+    cleanupAndReset();
 
-    // NUEVO: Lógica para cargar datos guardados
     try {
-        const savedStateJSON = localStorage.getItem('ketoOriginsData');
-        if (savedStateJSON) {
-            console.log("Found saved data in localStorage. Loading dashboard...");
-            const savedState = JSON.parse(savedStateJSON);
-            appState = savedState;
+        const savedSessionJSON = localStorage.getItem('ketoOriginsSession');
+        const savedDataJSON = localStorage.getItem('ketoOriginsData');
+        
+        if (savedSessionJSON && savedDataJSON) {
+            console.log("Found saved session. Loading dashboard directly.");
+            const savedData = JSON.parse(savedDataJSON);
+            appState = savedData;
 
-            // Ocultar pantalla de bienvenida y mostrar la app
-            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('access-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
-
-            // Inicializar la app en modo "recarga"
             initializeApp(true);
         } else {
-            console.log("No saved data found. Starting fresh.");
-            // Genera un UserID único para esta nueva sesión
-            appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            console.log("Generated session UserID:", appState.userId);
-            addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
-            console.log("Initial 'Comenzar mi Plan' button listener added.");
+            console.log("No saved session found. Showing access code screen.");
+            document.getElementById('access-screen').classList.remove('hidden');
+            addTrackedListener(document.getElementById('submit-code-btn'), 'click', handleCodeValidation);
+            addTrackedListener(document.getElementById('access-code-input'), 'keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleCodeValidation();
+                }
+            });
         }
     } catch (e) {
-        console.error("Error reading from localStorage. Starting fresh.", e);
-        // Si hay un error, empezar de cero
-        appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        addTrackedListener(document.getElementById('start-btn'), 'click', startQuestionnaire);
+        console.error("Error with localStorage, starting fresh.", e);
+        localStorage.clear(); // Clear potentially corrupted storage
+        document.getElementById('access-screen').classList.remove('hidden');
+        addTrackedListener(document.getElementById('submit-code-btn'), 'click', handleCodeValidation);
+         addTrackedListener(document.getElementById('access-code-input'), 'keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleCodeValidation();
+            }
+        });
     }
 }
 
-// Run the main function once the DOM is fully loaded.
 document.addEventListener('DOMContentLoaded', main);
 
 </script>
