@@ -301,13 +301,13 @@
         }
 
         /* --- Modal and Help Icon Styles --- */
-        #info-modal {
+        #info-modal, #confirm-modal {
             display: none; /* Initially hidden */
             align-items: center;
             justify-content: center;
             transition: opacity 0.3s ease;
         }
-        #info-modal.flex {
+        #info-modal.flex, #confirm-modal.flex {
             display: flex;
         }
         .help-icon {
@@ -337,13 +337,13 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Access Code Screen (New Welcome Screen) -->
+    <!-- Access Code Screen -->
     <div id="access-screen" class="welcome-screen fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center">
         <div class="logo-gradient-border mb-8 shadow-2xl">
             <img src="https://i.ibb.co/20NypXdZ/ketoorigins.png" alt="Logo Keto Origins" class="w-48 h-48 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/192x192/1e1b2e/ffffff?text=Logo';">
         </div>
         <div class="w-full max-w-sm">
-            <h1 class="text-3xl font-extrabold text-white mb-6">Bienvenido a Keto Origins</h1>
+            <h1 class="text-3xl font-extrabold text-white mb-6">Bienvenido(a) a Keto Origins</h1>
             <label for="access-code-input" class="block text-gray-300 mb-2">Ingresa tu código de acceso para comenzar</label>
             <input type="text" id="access-code-input" placeholder="Tu Código Aquí" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-4 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none transition">
             <button id="submit-code-btn" class="text-white font-bold py-4 px-16 rounded-full text-xl btn-glow mt-6 w-full">Validar Código</button>
@@ -398,7 +398,6 @@
                 <a href="#dashboard" class="nav-link dashboard-special-button block font-semibold py-3 px-4 rounded-lg transition duration-200 text-white">Dashboard</a>
                 <a href="#herramientas" class="nav-link locked-content hidden block font-semibold py-3 px-4 rounded-lg transition duration-200 text-white mt-4">Herramientas</a>
             </nav>
-             <!-- NUEVO: Botón de Reinicio -->
             <div class="mt-auto pt-4 border-t border-gray-700">
                 <button id="reset-app-btn" class="w-full text-center text-sm text-gray-400 hover:text-red-400 transition py-2 px-4 rounded-lg hover:bg-red-500/10">
                     Borrar mis datos y empezar de nuevo
@@ -420,7 +419,6 @@
             <section id="herramientas" class="mb-12 hidden">
                 <!-- Tools content will be rendered here -->
             </section>
-
         </main>
     </div>
 
@@ -433,6 +431,17 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black bg-opacity-70 p-4">
+        <div class="dashboard-card max-w-md w-full relative">
+            <h3 id="confirm-modal-title" class="text-2xl font-bold text-red-400 mb-4">¿Confirmar Acción?</h3>
+            <p id="confirm-modal-text" class="text-gray-300 mb-6"></p>
+            <div class="flex justify-end space-x-4">
+                <button id="confirm-modal-cancel" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</button>
+                <button id="confirm-modal-ok" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg transition">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
 <script>
 // --- Global State & Config ---
@@ -466,7 +475,6 @@ function cleanupAndReset() {
         }
     });
     eventListeners = [];
-    console.log("Event listeners cleared.");
 
     appState = {
         userId: '',
@@ -483,7 +491,6 @@ function cleanupAndReset() {
         },
         answers: {}
     };
-    console.log("App state reset to initial values.");
 
     isAppInitialized = false;
 
@@ -492,12 +499,10 @@ function cleanupAndReset() {
         const el = document.querySelector(selector);
         if (el) el.innerHTML = '';
     });
-    console.log("Dynamic containers cleared.");
 
     document.getElementById('access-screen')?.classList.remove('hidden');
     document.getElementById('onboarding-wizard')?.classList.add('hidden');
     document.getElementById('app-container')?.classList.add('hidden');
-    console.log("Main container visibility reset.");
 }
 
 
@@ -512,19 +517,19 @@ const infoCardGraphics = {
 const tooltipDefinitions = {
     'projection': {
         title: 'Proyección de Peso',
-        text: 'Estimación de cuanto podría demorar tu cuerpo en alcanzar su equilibrio metabólico. Siempre varía según los hábitos de cada persona.'
+        text: 'Estimación de cuanto podría demorar el cuerpo en alcanzar su equilibrio metabólico saludable. Siempre varía según los hábitos de cada persona.'
     },
     'imc': {
-        title: 'Tu IMC actual',
-        text: 'El Índice de Masa Corporal (IMC) es un indicador que relaciona el peso de una persona con su altura, utilizado para evaluar si el peso se encuentra dentro de rangos saludables.'
+        title: 'IMC Actual',
+        text: 'El Índice de Masa Corporal (IMC) relaciona el peso con la altura para evaluar si el cuerpo se encuentra dentro de rangos saludables de desarrollo.'
     },
     'water': {
         title: 'Consumo de agua',
-        text: 'El cuerpo humano está compuesto aproximadamente entre un 50% y un 70% de agua. Este porcentaje puede variar dependiendo de factores como la edad, el sexo y la composición corporal de cada individuo. Y es vital para el correcto funcionamiento de nuestro cuerpo.'
+        text: 'El agua mineral natural con sal de mar y limón es vital para el equilibrio celular de todos los tejidos y una hidratación profunda.'
     },
     'recipes': {
-        title: 'Tus Recetas Keto',
-        text: 'Tendrás acceso a nuestra aplicación de recetas keto para que no te quedes estancado sin saber que preparar cada día.'
+        title: 'Recetas Keto',
+        text: 'Acceso a ideas de platos reales, sanos y deliciosos adaptados para no estancarse.'
     }
 };
 
@@ -535,6 +540,7 @@ const baseWizardSteps = [
     },
     { id: 'weight_history', type: 'question', question: '⚖️ ¿Hace cuánto tiempo que no estás en tu peso ideal? (Selecciona una opción)', key: 'weight_history', options: [
         { text: '✅ Estoy en mi peso ideal', value: 'ideal_weight' },
+        { text: '📉 Me encuentro bajo mi peso ideal / Bajo peso', value: 'underweight' },
         { text: '🗓️ Menos de un año', value: 'less_than_year' },
         { text: '📅 Más de un año', value: 'more_than_year' },
         { text: '🤷 Ya ni lo recuerdo', value: 'cant_remember' }]
@@ -562,7 +568,7 @@ const baseWizardSteps = [
     { id: 'junk_food_freq', type: 'question', question: '🌭 ¿Con qué frecuencia consumes comida chatarra? (Selecciona una opción)', key: 'junk_food_freq', options: [
         { text: '🥗 Nunca o raramente', value: 'rarely' },
         { text: '🍟 1-2 veces por semana', value: '1-2_weekly' },
-        { text: '🍕 3-4 veces por semana', value: '3-4_weekly' },
+        { text: '🍟 3-4 veces por semana', value: '3-4_weekly' },
         { text: '🍔 Casi a diario', value: 'daily' }]
     },
     { id: 'eat_out_freq', type: 'question', question: '🏙️ ¿Con qué frecuencia sales a comer fuera? (Selecciona una opción)', key: 'eat_out_freq', options: [
@@ -596,14 +602,14 @@ const baseWizardSteps = [
         { text: '🥂 Ocasionalmente', value: 'occasionally' },
         { text: '🍻 Regularmente (fines de semana)', value: 'yes' }]
     },
-    { id: 'info_weight', type: 'info_card', title: 'Tu Peso', text: 'La dieta keto es una herramienta poderosa para alcanzar tu peso ideal. Al cambiar el combustible de tu cuerpo de azúcar a grasa, no solo pierdes peso, sino que también reduces la inflamación y ganas control sobre tu apetito, evitando el temido efecto rebote.<p class="text-sm italic text-purple-300 mt-4">"El hombre se convierte en lo que come" - Ludwig Feuerbach</p>', graphic_placeholder: 'weight-graph' },
+    { id: 'info_weight', type: 'info_card', title: 'Tu Peso', text: 'La dieta keto es una herramienta poderosa para alcanzar el peso ideal. Al cambiar el combustible del cuerpo de azúcar a grasa, no solo se pierde peso, sino que también se reduce la inflamación y se gana control sobre el apetito, evitando el temido efecto rebote.<p class="text-sm italic text-purple-300 mt-4">"El hombre se convierte en lo que come" - Ludwig Feuerbach</p>', graphic_placeholder: 'weight-graph' },
     { id: 'activity_level', type: 'question', question: '🤸 ¿Cuál es tu nivel de actividad física semanal? (Selecciona una opción)', key: 'activity_level', options: [
         { text: '🛋️ Sedentario', value: 'sedentary' },
         { text: '🚶 Ligero (caminatas 1-2 días)', value: 'light' },
         { text: '🏃 Moderado (ejercicio 2-3 días)', value: 'moderate' },
         { text: '🏋️ Intenso (ejercicio 4+ días)', value: 'high' }]
     },
-    { id: 'info_appetite', type: 'info_card', title: 'Tu Apetito', text: 'Al entrar en cetosis, tu cuerpo se vuelve sensible a las hormonas de la saciedad. Esto se traduce en menos antojos y un control natural del hambre, permitiéndote comer de forma consciente y no por impulso.<p class="text-sm italic text-purple-300 mt-4">"Comer es una necesidad, pero comer inteligentemente es un arte" - La Rochefoucauld</p>', graphic_placeholder: 'appetite-graph' },
+    { id: 'info_appetite', type: 'info_card', title: 'Tu Apetito', text: 'Al entrar en cetosis, el cuerpo se vuelve sensible a las hormonas de la saciedad. Esto se traduce en menos antojos y un control natural del hambre, permitiendo comer de forma consciente y no por impulso.<p class="text-sm italic text-purple-300 mt-4">"Comer es una necesidad, pero comer inteligentemente es un arte" - La Rochefoucauld</p>', graphic_placeholder: 'appetite-graph' },
     { id: 'health_conditions', type: 'question', question: '❤️‍🩹 ¿Tienes alguna de estas condiciones de salud? (Puedes seleccionar varias)', key: 'health_conditions', multiple: true, options: [
         { text: '🩸 Resistencia a la Insulina / Diabetes T2', value: 'insulin_resistance' },
         { text: '🌿 Hígado Graso', value: 'fatty_liver' },
@@ -613,14 +619,14 @@ const baseWizardSteps = [
         { text: '😴 Insomnio / Fatiga Crónica', value: 'insomnia' },
         { text: '✅ Ninguna de las anteriores', value: 'none' }]
     },
-    { id: 'info_sugar', type: 'info_card', title: 'Tu Azúcar en Sangre', text: 'La dieta keto es excepcional para estabilizar la glucosa. Al minimizar los carbohidratos, evitas los picos de azúcar que causan fatiga y antojos, logrando niveles de energía estables durante todo el día.<p class="text-sm italic text-purple-300 mt-4">"La comida debe ser simple, natural y nutritiva" - Louis Pasteur</p>', graphic_placeholder: 'sugar-graph' },
+    { id: 'info_sugar', type: 'info_card', title: 'Tu Azúcar en Sangre', text: 'La dieta keto es excepcional para estabilizar la glucosa. Al minimizar los carbohidratos, se evitan los picos de azúcar que causan fatiga y antojos, logrando niveles de energía estables durante todo el día.<p class="text-sm italic text-purple-300 mt-4">"La comida debe ser simple, natural y nutritiva" - Louis Pasteur</p>', graphic_placeholder: 'sugar-graph' },
     { id: 'stress_level', type: 'question', question: '🤯 ¿Sientes estrés con frecuencia? (Selecciona una opción)', key: 'stress_level', options: [
         { text: '😊 Nunca', value: 'never' },
         { text: '🙂 A veces', value: 'sometimes' },
         { text: '😟 A menudo', value: 'often' },
         { text: '😩 Casi siempre', value: 'always' }]
     },
-    { id: 'info_water', type: 'info_card', title: 'Tu Hidratación', text: 'El agua es clave en keto para optimizar la quema de grasa y eliminar toxinas. Una correcta hidratación con electrolitos previene la "gripe keto" y potencia tus resultados. Te daremos una meta personalizada.<p class="text-sm italic text-purple-300 mt-4">"La comida es la base de toda cura" - Paracelso</p>', graphic_placeholder: 'water-graph' },
+    { id: 'info_water', type: 'info_card', title: 'Tu Hidratación', text: 'El agua mineral natural con sal de mar y limón es clave en keto para optimizar la quema de grasa y eliminar toxinas. Una correcta hidratación previene la "gripe keto" y potencia tus resultados.<p class="text-sm italic text-purple-300 mt-4">"La comida es la base de toda cura" - Paracelso</p>', graphic_placeholder: 'water-graph' },
     { id: 'final_measures', type: 'final', question: '¡Casi listo! Introduce tus medidas para personalizar tu plan.' },
 ];
 
@@ -641,25 +647,25 @@ const mainGoalPlan = {
             "<strong>Vaciar las Reservas de Azúcar (Depleción de Glucógeno):</strong> Durante los primeros 3-5 días, tu única misión es agotar el azúcar almacenado en tus músculos e hígado. Para ello, elimina por completo todos los azúcares, granos, harinas y frutas (excepto un puñado de bayas). Sé estricto aquí, es la fase más crítica.",
             "<strong>Activar la Quema de Grasa (Lipólisis):</strong> Una vez vaciadas las reservas, tu cuerpo buscará una nueva fuente de energía. Aquí es donde entran las grasas saludables. Come palta, aceite de oliva, aceitunas, y no temas a la grasa natural de las carnes y huevos. Estás enseñando a cada célula de tu cuerpo a usar grasa como su combustible preferido.",
             "<strong>Controlar la Insulina con tus Comidas:</strong> Come 2 o 3 comidas densas en nutrientes al día hasta sentirte saciado. Evita picotear entre horas. Cada vez que comes, generas una respuesta de insulina. Al espaciar tus comidas, mantienes la insulina baja por más tiempo, maximizando las horas del día en que tu cuerpo está activamente quemando grasa.",
-            "<strong>Optimizar con Electrolitos:</strong> Este paso no es opcional. La pérdida de agua inicial arrastra minerales. Prepara tu suero con <strong>agua mineral, sal de mar y limón</strong> y bébelo durante el día para evitar fatiga o calambres."
+            "<strong>Optimizar tu Recuperación Celular:</strong> Dale prioridad absoluta a tu descanso. Intenta dormir entre 7 y 8 horas diarias de calidad para mantener regulado tu cortisol, asegurando que tu cuerpo pueda desinflamarse y regenerarse correctamente."
         ]
     },
     energy: {
         science: `Un objetivo fantástico y uno de los beneficios más sorprendentes para muchos. Piénsalo de esta manera: tu cerebro ha estado funcionando con glucosa (azúcar), que es como echarle a un auto de lujo la gasolina de peor calidad. Te da picos de energía seguidos de caídas bruscas, lo que causa esa 'niebla mental' y el cansancio de la tarde.<br><br>Cuando tu cuerpo entra en cetosis, empieza a producir <strong>cetonas</strong>. Las cetonas son un <strong>súper-combustible</strong> para el cerebro. Son una fuente de energía mucho más limpia, estable y duradera que la glucosa. Al darle a tu cerebro este combustible premium, lo que experimentarás no es una energía nerviosa como la del café, sino una <strong>calma enfocada</strong>.`,
         steps: [
             "<strong>Fase de Adaptación (Semana 1-2):</strong> Tu prioridad absoluta es enseñarle a tu cerebro a pedir el nuevo combustible. Elimina por completo azúcares, harinas y procesados. No te preocupes por contar calorías, solo enfócate en comer alimentos de nuestra lista de compras hasta sentirte saciado.",
-            "<strong>Prioriza las Grasas Inteligentes:</strong> Tu cerebro está composto en un 60% por grasa. Dale los mejores materiales. Incorpora a diario palta (aguacate), aceite de oliva extra virgen, aceitunas y considera añadir aceite MCT a tu café o batidos para un impulso cetónico directo al cerebro.",
-            "<strong>Hidratación Neuronal:</strong> Un cerebro deshidratado es un cerebro lento. Prepara tu suero diario con <strong>agua mineral, sal de mar y limón</strong>. Los electrolitos son cruciales para la comunicación entre neuronas y la claridad mental.",
+            "<strong>Prioriza las Grasas Inteligentes:</strong> Tu cerebro está compuesto en un 60% por grasa. Dale los mejores materiales. Incorpora a diario palta (aguacate), aceite de oliva extra virgen, aceitunas y considera añadir aceite MCT a tu café o batidos para un impulso cetónico directo al cerebro.",
+            "<strong>Estabilidad Dopaminérgica:</strong> Controla el consumo excesivo de estímulos tecnológicos y pantallas de noche. Esto regula tus niveles de dopamina y cortisol, permitiendo que tu cerebro funcione de manera enfocada, sin bloqueos y con alta claridad mental.",
             "<strong>Introduce el Ayuno 16/8:</strong> Una vez adaptado (después de la semana 2), intenta consolidar tus comidas en una ventana de 8 horas. Este período de ayuno de 16 horas potenciará la producción de cetonas y activará la autofagia, un proceso de limpieza celular que es increíblemente beneficioso para la salud neuronal."
         ]
     },
     health: {
         science: `Has elegido el camino más profundo y poderoso. La mayoría de las condiciones de salud crónicas modernas no son fallos de tu cuerpo, sino respuestas lógicas a un ambiente hostil, principalmente uno pro-inflamatorio. El azúcar y los carbohidratos refinados son los principales culpables, actúan como un incendio constante a nivel celular.<br><br>Al cambiar tu fuente de energía a grasas saludables, no solo quitamos el combustible a ese incendio, sino que producimos <strong>cetonas</strong>, que son moléculas de señalización que activamente le dan a tus genes la orden de <strong>reducir la inflamación</strong>. Estamos, literalmente, cambiando la expresión de tus genes hacia un estado de reparación y equilibrio.`,
         steps: [
-            "<strong>Apagar el Fuego Inflamatorio:</strong> Tu primer paso, no negociable, es cortar de raíz los principales agentes inflamatorios: azúcar, harinas, granos y aceites de semilla (girasol, canola, soya). Esto es como dejarleña al fuego.",
+            "<strong>Apagar el Fuego Inflamatorio:</strong> Tu primer paso, no negociable, es cortar de raíz los principales agentes inflamatorios: azúcar, harinas, granos y aceites de semilla (girasol, canola, soya). Esto es como dejar leña al fuego.",
             "<strong>Construir con Materiales Anti-inflamatorios:</strong> Prioriza grasas como la palta (aguacate), el aceite de oliva y el pescado graso (rico en Omega-3). Estas grasas son los ladrillos que tus células usarán para reparar sus membranas y calmar la inflamación.",
-            "<strong>Activar la Limpieza Celular (Autofagia):</strong> Introduce un ayuno intermitente suave, como el 16/8 (16 horas de ayuno, 8 para comer). Este período sin comer le da a tu cuerpo el tiempo y la señal para activar un proceso de 'reciclaje' interno, donde elimina las células dañadas que perpetúan la inflamación.",
-            "<strong>Reducir el Estrés Metabético:</strong> El estrés crónico libera cortisol, una hormona que puede sabotear tus esfuerzos. Dedica 10 minutos diarios a una actividad relajante (caminar, respirar, meditar). Calmar tu sistema nervioso es tan importante como calmar la inflamación con la comida."
+            "<strong>Activar la Limpieza Celular (Autofagia):</strong> Introduce un ayuno intermitente suave, como el 16/8 (16 horas de ayuno, 8 para comer). Este período sin comer le da a tu cuerpo el tiempo y la señal para activar un proceso de 'reciclaje' interno, donde elimina las células dañadas que de otra forma perpetúan la inflamación.",
+            "<strong>Reducir el Estrés Metabólico:</strong> El estrés crónico libera cortisol, una hormona que puede sabotear tus esfuerzos. Dedica 10 minutos diarios a una actividad relajante (caminar, respirar, meditar). Calmar tu sistema de alarma del sistema nervioso es tan importante como calmar la inflamación con la comida."
         ]
     },
     muscle: {
@@ -668,12 +674,50 @@ const mainGoalPlan = {
             "<strong>Calcula tu Proteína Objetivo:</strong> Este es tu paso más importante. Apunta a consumir entre 1.6 y 2.2 gramos de proteína por cada kilogramo de tu peso corporal ideal. Divide esa meta entre tus comidas. La proteína es el ladrillo para tus músculos.",
             "<strong>Entrenamiento de Fuerza es Prioridad:</strong> Debes darle a tus músculos una razón para crecer. Prioriza el entrenamiento con pesas (pesas, calistenia) al menos 3-4 veces por semana, enfocándote en la sobrecarga progresiva (levantar un poco más o hacer más repeticiones con el tiempo).",
             "<strong>Usa la Grasa como Palanca Energética:</strong> La grasa es tu energía para entrenar. No le temas. Asegúrate de consumir suficientes grasas saludables para sentirte con energía durante tus sesiones. Si te sientes débil, probablemente necesites más grasa, no más carbohidratos.",
-            "<strong>El Sueño es Anabólico:</strong> El músculo no crece en el gimnasio, crece mientras duermes. Apunta a 7-9 horas de sueño de calidad por noche. Durante el sueño profundo, tu cuerpo libera hormona de crecimiento, que es esencial para la reparación y el crecimiento muscular."
+            "<strong>El Sueño es Anabólico:</strong> El músculo no crece en el gimnasio, crece mientras duermes. Apunta a 7-9 horas de sueño de calidad por noche. Durante el sueño profundo, tu cuerpo libera la hormona de crecimiento, que es esencial para la reparación y el crecimiento muscular."
         ]
     }
 };
 
-// --- 100% REWRITTEN CONTENT FOR ORIGINALITY AND PLAGIARISM-FREE GUARANTEE ---
+const mainGoalPlanPediatric = {
+    loss: {
+        science: `Tu hijo(a) tiene un cuerpo en desarrollo activo que requiere materiales de construcción de primera calidad. Cuando un(a) niño(a) tiene exceso de peso, no se debe a una "falta de voluntad", sino a una respuesta de almacenamiento constante de energía provocada por picos continuos de insulina. Cada vez que consumen harinas refinadas o azúcares ocultos, el cuerpo guarda esa energía y bloquea su capacidad de usarla como combustible.<br><br>Al priorizar alimentos reales y reducir drásticamente los procesados industriales, bajamos suavemente los niveles de insulina. Esto permite que el organismo de tu hijo(a) use sus propias reservas de grasa de forma natural para crecer con fuerza y vitalidad, sin pasar hambre ni sufrir ansiedad. No buscamos restrictividad, sino restauración de su metabolismo infantil de manera segura.`,
+        steps: [
+            "<strong>Alimentación Basada en Comida Real:</strong> Enfócate en eliminar jugos envasados, cereales de caja, harinas y azúcares. Llena su plato de proteínas de calidad (huevos, carnes, pescados), vegetales de colores y grasas saludables (palta, mantequilla, aceite de oliva).",
+            "<strong>El Único Ayuno Infantil Permitido:</strong> El único ayuno que se recomienda para un(a) niño(a) es el ayuno fisiológico natural nocturno. Consiste en respetar el intervalo entre su última comida de la tarde/noche y el desayuno del día siguiente, considerando sus indispensables horas de sueño profundo (mínimo 10-12 horas sin ingerir comida sólida). No se permiten ayunos prolongados.",
+            "<strong>Protección del Crecimiento Celular:</strong> No cuentes calorías ni limites las porciones de comida real. Deja que coma hasta saciarse de alimentos nutritivos. Un cerebro y cuerpo bien nutridos detienen los antojos de forma automática.",
+            "<strong>Soporte Metabólico en Casa:</strong> Establece rutinas estructuradas de juego activo y movimiento al aire libre. La actividad física de juego libre actúa como un sensibilizador natural a la insulina, permitiendo que su metabolismo queme energía eficientemente y crezca de forma equilibrada."
+        ]
+    },
+    energy: {
+        science: `Para un(a) niño(a) en etapa escolar, la concentración, el enfoque y la estabilidad del carácter son fundamentales. El cerebro infantil consume una cantidad masiva de energía basándose en la calidad de lo que ingiere. Al alimentarlo con azúcares y jugos procesados, su cerebro vive en una constante montaña rusa de energía: picos de hiperactividad seguidos de caídas bruscas de glucosa que causan déficit de atención, irritabilidad y cansancio crónico.<br><br>Al transicionar hacia energía limpia proveniente de grasas saludables, su cerebro empieza a utilizar cetonas. Las cetonas actúan como un combustible premium de flujo constante, proporcionando una calma enfocada y una atención sostenida durante sus actividades de aprendizaje y juego.`,
+        steps: [
+            "<strong>Energía Cerebral Premium:</strong> Asegura el consumo de grasas saludables que forman el 60% de su estructura cerebral. Incorpora palta, aceite de oliva virgen extra, yemas de huevo y frutos secos adecuados para su edad.",
+            "<strong>Evita los Estimulantes Artificiales:</strong> Bebidas energéticas, refrescos de cola y café están contraindicados. Sobrecargan sus glándulas suprarrenales y sabotean su desarrollo neurológico.",
+            "<strong>Respeta su Descanso Nocturno:</strong> Asegura que cene al menos 2 horas antes de dormir para que la insulina no interfiera con la liberación nocturna de la Hormona del Crecimiento (GH). El ayuno natural nocturno es el único permitido.",
+            "<strong>Ambiente de Aprendizaje Estimulante:</strong> Fomenta actividades de concentración que no involucren pantallas táctiles (lectura, juegos de mesa, dibujo) para regular su dopamina natural. Esto estabilizará su atención de forma sostenida junto con la energía de la comida real."
+        ]
+    },
+    health: {
+        science: `La inflamación de bajo grado es el principal enemigo del desarrollo celular óptimo de tu hijo(a). Elementos procesados como aceites de semillas vegetales industriales refinados, harinas y azúcares actúan como un constante agresor a nivel intestinal y de tejidos. Al cambiar estos agresores por alientos antiinflamatorios reales, permitimos que el cuerpo desvíe su energía de la "defensa inflamatoria" hacia el desarrollo óptimo de todos sus sistemas.<br><br>Las cetonas producidas a través de comida real actúan como moléculas de señalización celular que reducen activamente la inflamación sistémica, permitiendo una regeneración y salud profunda para su crecimiento.`,
+        steps: [
+            "<strong>Eliminar Agresores Celulares:</strong> Quita por completo de su dieta aceites de soya, canola o maravilla, azúcares y harinas procesadas que inflaman su intestino y tejidos.",
+            "<strong>Nutrientes de Reparación:</strong> Prioriza fuentes ricas en Omega-3 como pescados grasos pequeños, huevos de campo y grasas estables como el aceite de coco y de oliva.",
+            "<strong>Descanso Fisiológico del Intestino:</strong> Permite que su sistema digestivo descanse únicamente durante el sueño nocturno. El único ayuno recomendado es el descanso nocturno natural de 12 horas entre la cena y el desayuno.",
+            "<strong>Equilibrio del Sistema de Alarma:</strong> Promueve un ambiente de calma emocional en el hogar. Reducir el estrés del entorno familiar es indispensable para mantener bajos sus niveles de cortisol de defensa y permitir una recuperación celular profunda."
+        ]
+    },
+    muscle: {
+        science: `El desarrollo óseo, muscular y articular de un(a) niño(a) es un proceso de ingeniería biológica asombroso. Para construir huesos fuertes y una musculatura sana en crecimiento, el menor necesita aminoácidos esenciales de alta biodisponibilidad y un entorno hormonal estable. La insulina alta y la inflamación crónica interfieren directamente con la asimilación de proteínas en las placas de crecimiento.<br><br>Al proporcionar un entorno metabólico equilibrado a través de la comida real, optimizamos la mineralización de sus huesos y aseguramos que las proteínas construyan tejido magro de forma segura y eficiente.`,
+        steps: [
+            "<strong>Proteína Pediátrica de Calidad:</strong> Ofrece porciones adecuadas de proteínas reales (huevos, pollo, carnes rojas de pastoreo, pescados). Su requerimiento clínico se calcula en un rango de 1.2 a 1.5 g/kg.",
+            "<strong>Estimula sus Huesos con Movimiento:</strong> Promueve el juego activo al aire libre, correr, saltar y colgarse. El impacto y la tracción muscular son indispensables para la fijación del calcio.",
+            "<strong>Hormonas de Crecimiento Activas:</strong> Protege sus horas de sueño profundo (mínimo 9-10 horas), que es cuando se libera el mayor pulso de Hormona del Crecimiento (GH). El único ayuno es el nocturno fisiológico.",
+            "<strong>Recuperación y Descanso Estructural:</strong> Asegura periodos de reposo activo después del juego intenso. El músculo infantil y las placas de crecimiento óseo requieren momentos de inactividad física combinados con sueño profundo para consolidar la síntesis de nuevas fibras y tejidos."
+        ]
+    }
+};
+
 const pathologyExplanations = {
     insulin_resistance: {
         title: "Punto de Enfoque: Resistencia a la Insulina / Diabetes tipo 2",
@@ -693,7 +737,7 @@ const pathologyExplanations = {
     hypothyroidism: {
         title: "Punto de Enfoque: Hipotiroidismo",
         cause: "La tiroides es el 'termostato' de tu metabolismo. En el hipotiroidismo, este termostato funciona a un ritmo más bajo, causando cansancio y lentitud. Este estado a menudo se ve empeorado por una inflamación corporal generalizada, que actúa como un 'ruido de fondo' que interfiere aún más con la señal de la tiroides.",
-        action: "Este plan actúa como un 'aislante acústico' para tu metabolismo. Al ser profundamente antiinflamatorio, reducimos ese 'ruido de fondo', permitiendo que la función tiroidea que tienes trabaje de forma más eficiente. Aunque no es un reemplazo de tu tratamiento, muchas personas sienten un aumento significativo de energía y vitalidad al quitarle esta carga extra al cuerpo."
+        action: "Este plan actúa como un 'aislante acústico' para tu metabolismo. Al ser profundamente antiinflamatorio, reducimos ese 'ruido de fondo', permitiendo que la función tiroidea que tienes trabaje de forma más eficiente. Aunque no es un reemplazo de tu tratamiento, muchas personas sienten un aumento de energía y vitalidad al quitarle esta carga extra al cuerpo."
     },
     inflammation: {
         title: "Punto de Enfoque: Inflamación Sistémica",
@@ -707,11 +751,10 @@ const pathologyExplanations = {
     }
 };
 
-// --- LIBRERÍA DE CONSEJOS PARA HÁBITOS ---
 const habitAdviceLibrary = {
     'sleep_less': {
         title: 'Sobre Dormir Poco',
-        text: 'Dormir menos de 7 horas dispara la hormona del estrés, cortisol. Esto no solo aumenta el azúcar en sangre y promove el almacenamiento de grasa abdominal, sino que también incrementa la grelina, la hormona del hambre, provocando antojos de energía rápida (azúcar) al día siguiente. Priorizar el sueño es una estrategia metabólica fundamental.'
+        text: 'Dormir menos de 7 horas dispara la hormona del estrés, cortisol. Esto no solo aumenta el azúcar en sangre y promueve el almacenamiento de grasa abdominal, sino que también incrementa la grelina, la hormona del hambre, provocando antojos de energía rápida (azúcar) al día siguiente. Priorizar el sueño es una estrategia metabólica fundamental.'
     },
     'dine_late': {
         title: 'Sobre Comer Tarde por la Noche',
@@ -731,11 +774,10 @@ const habitAdviceLibrary = {
     }
 };
 
-// --- LIBRERÍA PSICOLÓGICA COMBINADA ---
 const psicologiaCombinada = {
     'yes': {
         'always': {
-            enfoquePsicologico: "Gracias por tu valentía al compartir esto. Es vital que reconozcas esta intensa conexión: cuando el estrés es constante, tu cuerpo está en modo de supervivencia y busca alivio inmediato. Comer por emoción no es una falla de voluntad, sino una respuesta bioquímica para obtener una dosis rápida de calma a través de la comida. Este plan está diseñado para romper ese ciclo, dándote energía estable desde las grasas para que tu cerebro no necesite esos 'rescates' de azúcar.",
+            enfoquePsicologico: "Gracias por tu valentía al compartir esto. Es vital que reconozcas esta intensa conexión: cuando el estrés es constante, tu cuerpo está en modo de supervivencia y busca alivio inmediato. Comer por emoción no es una falla de voluntad, sino una respuesta bioquímica para obtener una dosis rápida de calma a través de la comida. Este plan está diseñado para romper ese ciclo, dándote energía de manera estable desde las grasas para que tu cerebro no necesite esos 'rescates' de azúcar.",
             consejoAntiEstres: "Como un primer paso para recuperar el control, te propongo una 'Pausa de Anclaje' de 1 minuto. Cuando sientas que el estrés te desborda, detente. Pon una mano sobre tu pecho y siente tu respiración. No intentes cambiarla, solo siéntela. Este simple acto físico te reconecta con tu cuerpo en el presente y crea un espacio entre el impulso y la acción, dándote el poder de elegir."
         },
         'often': {
@@ -748,7 +790,7 @@ const psicologiaCombinada = {
         },
         'never': {
             enfoquePsicologico: "Es interesante que, aunque no sientas estrés, sí identifiques el hambre emocional. Esto puede indicar que el hábito está muy arraigado o que la causa es puramente bioquímica: la montaña rusa del azúcar. Al estabilizar tu glucosa con Keto, le quitamos el combustible a ese impulso, permitiéndote nutrir tu cuerpo con verdadera intención.",
-            consejoAntiEstres: "Ya que no sientes estrés, tu herramienta será la 'Nutrición Consciente'. Antes de comer, pregúntate: '¿Esto es hambre real o es un hábito?'. Tómate un vaso de agua y espera 5 minutos. Esta simple pausa te dará la claridad para diferenciar el hambre física de la emocional."
+            consejoAntiEstres: "Ya que no sientes estrés, tu herramienta será la 'Nutrición Consciente'. Antes de comer, pregúntate: '¿Esto es hambre real o es un hábito?'. Tómate un vaso de agua mineral y espera 5 minutos. Esta simple pausa te dará la claridad para diferenciar el hambre física de la emocional."
         }
     },
     'sometimes': {
@@ -765,7 +807,7 @@ const psicologiaCombinada = {
             consejoAntiEstres: "Tu herramienta será el 'Diario de Detonantes'. Cuando sientas la combinación de estrés y ganas de comer por emoción, anota rápidamente qué pasó justo antes. ¿Una reunión difícil? ¿Una mala noticia? Identificar tus patrones es el primer paso para desactivarlos."
         },
         'never': {
-            enfoquePsicologico: "Aquí vemos que el hambre emocional, aunque ocasional, no está ligada al estrés. Esto apunta fuertemente a una causa fisiológica. Probablemente, tus 'antojos' ocasionais coinciden con bajadas de azúcar en sangre. Keto es la solución perfecta para esto, ya que elimina esa montaña rusa de glucosa.",
+            enfoquePsicologico: "Aquí vemos que el hambre emocional, aunque ocasional, no está ligada al estrés. Esto apunta fuertemente a una causa fisiológica. Probablemente, tus 'antojos' ocasionales coinciden con bajadas de azúcar en sangre. Keto es la solución perfecta para esto, ya que elimina esa montaña rusa de glucosa.",
             consejoAntiEstres: "Tu práctica será la 'Planificación de Snacks Inteligentes'. Ten siempre a mano un snack keto aprobado (un puñado de almendras, unas aceitunas). Así, cuando aparezca el impulso, tienes una opción que te saciará sin sacarte del plan y sin reforzar el ciclo del azúcar."
         }
     },
@@ -784,7 +826,7 @@ const psicologiaCombinada = {
         },
         'never': {
             enfoquePsicologico: "Este es el escenario ideal. No sufres de estrés y el hambre emocional es prácticamente inexistente. Tienes una base psico-metabólica sólida. Para ti, este plan no es una reparación, es una optimización para alcanzar tu máximo potencial de energía y rendimiento cognitivo.",
-            consejoAntiEstres: "Tu práctica es la 'Gratitud Activa'. Cada día, piensa en tres cosas específicas por las que estás agradecido. Esto refuerza las vías neuronales positivas y protege tu mente contra el estrés futuro, manteniendo esa fortaleza que ya posees."
+            consejoAntiEstres: "Tu práctica es la 'Gratitud Activa'. Cada día, piensa en tres cosas específicas por las que estás agradecido. Esto devuelve calma al sistema de alarma y protege tu mente contra el estrés futuro, manteniendo esa fortaleza que ya posees."
         }
     },
     'never': {
@@ -793,7 +835,7 @@ const psicologiaCombinada = {
             consejoAntiEstres: "Tu enfoque debe ser el movimiento. El ejercicio de baja intensidad, como una caminata diaria de 30 minutos, es una de las formas más efectivas de 'quemar' el exceso de cortisol y adrenalina generados por el estrés crónico. No es para quemar calorías, es para limpiar tu sistema."
         },
         'often': {
-            enfoquePsicologico: "Tienes una excelente disociación entre emoción y comida. El estrés frecuente sigue siendo un desafío metabólico. Al cambiar a Keto, tu cuerpo y cerebro tendrán un combustible más eficiente, lo que te hará sentir más ecuánime y con mayor capacidad para gestionar esos picos de estrés sin que te agoten.",
+            enfoquePsicologico: "Tienes una excelente disociación entre emoción y comida. El estrés frecuente sigue siendo un desafío metabólico. Al cambiar a Keto, tu cuerpo y cerebro tendrán un combustible más eficiente, lo que te hará sentir con mayor capacidad para gestionar esos picos de estrés sin que te agoten.",
             consejoAntiEstres: "Usa la 'Técnica de la Perspectiva'. Cuando te sientas estresado, pregúntate: '¿Esto importará en 5 días? ¿En 5 meses? ¿En 5 años?'. Esta pregunta ayuda a redimensionar el problema y a reducir la respuesta de estrés inmediata."
         },
         'sometimes': {
@@ -802,7 +844,7 @@ const psicologiaCombinada = {
         },
         'never': {
             enfoquePsicologico: "Felicidades, este es el estado óptimo de bienestar psico-metabólico. Tienes una relación impecable con la comida y un sistema nervioso bien regulado. Este plan te servirá para explorar los beneficios más profundos de la cetosis, como la longevidad celular y el máximo rendimiento cognitivo.",
-            consejoAntiEstres: "Tu práctica es el 'Reto Positivo'. Ya que no tienes que luchar contra el estrés, canaliza esa energía en un nuevo reto que te entusiasme: aprender una nueva habilidad, un nuevo deporte. Esto mantiene tu cerebro plástico y tu motivación alta."
+            consejoAntiEstres: "Tu práctica es el 'Reto Positivo'. Ya que no tienes que luchar contra el estrés, canaliza esa energía en un nuevo reto que te entusiasme: aprender una nueva habilidad, un nuevo deporte. Esto mantiene tu cerebro activo y tu motivación alta."
         }
     }
 };
@@ -813,18 +855,18 @@ const junkFoodAdviceLibrary = {
         text: "¡Excelente! Disfrutar de un gusto de vez en cuando es parte de un estilo de vida sostenible. La clave es hacerlo de forma inteligente. La próxima vez que tengas antojo de una hamburguesa, te retamos a que la prepares en casa. Imagina: carne de alta calidad, queso derretido, tocino crujiente, palta y tus vegetales favoritos... todo dentro de un <strong>delicioso pan de hamburguesa keto</strong> que puedes hacer tú mismo o encontrar en tiendas especializadas. Descubrirás que la versión casera y keto no solo es increíblemente sabrosa, sino que te dejará sintiéndote con energía, no inflamado."
     },
     '1-2_weekly': {
-        text: "Gracias por tu honestidad. Es importante que sepas que consumir comida chatarra varias veces por semana somete a tu cuerpo a un estrés metabólico constante. No se trata solo de calorías, sino de una avalancha de inflamación. Los aceites vegetales refinados (soya, canola) aumentan la inflamación celular, mientras que el exceso de azúcar y harinas dispara tu insulina, promoviendo el almacenamiento de grasa y alimentando un ciclo de antojos. Este plan está diseñado para darte las herramientas para romper ese ciclo."
+        text: "Gracias por tu honestidad. Es importante que sepas que consumir comida chatarra varias veces por semana somete a tu cuerpo a un estrés metabólico constante. No se trata solo de calorías, sino de una avalancha de inflamación. Los aceites vegetales de semillas industriales refinados aumentan la inflamación celular, mientras que el exceso de azúcar y harinas dispara tu insulina, promoviendo el almacenamiento de grasa y alimentando un ciclo de antojos. Este plan está diseñado para darte las herramientas para romper ese ciclo."
     },
     '3-4_weekly': {
-        text: "Gracias por tu honestidad. Es importante que sepas que consumir comida chatarra varias veces por semana somete a tu cuerpo a un estrés metabólico constante. No se trata solo de calorías, sino de una avalancha de inflamación. Los aceites vegetales refinados (soya, canola) aumentan la inflamación celular, mientras que el exceso de azúcar y harinas dispara tu insulina, promoviendo el almacenamiento de grasa y alimentando un ciclo de antojos. Este plan está diseñado para darte las herramientas para romper ese ciclo."
+        text: "Gracias por tu honestidad. Es importante que sepas que consumir comida chatarra varias veces por semana somete a tu cuerpo a un estrés metabólico constante. No se trata solo de calorías, sino de una avalancha de inflamación. Los aceites vegetales de semillas industriales refinados aumentan la inflamación celular, mientras que el exceso de azúcar y harinas dispara tu insulina, promoviendo el almacenamiento de grasa y alimentando un ciclo de antojos. Este plan está diseñado para darte las herramientas para romper ese ciclo."
     },
     'daily': {
         text: `Aquí necesitamos ser completamente transparentes. Comer comida rápida a diario es una de las acciones más perjudiciales para tu salud a largo plazo. Es similar a la advertencia que las cadenas de comida rápida están obligadas a mostrar: estos alimentos están asociados a enfermedades graves. Esto se debe a que no solo consumes calorías vacías, sino un cóctel de químicos diseñados para crear adicción.<br><br>
         <strong>Algunos de los ingredientes que estás ingeriendo son:</strong><br>
         <ul class="list-disc list-inside mt-2 space-y-1">
-            <li><strong>Aceites Hidrogenados (Grasas Trans):</strong> Se utilizan para freír porque son baratos y reutilizables. Tu cuerpo no puede procesarlos, lo que causa inflamación masiva en tus arterias y células.</li>
+            <li><strong>Aceites Hidrogenados (Grasas Trans) y de semillas refinados:</strong> Se utilizan para freír porque son baratos y reutilizables. Tu cuerpo no puede procesarlos, lo que causa inflamación masiva en tus arterias y células.</li>
             <li><strong>Jarabe de Maíz de Alta Fructosa:</strong> Un azúcar ultraprocesado que va directo a tu hígado, convirtiéndose en grasa y siendo un precursor directo del hígado graso y la resistencia a la insulina.</li>
-            <li><strong>Glutamato Monosódico (GMS):</strong> Un potenciador del sabor que 'engaña' a tu cerebro, haciéndote comer más de lo que necesitas y anulando tus señales naturales de saciedad.</li>
+            <li><strong>Glutamato Monosódico (GMS):</strong> Un potenciador del sabor que 'engaña' a tu cerebro, haciéndote comer más de lo que necesitas y anulando tus señales de saciedad naturales.</li>
             <li><strong>Acrilamidas:</strong> Un compuesto químico que se forma en alimentos ricos en almidón (como las papas fritas) al ser cocinados a altas temperaturas. Las agencias de salud lo clasifican como un probable carcinógeno.</li>
         </ul><br>
         La decisión de seguir este plan es el primer paso para liberar a tu cuerpo de esta carga tóxica.`
@@ -834,28 +876,28 @@ const junkFoodAdviceLibrary = {
 // --- LIBRERÍA DE CONSEJOS PARA BEBIDAS ---
 const drinksAdviceLibrary = {
     'water': {
-        title: 'La Jerarquía de la Hidratación',
-        text: "Has elegido el pilar fundamental de la vida, pero es crucial entender que no toda el agua hidrata de la misma manera.<br><ul class='list-disc list-inside mt-2 space-y-1'><li><strong>Agua de la Llave:</strong> A menudo contiene aditivos como el cloro, que puede dañar tu microbiota, y el flúor, un disruptor endocrino que puede calcificar la glándula pineal, reguladora de tus ciclos de sueño.</li><li><strong>Agua Purificada:</strong> Es un agua 'muerta' y desmineralizada que puede 'robar' minerales de tu cuerpo.</li><li><strong>Agua Mineral:</strong> Es la opción superior, cargada de electrolitos naturales para una verdadera hidratación celular.</li></ul>"
+        title: 'La Jerarquía de la Hidratación Real',
+        text: "Has elegido el pilar fundamental de la vida, pero es crucial entender que no toda el agua hidrata de la misma manera.<br><ul class='list-disc list-inside mt-2 space-y-1'><li><strong>Agua de la Llave y Agua Filtrada Común:</strong> El agua filtrada normal o de la llave carece de minerales esenciales, arrastra aditivos como cloro (perjudicial para la microbiota intestinal) o flúor (potente calcificador de la glándula pineal). No hidrata de forma intracelular porque está desprovista de sales.</li><li><strong>Agua Purificada Industrial:</strong> Es agua metabólicamente desmineralizada que puede 'robar' minerales de tu cuerpo al intentar equilibrarse en tus tejidos.</li><li><strong>Agua Mineral Natural:</strong> Es la única opción superior. Acompáñala siempre de <strong>sal de mar y limón</strong>. El sodio y el potasio son los conductores eléctricos que permiten que el agua entre verdaderamente a las células. Puedes saborizarla de forma deliciosa agregando rodajas de pepino, hojas de menta, frambuesas o arándanos para aromatizar y mejorar su sabor de manera saludable.</li></ul>"
     },
     'juice': {
-        title: 'La Verdad Tóxica de la Fructosa',
-        text: "Los jugos, incluso naturales, son una bomba de **fructosa** líquida. Su metabolismo en el hígado consume energía (ATP) y genera un residuo tóxico: **ácido úrico**. El ácido úrico elevado puede cristalizarse en las articulaciones causando **Gota** y, además, inhibe la producción de **óxido nítrico**, crucial para la salud de tus vasos sanguíneos y la presión arterial."
+        title: 'La Verdad Fisiológica de la Fructosa',
+        text: "Los jugos, incluso naturales, son una bomba de **fructosa** líquida desprovista de fibra. Su metabolismo en el hígado consume energía (ATP) de forma acelerada y genera un residuo inflamatorio: el **ácido úrico**. El ácido úrico elevado inhibe la producción de **óxido nítrico**, crucial para la flexibilidad de los vasos sanguíneos y el control de la presión arterial, además de propiciar el hígado graso de forma silenciosa."
     },
     'soda': {
         title: 'El Cóctel Químico de las Gaseosas',
-        text: "Las gaseosas, incluidas las 'diet', son un ataque químico a tu metabolismo. Las azucaradas conducen al hígado graso. Las 'diet' usan químicos como el **aspartamo** (asociado en estudios con daños neurológicos) y el **colorante caramelo (E150d)**, cuyo proceso de fabricación genera 4-MEI, un posible carcinógeno."
+        text: "Las gaseosas, incluidas las 'diet', son un ataque químico a tu metabolismo. Las azucaradas conducen de inmediato al hígado graso. Las 'diet' usan edulcorantes químicos como el **aspartamo** (asociado en estudios con daños neurodegenerativos) y el **colorante caramelo (E150d)**, cuyo proceso de fabricación genera compuestos sospechosos para la salud general."
     },
     'coffee': {
         title: 'El Doble Filo del Café',
-        text: "El café es una potente herramienta metabólica por sus antioxidantes. Sin embargo, es un diurético y su alto contenido en **oxalatos** puede aumentar el riesgo de cálculos renales si no se gestiona con una hidratación inteligente."
+        text: "El café es una potente herramienta metabólica por sus antioxidantes. Sin embargo, es un diurético y su alto contenido en **oxalatos** puede aumentar el riesgo de cálculos renales si no se gestiona con una hidratación inteligente mineralizada que los disuelva."
     },
     'tea': {
         title: 'El Doble Filo del Té',
-        text: "El té, especialmente el verde, es rico en antioxidantes. No obstante, al igual que el café, es un diurético y contiene oxalatos. La clave es la moderación y acompañarlo siempre de agua mineralizada."
+        text: "El té, especialmente el verde, es rico en antioxidantes. No obstante, al igual que el café, es un diurético y contiene oxalatos. La clave es la moderación y acompañarlo siempre de agua mineralizada con sal y limón."
     },
     'smart_combo': {
         title: 'Sinergia de Hidratación Inteligente',
-        text: "¡Esta es una combinación estratégica! Entiendes que el café/té aporta beneficios, pero que la verdadera **homeostasis hídrica** (el equilibrio de agua en tus células) depende de minerales como el **sodio, potasio y magnesio**.<br><br><strong>Tu Protocolo Experto:</strong> Por cada taza de café o té, bebe un vaso de agua mineral con una pizca de **sal de mar** (para el sodio y oligoelementos) y el **jugo de medio limón**. La sal repone los electrolitos que el café/té elimina, y el citrato del limón es el inhibidor natural más potente de la formación de cálculos de oxalato. Con esta estrategia, obtienes todos los beneficios mientras anulas todos los riesgos."
+        text: "¡Esta es una combinación estratégica! Entiendes que el café/té aporta beneficios, pero que la verdadera **homeostasis hídrica** (el equilibrio de agua en tus células) depende de minerales como el **sodio, potasio y magnesio**.<br><br><strong>Tu Protocolo Experto:</strong> Por cada taza de café o té, bebe un vaso de agua mineral con una pizca de **sal de mar** (para el sodio y oligoelementos) y el **jugo de medio limón**. La sal repone los electrolitos que el café/té elimina, y el citrato del limón es el inhibidor natural más potente de la formación de cálculos. Puedes aromatizar tu agua con rodajas de pepino, frambuesas o arándanos."
     }
 };
 
@@ -863,30 +905,30 @@ const personalizedAdviceLibrary = {
     alcohol_intake: {
         'yes': {
             emoji: '🛑',
-            title: "Foco Rojo: Consumo Regular de Alcohol",
-            text: "El consumo de alcohol afecta gravemente al hígado, provoca inflamación, acumulación de grasa y cicatrices, lo que puede derivar en enfermedades hepáticas graves como la cirrosis. Además, puede interferir con el metabolismo de las grasas y dificultar la pérdida de peso, lo que va en contra de los principios de la dieta cetogénica."
+            title: "Foco Rojo: Consumo de Alcohol",
+            text: "El consumo de alcohol afecta gravemente al hígado, provoca inflamación, acumulación de grasa y cicatrices, lo que puede derivar en enfermedades hepáticas graves como la cirrosis. Además, interfiere directamente con el metabolismo de las grasas y dificulta la pérdida de peso, lo que va en contra de los principios de la dieta cetogénica."
         },
         'occasionally': {
             emoji: '🥂',
             title: "Brindis Inteligente: Alcohol en Ocasiones",
-            text: "Debemos aclarar que no recomendamos el consumo de alcohol para la dieta keto!, ya que te saca completamente de cetosis. y no ayuda en nada a nuestro hígado. Pero entendemos que la vida tiene momentos para celebrar. ¡No se trata de prohibir, sino de elegir sabiamente! Para esas ocasiones, prefiere destilados puros (whisky, gin, vodka, tequila) con agua mineral y hielo, o comparte una botella de vino (sin azúcar adicionada o vinos soleados). Al final de la lista, cerveza ligera y espumantes Brut Nature o Extra Brut . Así minimizas el azúcar y el impacto en tu progreso. ¡Salud por eso!"
+            text: "Debemos aclarar que no recomendamos el consumo de alcohol para la dieta keto!, ya que te saca de cetosis y sobrecarga nuestro hígado. Pero entendemos que la vida tiene momentos para celebrar. ¡No se trata de prohibir, sino de elegir sabiamente! Para esas ocasiones, prefiere destilados puros (whisky, gin, vodka, tequila) con agua mineral y hielo, o comparte una botella de vino (sin azúcar adicionada). Evita jugos y bebidas azucaradas de acompañamiento."
         },
         'no': {
             emoji: '🏆',
             title: "¡Decisión de Campeón!",
-            text: "¡Excelente! Esta es una de las decisiones que más acelera los resultados. Al no consumir alcohol, le das a tu hígado la libertad para enfocarse 100% en quemar grasa y desintoxicar tu cuerpo. Tienes una ventaja competitiva enorme. ¡Felicidades!"
+            text: "¡Excelente! Esta es una de las decisiones que más acelera los resultados. Al no consumir alcohol, le das a tu hígado la libertad para enfocarse 100% en quemar grasa y desintoxicar tu cuerpo. Tienes una ventaja enorme. ¡Felicidades!"
         }
     },
     cooking_skill: {
         'no': {
             emoji: '🍳',
             title: "¡Bienvenido a tu Nueva Cocina!",
-            text: "¡No te preocupes en absoluto! Nuestras recetas están diseñadas para ser a prueba de principiantes: sencillas, rápidas y deliciosas. Verás que te conviertes en un chef keto con confianza antes de lo que imaginas. ¡Este es el inicio de una nueva habilidad!"
+            text: "¡No te preocupes en absoluto! Nuestras recetas están diseñadas para ser sencillas, rápidas y deliciosas. Verás que te conviertes en un chef keto con confianza antes de lo que imaginas. ¡Este es el inicio de una nueva habilidad!"
         },
         'beginner': {
             emoji: '👨‍🍳',
             title: "De Principiante a Profesional Keto",
-            text: "¡Perfecto! Tienes la curiosidad y las ganas, que es lo más importante. Con nuestra guía, pasarás de amateur a un cocinero keto seguro, sorprendiendo a todos (incluyéndote a ti) con platos increíbles y saludables."
+            text: "¡Perfecto! Tienes la curiosidad y las ganas, que es lo más importante. Con nuestra guía, pasarás de amateur a un cocinero keto seguro, sorprendiendo a todos con platos increíbles y saludables."
         },
         'intermediate': {
             emoji: '🔥',
@@ -903,11 +945,11 @@ const personalizedAdviceLibrary = {
         'sedentary': {
             emoji: '🌱',
             title: "Este es el comienzo de tu Transformación",
-            text: "Este es el punto de partida perfecto para un cambio increíble. Nuestras mitocondrias son las fuentes energéticas de nuestro cuerpo, y se multiplican principalmente a través de un proceso llamado biogénesis mitocondrial, que es estimulado por el ejercicio físico. a mas mitocondrias, más grasa quemas!. No necesitas ser un atleta. Empezaremos a despertar tu metabolismo con movimientos y rutinas suaves y efectivos. Cada paso, por pequeño que sea, construye un gran progreso."
+            text: "Este es el punto de partida perfecto para un cambio increíble. Nuestras mitocondrias son las fuentes energéticas de nuestro cuerpo, y se multiplican principalmente a través de un proceso llamado biogénesis mitocondrial, que es estimulado por el ejercicio físico. A más mitocondrias, ¡más grasa quemas! Empezaremos a despertar tu metabolismo con movimientos suaves y efectivos. Cada paso construye un gran progreso."
         },
         'light': {
             emoji: '🚶‍♂️',
-            title: "Encendiendo tu Metabolismo.",
+            title: "Encendiendo tu Metabolismo",
             text: "¡Excelente! Ya tienes el hábito del movimiento, y eso es una gran victoria. Ahora, vamos a optimizar esa actividad para que cada paso se convierta en una señal potente para pasar al próximo nivel, quemar grasa y construir energía duradera."
         },
         'moderate': {
@@ -918,7 +960,7 @@ const personalizedAdviceLibrary = {
         'high': {
             emoji: '🚀',
             title: "Rendimiento de Élite",
-            text: "Impresionante. Ya estás construyendo tu mejor versión!. La alimentación Keto puede ser el eslabón perdido para llevar tu rendimiento y recuperación a un nivel superior. Usaremos la grasa como un combustible de alto octanaje para tu motor. ¡A romper tus propios récords!"
+            text: "Impresionante. ¡Ya estás construyendo tu mejor versión! La alimentación Keto puede ser el eslabón perdido para llevar tu rendimiento y recuperación a un nivel superior. Usaremos la grasa como un combustible de alto octanaje para tu motor. ¡A romper tus propios récords!"
         }
     },
     eat_out_freq: {
@@ -945,7 +987,6 @@ const personalizedAdviceLibrary = {
     }
 };
 
-
 const imcCategories = [
     { range: [0, 15.9], name: 'Delgadez Severa', rangeText: '< 16.0', definition: 'Un peso significativamente bajo que puede suponer un riesgo para la salud.' },
     { range: [16, 16.9], name: 'Delgadez Moderada', rangeText: '16.0 - 16.9', definition: 'Indica un peso bajo. Es importante asegurar una nutrición adecuada.' },
@@ -958,7 +999,45 @@ const imcCategories = [
     { range: [50, Infinity], name: 'Obesidad Tipo IV (Extrema)', rangeText: '≥ 50.0', definition: 'El nivel más alto de obesidad, que requiere un plan de acción inmediato y supervisado.' }
 ];
 
-// --- App Start & Wizard Logic ---
+const pediatricBmiTable = {
+    male: {
+        2: { p5: 14.8, p85: 18.2, p95: 19.3 },
+        3: { p5: 14.1, p85: 17.4, p95: 18.3 },
+        4: { p5: 13.7, p85: 16.8, p95: 17.8 },
+        5: { p5: 13.5, p85: 16.6, p95: 17.9 },
+        6: { p5: 13.5, p85: 16.8, p95: 18.4 },
+        7: { p5: 13.5, p85: 17.3, p95: 19.1 },
+        8: { p5: 13.6, p85: 17.9, p95: 20.0 },
+        9: { p5: 13.8, p85: 18.6, p95: 21.0 },
+        10: { p5: 14.1, p85: 19.3, p95: 22.0 },
+        11: { p5: 14.4, p85: 20.1, p95: 23.1 },
+        12: { p5: 14.8, p85: 20.9, p95: 24.2 },
+        13: { p5: 15.2, p85: 21.8, p95: 25.2 },
+        14: { p5: 15.7, p85: 22.6, p95: 26.2 },
+        15: { p5: 16.2, p85: 23.4, p95: 27.2 },
+        16: { p5: 16.7, p85: 24.1, p95: 28.1 },
+        17: { p5: 17.2, p85: 24.8, p95: 29.0 }
+    },
+    female: {
+        2: { p5: 14.4, p85: 18.0, p95: 19.1 },
+        3: { p5: 13.8, p85: 17.2, p95: 18.3 },
+        4: { p5: 13.4, p85: 16.7, p95: 17.8 },
+        5: { p5: 13.1, p85: 16.7, p95: 17.9 },
+        6: { p5: 13.1, p85: 17.0, p95: 18.5 },
+        7: { p5: 13.1, p85: 17.5, p95: 19.2 },
+        8: { p5: 13.2, p85: 18.2, p95: 20.3 },
+        9: { p5: 13.4, p85: 19.0, p95: 21.4 },
+        10: { p5: 13.7, p85: 19.9, p95: 22.6 },
+        11: { p5: 14.1, p85: 20.8, p95: 23.7 },
+        12: { p5: 14.5, p85: 21.7, p95: 24.8 },
+        13: { p5: 14.9, p85: 22.5, p95: 25.8 },
+        14: { p5: 15.4, p85: 23.2, p95: 26.7 },
+        15: { p5: 15.8, p85: 23.8, p95: 27.5 },
+        16: { p5: 16.1, p85: 24.2, p95: 28.1 },
+        17: { p5: 16.4, p85: 24.6, p95: 28.6 }
+    }
+};
+
 function startQuestionnaire() {
     console.log("Starting questionnaire...");
     const accessScreen = document.getElementById('access-screen');
@@ -1096,7 +1175,6 @@ function createActionPlan() {
     }, 500);
 }
 
-// --- HTML Generation for Steps ---
 function createQuestionStep(stepData) {
     const gridCols = stepData.options.length > 4 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1';
     let optionsHtml = stepData.options.map(opt => `
@@ -1146,7 +1224,6 @@ function createConditionalInputStep(stepData) {
     return `<div class="w-full max-w-md text-white"><h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">${stepData.question}</h2><div class="space-y-4 text-left bg-gray-800 bg-opacity-50 p-6 rounded-lg border border-gray-700">${inputsHtml}</div></div>`;
 }
 
-// --- Data Saving ---
 function saveFinalMeasures() {
     const age = document.getElementById('final-age').value;
     const height = document.getElementById('final-altura').value;
@@ -1178,7 +1255,6 @@ function saveConditionalData(step) {
     console.log(`Conditional data saved for ${step.key}:`, appState.answers[step.key]);
 }
 
-// --- Wizard State & UI ---
 function checkNextButtonState() {
     const step = appState.wizardFlow[appState.currentStepIndex];
     const nextBtn = document.getElementById('wizard-next-btn');
@@ -1232,18 +1308,63 @@ function selectOption(button, isMultiple) {
     checkNextButtonState();
 }
 
-// --- Helper & Calculation Functions ---
 function calculateIMC(height, weight) {
     return (height > 0 && weight > 0) ? (weight / ((height / 100) ** 2)) : 0;
 }
 
-function getIMCCategory(imc) {
-    return imcCategories.find(cat => imc >= cat.range[0] && imc <= cat.range[1]) || { name: 'N/A', definition: '' };
+function getIMCCategory(imc, age, gender) {
+    if (age >= 18) {
+        return imcCategories.find(cat => imc >= cat.range[0] && imc <= cat.range[1]) || { name: 'N/A', definition: '' };
+    }
+    
+    const table = pediatricBmiTable[gender];
+    if (!table) return { name: 'Pediátrico N/A', definition: 'Datos de referencia no encontrados.' };
+    
+    const floorAge = Math.max(2, Math.min(17, Math.floor(age)));
+    const ceilAge = Math.max(2, Math.min(17, Math.ceil(age)));
+    
+    let p5, p85, p95;
+    if (floorAge === ceilAge) {
+        p5 = table[floorAge].p5;
+        p85 = table[floorAge].p85;
+        p95 = table[floorAge].p95;
+    } else {
+        const t = age - floorAge;
+        p5 = table[floorAge].p5 + t * (table[ceilAge].p5 - table[floorAge].p5);
+        p85 = table[floorAge].p85 + t * (table[ceilAge].p85 - table[floorAge].p85);
+        p95 = table[floorAge].p95 + t * (table[ceilAge].p95 - table[floorAge].p95);
+    }
+    
+    if (imc < p5) {
+        return { name: 'Bajo peso (Pediátrico)', rangeText: `< P5 (${p5.toFixed(1)})`, definition: 'El peso del/de la menor se sitúa por debajo del percentil 5 para su edad y sexo biológico.' };
+    } else if (imc < p85) {
+        return { name: 'Peso normal (Pediátrico)', rangeText: `P5 - P85`, definition: 'Rango metabólicamente óptimo y saludable para su etapa de desarrollo activo.' };
+    } else if (imc < p95) {
+        return { name: 'Sobrepeso (Pediátrico)', rangeText: `P85 - P95`, definition: 'El/la menor se encuentra por sobre el percentil 85, lo que sugiere un monitoreo preventivo.' };
+    } else {
+        return { name: 'Obesidad (Pediátrica)', rangeText: `≥ P95 (${p95.toFixed(1)})`, definition: 'El peso del/de la menor supera el percentil 95. Requiere modulación de hábitos y guía profesional.' };
+    }
 }
 
-function calculateHealthyWeightRange(height) {
+function calculateHealthyWeightRange(height, age, gender) {
     if (!height || height <= 0) return null;
     const heightInMeters = height / 100;
+    
+    if (age < 18) {
+        const table = pediatricBmiTable[gender];
+        const ageKey = Math.max(2, Math.min(17, Math.round(age)));
+        if (table && table[ageKey]) {
+            const minBmi = table[ageKey].p5;
+            const maxBmi = table[ageKey].p85;
+            const idealBmi = (minBmi + maxBmi) / 2;
+            return {
+                min: (minBmi * (heightInMeters ** 2)).toFixed(1),
+                max: (maxBmi * (heightInMeters ** 2)).toFixed(1),
+                ideal: (idealBmi * (heightInMeters ** 2)).toFixed(1)
+            };
+        }
+    }
+    
     const minWeight = 18.5 * (heightInMeters ** 2);
     const maxWeight = 24.9 * (heightInMeters ** 2);
     const idealWeight = 21.75 * (heightInMeters ** 2);
@@ -1256,7 +1377,23 @@ function calculateHealthyWeightRange(height) {
 
 
 function calculateWaterIntake(weight, height, age, gender, activity_level) {
-    if (isNaN(weight) || weight <= 0 || isNaN(height) || height <= 0 || isNaN(age) || age <= 0 || !gender || !activity_level) {
+    if (isNaN(weight) || weight <= 0) {
+        return null;
+    }
+
+    if (age < 18) {
+        let waterMl = 0;
+        if (weight <= 10) {
+            waterMl = weight * 100;
+        } else if (weight <= 20) {
+            waterMl = 1000 + (weight - 10) * 50;
+        } else {
+            waterMl = 1500 + (weight - 20) * 20;
+        }
+        return Math.min(3.0, waterMl / 1000); 
+    }
+
+    if (isNaN(height) || height <= 0 || isNaN(age) || age <= 0 || !gender || !activity_level) {
         console.warn("Invalid input for calculateWaterIntake. Returning null.");
         return null;
     }
@@ -1270,29 +1407,96 @@ function calculateWaterIntake(weight, height, age, gender, activity_level) {
     return Math.max(2.0, waterLiters);
 }
 
-function renderImcDetails(container, height, weight) {
+function renderImcDetails(container, height, weight, age, gender) {
     if(!container) return;
     container.innerHTML = '';
     const h = parseFloat(height), w = parseFloat(weight);
     if (h > 0 && w > 0) {
         const imc = calculateIMC(h, w);
-        const imcCategory = getIMCCategory(imc);
-        let html = `<p class="text-5xl font-bold">${imc.toFixed(1)}</p><p class="text-lg text-gray-300 mt-1">${imcCategory.name}</p><ul class="space-y-1 text-sm mt-4">`;
-        imcCategories.forEach(cat => {
-            const isCurrent = (imc >= cat.range[0] && imc <= cat.range[1]);
-            html += `<li class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isCurrent ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}"><span>${cat.name}</span><span class="font-mono text-gray-400">${cat.rangeText}</span></li>`;
-        });
-        html += '</ul>';
-        container.innerHTML = html;
-        console.log(`IMC calculated: ${imc.toFixed(1)} (${imcCategory.name})`);
+        const imcCategory = getIMCCategory(imc, age, gender);
+        
+        if (age >= 18) {
+            let html = `<p class="text-5xl font-bold">${imc.toFixed(1)}</p><p class="text-lg text-gray-300 mt-1">${imcCategory.name}</p><ul class="space-y-1 text-sm mt-4">`;
+            imcCategories.forEach(cat => {
+                const isCurrent = (imc >= cat.range[0] && imc <= cat.range[1]);
+                html += `<li class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isCurrent ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}"><span>${cat.name}</span><span class="font-mono text-gray-400">${cat.rangeText}</span></li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+            console.log(`IMC calculated: ${imc.toFixed(1)} (${imcCategory.name})`);
+        } else {
+            const table = pediatricBmiTable[gender];
+            if (table) {
+                const floorAge = Math.max(2, Math.min(17, Math.floor(age)));
+                const ceilAge = Math.max(2, Math.min(17, Math.ceil(age)));
+                let p5, p85, p95;
+                if (floorAge === ceilAge) {
+                    p5 = table[floorAge].p5;
+                    p85 = table[floorAge].p85;
+                    p95 = table[floorAge].p95;
+                } else {
+                    const t = age - floorAge;
+                    p5 = table[floorAge].p5 + t * (table[ceilAge].p5 - table[floorAge].p5);
+                    p85 = table[floorAge].p85 + t * (table[ceilAge].p85 - table[floorAge].p85);
+                    p95 = table[floorAge].p95 + t * (table[ceilAge].p95 - table[floorAge].p95);
+                }
+                
+                const heightInMeters = h / 100;
+                const w5 = (p5 * (heightInMeters ** 2)).toFixed(1);
+                const w85 = (p85 * (heightInMeters ** 2)).toFixed(1);
+                const w95 = (p95 * (heightInMeters ** 2)).toFixed(1);
+                const w50 = (((p5 + p85) / 2) * (heightInMeters ** 2)).toFixed(1);
+                
+                const currentImc = imc;
+                const isBajo = currentImc < p5;
+                const isNormal = currentImc >= p5 && currentImc < p85;
+                const isSobre = currentImc >= p85 && currentImc < p95;
+                const isObese = currentImc >= p95;
+                
+                let targetText = "";
+                if (isBajo) {
+                    const diff = (parseFloat(w5) - w).toFixed(1);
+                    targetText = `<p class="text-sm text-amber-400 mt-2"><strong>Falta:</strong> Tu hijo(a) necesita ganar aproximadamente <strong>${diff} kg</strong> para alcanzar la curva de desarrollo mínimo saludable (Percentil 5).</p>`;
+                } else if (isNormal) {
+                    targetText = `<p class="text-sm text-green-400 mt-2"><strong>¡Felicidades!:</strong> Tu hijo(a) se encuentra en un estado óptimo de desarrollo y crecimiento saludable.</p>`;
+                } else {
+                    const diff = (w - parseFloat(w50)).toFixed(1);
+                    targetText = `<p class="text-sm text-amber-400 mt-2"><strong>Exceso:</strong> Tu hijo(a) se encuentra por encima del rango ideal de desarrollo. Se sugiere una modulación de hábitos saludables para aproximarse de forma progresiva a su mediana de crecimiento ideal (alrededor de <strong>${w50} kg</strong>, es decir, regularizar aproximadamente <strong>${diff} kg</strong>).</p>`;
+                }
+
+                let pediatricTableHtml = `
+                    <p class="text-5xl font-bold">${currentImc.toFixed(1)}</p>
+                    <p class="text-lg text-gray-300 mt-1">${imcCategory.name}</p>
+                    <p class="text-xs text-gray-400 mt-1">${imcCategory.definition}</p>
+                    <div class="mt-4 space-y-1 text-sm">
+                        <div class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isBajo ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}">
+                            <span>Bajo Peso (Pediátrico)</span>
+                            <span class="font-mono text-gray-400">&lt; ${w5} kg (&lt; P5)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isNormal ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}">
+                            <span>Peso Normal (Pediátrico)</span>
+                            <span class="font-mono text-gray-400">${w5} - ${w85} kg (P5-P85)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isSobre ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}">
+                            <span>Sobrepeso (Pediátrico)</span>
+                            <span class="font-mono text-gray-400">${w85} - ${w95} kg (P85-P95)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded-md transition-all duration-300 ${isObese ? 'bg-blue-900/50 ring-1 ring-blue-400' : ''}">
+                            <span>Obesidad (Pediátrica)</span>
+                            <span class="font-mono text-gray-400">&ge; ${w95} kg (&ge; P95)</span>
+                        </div>
+                    </div>
+                    ${targetText}
+                `;
+                container.innerHTML = pediatricTableHtml;
+            }
+        }
     } else {
         container.innerHTML = '<p class="text-gray-400">Ingresa tus datos para calcular.</p>';
         console.warn("Cannot calculate IMC: height or weight is zero/invalid.");
     }
 }
 
-
-// --- Main App Initialization ---
 function initializeApp(isReloading = false) {
     console.log(`Initializing app... (Reloading: ${isReloading})`);
     if (isAppInitialized) {
@@ -1349,10 +1553,12 @@ function initializeApp(isReloading = false) {
     setActiveNavLink();
 }
 
-// --- Dashboard Rendering ---
-
-function generateMainGoalAccordion(goal) {
-    const plan = mainGoalPlan[goal];
+function generateMainGoalAccordion(goal, age) {
+    const isPediatric = age < 18;
+    const plan = isPediatric 
+        ? JSON.parse(JSON.stringify(mainGoalPlanPediatric[goal])) 
+        : JSON.parse(JSON.stringify(mainGoalPlan[goal]));
+        
     if (!plan) return '';
 
     const stepsHtml = plan.steps.map((step, index) => `
@@ -1379,6 +1585,199 @@ function generateMainGoalAccordion(goal) {
             </div>
         </div>
     `;
+}
+
+function generatePediatricPersonalizedAdvice(answers) {
+    let adviceHtml = '';
+    const handledKeys = new Set();
+
+    const createAccordionHtml = (advice) => {
+        return `
+            <div>
+                <button class="accordion-button w-full flex justify-between items-center text-left bg-gray-800/50 p-4 rounded-lg hover:bg-gray-700/50 transition">
+                    <span class="font-semibold text-lg text-cyan-400 flex items-center">
+                        <span class="text-2xl mr-3">${advice.emoji || ''}</span>
+                        <span>${advice.title}</span>
+                    </span>
+                    <span class="accordion-arrow text-2xl text-cyan-400">&rarr;</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="pt-4 text-sm text-gray-300">${advice.text}</div>
+                </div>
+            </div>
+        `;
+    };
+
+    const selectedHabits = answers.habits;
+    if (selectedHabits && Array.isArray(selectedHabits) && selectedHabits.length > 0 && !selectedHabits.includes('none')) {
+        let combinedText = '';
+        selectedHabits.forEach(habitKey => {
+            if (habitKey === 'sleep_less') {
+                combinedText += `<p class="mb-3"><strong>Sobre el Sueño y la Hormona del Crecimiento:</strong> El 80% de la Hormona del Crecimiento (GH) de tu hijo(a) se libera en pulsos durante las fases de sueño profundo (ondas lentas), principalmente antes de la medianoche. Si tu hijo(a) duerme menos de 9-10 horas, no solo se interrumpe este desarrollo físico y de estatura, sino que se eleva crónicamente su cortisol, lo que causa hiperreactividad, dificultad para concentrarse en la escuela y acumulación de grasa abdominal de protección.</p>`;
+            } else if (habitKey === 'dine_late') {
+                combinedText += `<p class="mb-3"><strong>Sobre Cenar Tarde o Alimentos Dulces de Noche:</strong> Si tu hijo(a) se acuesta tarde o come alimentos con carbohidratos/azúcar antes de dormir, la insulina resultante bloquea por completo la liberación de la Hormona del Crecimiento (GH). Esto detiene literalmente su desarrollo físico y altera su sistema inmunológico durante la noche, dejándolo(a) vulnerable a la fatiga y la inflamación.</p>`;
+            } else if (habitKey === 'low_salt') {
+                combinedText += `<p class="mb-3"><strong>La Sal de Mar en el Desarrollo de tu hijo(a):</strong> En plena etapa de crecimiento, los riñones de tu hijo(a) necesitan un equilibrio preciso de minerales. Al iniciar una alimentación real baja en procesados, el cuerpo excreta más sodio. No le temas a la sal de mar de buena calidad; es esencial para mantener su energía basal, hidratación celular y el correcto funcionamiento de su sistema nervioso.</p>`;
+            } else if (habitKey === 'sweet_cravings') {
+                combinedText += `<p class="mb-3"><strong>La Montaña Rusa de Azúcar e Irritabilidad Infantil:</strong> Los antojos constantes de dulces en tu hijo(a) no son una falla de conducta o capricho; son un síntoma de picos y caídas bruscas de glucosa en sangre. Este ciclo genera una respuesta de dopamina rápida que calma momentáneamente su sistema nervioso, pero produce una 'tormenta de irritabilidad' a los pocos minutos. Al estabilizar su energía, recuperará la calma de forma natural.</p>`;
+            } else if (habitKey === 'love_soda') {
+                combinedText += `<p class="mb-3"><strong>La Catástrofe Silenciosa de las Gaseosas y Energéticas:</strong> Las gaseosas y bebidas energéticas son una agresión biológica directa en un(a) menor. El ácido fosfórico y el exceso de cafeína/químicos bloquean activamente la absorción de calcio en los huesos (frenando la mineralización ósea y limitando su estatura futura). Además, sobreestimulan sus glándulas suprarrenales, alterando su plasticidad cerebral y su conducta de manera artificial.</p>`;
+            }
+        });
+        if (combinedText) {
+            adviceHtml += createAccordionHtml({ emoji: '⚠️', title: 'Análisis Crítico: Desafíos del Desarrollo de tu hijo(a)', text: combinedText });
+        }
+    }
+
+    const emotionalResponse = answers.emotional_eating;
+    const stressResponse = answers.stress_level;
+    if (emotionalResponse && stressResponse) {
+        let text = '';
+        if (stressResponse === 'always' || stressResponse === 'often') {
+            text = `<p class="mb-3"><strong>El Impacto Fisiológico del Estrés Infantil (Bullying, Separaciones, Duelos):</strong> El estrés en los niños(as) no es solo tristeza; es una inundación hormonal. Ante situaciones difíciles como el bullying, el divorcio o separación de los padres, un duelo familiar o la presión escolar, el eje Hipofisario-Adrenal del(la) niño(a) inunda su cuerpo con cortisol. El cortisol elevado le dice a su cuerpo que está en peligro, lo que <strong>frena la secreción de la Hormona del Crecimiento (GH)</strong> y desvía la glucosa para almacenarla como grasa visceral protectora (abdominal).</p>
+            <p class="mb-3">El 'antojo de azúcar' o el aumento de peso de tu hijo(a) no es falta de voluntad, sino un grito bioquímico de auxilio de un cerebro infantil estresado que está sacrificando su crecimiento físico por defenderse emocionalmente.</p>
+            <p><strong>Tu primer paso práctico:</strong> Implementa una 'Pausa de Calma' en casa. Antes de cenar o al llegar de la escuela, dediquen 5 minutos a conversar sin pantallas, validando sus emociones. Escucha activa sin juzgar; calmar su sistema de alarma cerebral es el primer paso para equilibrar su metabolismo.</p>`;
+        } else {
+            text = `<p class="mb-3"><strong>Regulación Psico-Emocional:</strong> Aunque tu hijo(a) no presente niveles críticos de estrés cotidianos, el hambre emocional puede surgir ante cambios sutiles en su entorno o aburrimiento. Enseñar al(la) menor a distinguir la deshidratación del hambre real y mantener una comunicación abierta en el hogar es la mejor vacuna contra los desórdenes alimentarios futuros.</p>
+            <p><strong>Tu primer paso práctico:</strong> Practiquen la 'Nutrición Consciente lúdica'. Pregúntale con cariño: "¿Sientes hambre en tu pancita o es tu cerebro que quiere jugar con un sabor?". Beber agua mineralizada juntos ayuda a disipar el antojo por hábito.</p>`;
+        }
+        adviceHtml += createAccordionHtml({ emoji: '❤️‍🩹', title: 'Entorno Emocional y Metabolismo Infantil', text: text });
+        handledKeys.add('emotional_eating');
+    }
+
+    const waterGoal = calculateWaterIntake(answers.measurements.weight, answers.measurements.height, answers.measurements.age, answers.gender, answers.activity_level);
+    const waterIntakeResponse = answers.water_intake;
+    if (waterGoal !== null && waterIntakeResponse) {
+        let userIntakeLiters = 0;
+        let userCups = 0;
+        switch (waterIntakeResponse) {
+            case 'less_2': userIntakeLiters = 0.25; userCups = 1; break;
+            case '2-4': userIntakeLiters = 0.75; userCups = 3; break;
+            case '4-6': userIntakeLiters = 1.25; userCups = 5; break;
+            case 'more_6': userIntakeLiters = 1.75; userCups = 7; break;
+        }
+        const goalCups = (waterGoal / 0.25).toFixed(1);
+        const diffCups = Math.max(0, (waterGoal - userIntakeLiters) / 0.25).toFixed(1);
+        
+        let comparisonHeader = "";
+        if (userIntakeLiters < waterGoal) {
+            comparisonHeader = `<p class="mb-3 text-amber-300 font-semibold">El análisis revela que tu hijo(a) consume actualmente unos <strong>${userCups} vasos</strong> (${userIntakeLiters.toFixed(2)} L) de agua al día. Sin embargo, su meta de desarrollo basal según la fórmula de Holliday-Segar es de <strong>${goalCups} vasos</strong> (${waterGoal.toFixed(1)} L). Para alcanzar su estado de hidratación óptimo, ¡su organismo se encuentra a solo <strong>${diffCups} vasos</strong> de diferencia!</p>`;
+        } else {
+            comparisonHeader = `<p class="mb-3 text-green-300 font-semibold">¡Felicidades! Tu hijo(a) cumple de forma excelente con su hidratación. Consume actualmente unos <strong>${userCups} vasos</strong> al día, superando su meta de desarrollo basal de <strong>${goalCups} vasos</strong> (${waterGoal.toFixed(1)} L) según la fórmula de Holliday-Segar.</p>`;
+        }
+
+        let text = `
+        ${comparisonHeader}
+        <div class="mt-4 space-y-4">
+            <p class="text-sm">Asegurar una hidratación mineralizada es crucial en niños(as) para evitar la fatiga escolar y mantener las reacciones metabólicas óptimas en plena fase de desarrollo. <strong>Evita por completo el agua filtrada común, de la llave o purificada industrial</strong>, ya que carecen de minerales conductores y arrastran aditivos químicos perjudiciales. La hidratación de tu hijo(a) debe estructurarse bajo los siguientes cuatro pilares científicos:</p>
+            
+            <div class="space-y-3 pl-2">
+                <div>
+                    <h5 class="font-bold text-green-300 text-xs">🧂 1. SAL DE MAR (Más de 80 Minerales):</h5>
+                    <p class="text-xs text-gray-300">A diferencia de la sal común de mesa (cloruro de sodio refinado al 99%), la sal de mar natural conserva más de 80 minerales y oligoelementos esenciales (como magnesio y zinc). En el menor en crecimiento acelerado, estos actúan como indispensables cofactores enzimáticos que optimizan la síntesis proteica, la mineralización ósea y la conductividad de los impulsos neuronales de su cerebro.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-green-300 text-xs">🍋 2. EL LIMÓN (Escudo Renal y Absorción Activa):</h5>
+                    <p class="text-xs text-gray-300">Aporta ácido cítrico que en su organismo se transforma en citrato, un compuesto que se une al calcio e impide la cristalización urinaria (protegiendo sus riñones en desarrollo). Adicionalmente, su vitamina C triplica la absorción de hierro en su intestino y promueve la síntesis de colágeno estructural.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-green-300 text-xs">💧 3. AGUA MINERAL (Agua Viva y Electrolitos):</h5>
+                    <p class="text-xs text-gray-300">El agua purificada por ósmosis es agua "muerta" que desmineraliza las células del menor al arrastrar sus propios nutrientes. El agua mineral natural filtrada por rocas posee la conductividad eléctrica necesaria para garantizar que el líquido penetre de verdad en el espacio intracelular de sus tejidos.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-green-300 text-xs">🫧 4. ¿POR QUÉ IDEALMENTE CON GAS? (Estímulo Gástrico y el Caballo de Troya):</h5>
+                    <p class="text-xs text-gray-300">El gas (CO<sub>2</sub> disuelto) forma un ácido carbónico débil que estimula los mecanorreceptores estomacales, facilitando la acidez clorhídrica necesaria para digerir proteínas y grasas del plan. Además, representa el <strong>Caballo de Troya conductual perfecto</strong>: imita la efervescencia de las gaseosas que tu hijo(a) desea, facilitando que los padres reemplacen las bebidas tóxicas sin generar rechazo psicológico.</p>
+                </div>
+            </div>
+            
+            <p class="text-xs italic text-gray-400 mt-2">Para preparar la receta, acompáñala siempre de <strong>sal de mar y limón</strong>. Puedes aromatizarla y saborizarla de forma natural con rodajas de pepino, hojas de menta, frambuesas o arándanos frescos para darle un sabor inigualable y divertido para el menor.</p>
+        </div>`;
+        
+        adviceHtml += createAccordionHtml({ emoji: '💧📈', title: 'Análisis de la Hidratación de tu hijo(a)', text: text });
+        handledKeys.add('water_intake');
+    }
+
+    const alcoholResponse = answers.alcohol_intake;
+    if (alcoholResponse === 'yes' || alcoholResponse === 'occasionally') {
+        const warning = {
+            emoji: '🛑',
+            title: "🔴 ADVERTENCIA CRÍTICA: El Alcohol en la Biología de tu hijo(a)",
+            text: "<strong>¡CONSUMO CONTRAINDICADO DE FORMA TAJANTE!</strong> Un(a) menor de edad bajo ninguna circunstancia puede consumir alcohol. Su hígado carece por completo de la madurez enzimática (alcohol deshidrogenasa) para procesar el etanol, lo que puede provocar hipoglucemias severas, colapso de glucógeno y convulsiones. Además, actúa como una neurotoxina directa que interrumpe la mielinización de la corteza prefrontal, saboteando de por vida su desarrollo cerebral, cognitivo y de toma de decisiones. Este comportamiento es extremadamente riesgoso y debe ser abordado de inmediato bajo supervisión de un profesional."
+        };
+        adviceHtml += createAccordionHtml(warning);
+        handledKeys.add('alcohol_intake');
+    } else if (alcoholResponse === 'no') {
+        adviceHtml += createAccordionHtml({
+            emoji: '🏆',
+            title: "Entorno Protegido y Libre de Tóxicos",
+            text: "Excelente decisión. Mantener a tu hijo(a) en un entorno libre de alcohol protege su desarrollo hepático, digestivo y neurológico en la fase de construcción más crítica de su vida. ¡Felicidades por resguardar su potencial!"
+        });
+        handledKeys.add('alcohol_intake');
+    }
+
+    const skill = answers.cooking_skill;
+    if (skill) {
+        let text = '';
+        if (skill === 'no') {
+            text = "Si no sabes cocinar, ¡es la oportunidad perfecta! Involucrar a tu hijo(a) en tareas sencillas de la cocina (ordenar ingredientes, lavar vegetales) no solo es una actividad excelente de conexión familiar, sino que reduce la selectividad alimentaria infantil: un(a) niño(a) que ayuda a preparar su comida tiene un 80% más de probabilidad de probarla con agrado.";
+        } else if (skill === 'beginner') {
+            text = "Tu nivel de principiante es ideal para emprender un viaje de sabores en familia. Aprender a preparar recetas simples, reales y densas en nutrientes junto a tu hijo(a) enseñará al(la) menor a experimentar con texturas y aromas de forma natural, educando su paladar hacia la salud desde la infancia.";
+        } else {
+            text = "Tus habilidades en la cocina son un verdadero súper-poder para el desarrollo de tu hijo(a). Úsalas para demostrarle que la comida real, antiinflamatoria y natural puede ser infinitamente más sabrosa y divertida que cualquier producto procesado industrial.";
+        }
+        adviceHtml += createAccordionHtml({ emoji: '🍳', title: 'La Cocina como Escuela de Vida', text: text });
+        handledKeys.add('cooking_skill');
+    }
+
+    const act = answers.activity_level;
+    if (act) {
+        let text = '';
+        if (act === 'sedentary') {
+            text = "El sedentarismo en un(a) niño(a) limita el desarrollo de su densidad ósea futura y disminuye su capacidad mitocondrial celular. No necesitas inscribirlo(a) en un deporte rígido; comiencen con juegos activos en el parque, andar en bicicleta juntos o bailar en la sala de estar. El movimiento lúdico estimula las placas de crecimiento de forma saludable.";
+        } else {
+            text = "¡Impresionante! El juego activo y el ejercicio físico regular en tu hijo(a) estimulan la multiplicación de sus mitocondrias (las centrales de energía celular) y fortalecen su estructura ósea en plena fase de mineralización. Esto previene la inflamación sistémica, apoya un sistema inmune fuerte y asegura una musculatura sana.";
+        }
+        adviceHtml += createAccordionHtml({ emoji: '🚀', title: 'Movimiento, Mitocondrias y Huesos Fuertes', text: text });
+        handledKeys.add('activity_level');
+    }
+
+    const junk = answers.junk_food_freq;
+    if (junk) {
+        let text = '';
+        if (junk === 'rarely') {
+            text = "¡Excelente! Mantener la comida ultraprocesada al margen es vital. Si tu hijo(a) tiene antojos de hamburguesas o papas fritas, prepárenlas juntos en casa usando carne real, vegetales frescos, palta y reemplaza las papas fritas industriales por bastones de zapallo italiano o camote al horno con aceite de oliva. Le darás una experiencia deliciosa y nutritiva.";
+        } else {
+            text = `La comida rápida consumida de forma regular es un saboteador directo del potencial de crecimiento de tu hijo(a). Consumir estos alimentos industriales interrumpe su desarrollo biológico óptimo debido a un cóctel de compuestos diseñados para generar dependencia neurológica:<br><br>
+            <strong>La invasión silenciosa en el cuerpo de tu hijo(a):</strong><br>
+            <ul class="list-disc list-inside mt-2 space-y-1">
+                <li><strong>Aceites Hidrogenados (Grasas Trans) y de semillas refinados:</strong> Se depositan directamente e inflaman masivamente sus membranas celulares en desarrollo y dañan la elasticidad de sus arterias desde la infancia.</li>
+                <li><strong>Jarabe de Maíz de Alta Fructosa:</strong> Un endulzante barato que satura su hígado de inmediato, convirtiéndose en grasa y siendo el precursor principal del hígado graso infantil y la resistencia a la insulina temprana.</li>
+                <li><strong>Glutamato Monosódico (GMS):</strong> Un aditivo neuroexcitador que sobreestimula las neuronas y bloquea la hormona leptina (saciedad), haciendo que tu hijo(a) coma de forma compulsiva.</li>
+                <li><strong>Colorantes Artificiales (como Tartrazina o Rojo 40):</strong> Asociados en pediatría con hiperactividad, alteración de la conducta y alergias alimentarias recurrentes.</li>
+            </ul>`;
+        }
+        adviceHtml += createAccordionHtml({ emoji: '🍔🍕', title: 'La Verdad Oculta en la Comida Rápida para Niños(as)', text: text });
+        handledKeys.add('junk_food_freq');
+    }
+
+    const drinks = answers.daily_drinks;
+    if (drinks && Array.isArray(drinks) && drinks.length > 0 && !drinks.includes('none')) {
+        let text = '';
+        if (drinks.includes('juice') || drinks.includes('soda')) {
+            text += `<p class="mb-3"><strong>Jugos y Gaseosas: La Inundación de Fructosa en su Hígado:</strong> Los jugos envasados o naturales y las gaseosas inundan el hígado de tu hijo(a) con fructosa líquida sin fibra. Su metabolismo genera de inmediato ácido úrico, lo que inhibe la producción de óxido nítrico (fundamental para la flexibilidad de sus vasos sanguíneos) y promueve la acumulación de grasa visceral de almacenamiento. Te invitamos a sustituir estas opciones dañinas por agua pura, apoyando la recomendación de su hidratación personalizada.</p>`;
+        }
+        if (drinks.includes('coffee') || drinks.includes('tea')) {
+            text += `<p class="mb-3"><strong>El Daño del Café y Estimulantes en Niños(as):</strong> La cafeína y teína aceleran artificialmente el sistema nervioso simpático del(la) menor, interfiriendo de inmediato con la absorción de hierro y calcio en sus intestinos. Esto puede limitar su desarrollo muscular y densidad ósea futura, además de alterar sus patrones de sueño profundo donde se secreta la hormona de crecimiento.</p>`;
+        }
+        if (drinks.includes('water') && text === '') {
+            text += `<p class="mb-3"><strong>¡Felicidades por elegir agua!</strong> Mantener a tu hijo(a) hidratado(a) utilizando agua como su bebida principal es una de las mejores decisiones para su salud general. El agua pura es el vehículo esencial para el transporte de nutrientes y la detoxificación celular diaria. Te invitamos a mantener este excelente hábito que protege su desarrollo de forma natural, en sintonía con su meta hídrica personalizada.</p>`;
+        }
+        if (text) {
+            adviceHtml += createAccordionHtml({ emoji: '🥛🥤', title: 'Lo que Bebe tu hijo(a) Determina su Desarrollo', text: text });
+        }
+    }
+
+    return adviceHtml;
 }
 
 function generatePersonalizedAdvice(answers) {
@@ -1425,30 +1824,53 @@ function generatePersonalizedAdvice(answers) {
     const waterIntakeResponse = answers.water_intake;
     if (waterIntakeResponse) {
         const waterGoal = calculateWaterIntake(answers.measurements.weight, answers.measurements.height, answers.measurements.age, answers.gender, answers.activity_level);
-        let hydrationText = '', userIntakeLiters = 0;
+        let userIntakeLiters = 0;
+        let userCups = 0;
         switch (waterIntakeResponse) {
-            case 'less_2': userIntakeLiters = 0.25; break;
-            case '2-4': userIntakeLiters = 0.75;  break;
-            case '4-6': userIntakeLiters = 1.25; break;
-            case 'more_6': userIntakeLiters = 1.75; break;
+            case 'less_2': userIntakeLiters = 0.25; userCups = 1; break;
+            case '2-4': userIntakeLiters = 0.75; userCups = 3; break;
+            case '4-6': userIntakeLiters = 1.25; userCups = 5; break;
+            case 'more_6': userIntakeLiters = 1.75; userCups = 7; break;
         }
-        if (waterGoal === null) {
-            hydrationText = `<p class="text-gray-400">Datos insuficientes o inválidos para calcular tu meta de hidratación.</p>`;
-        } else if (waterIntakeResponse === 'less_2') {
-            hydrationText = `Gracias por tu honestidad. Aquí hemos detectado un foco rojo de alto riesgo para tu salud. Tu meta diaria de hidratación es de <strong>${waterGoal.toFixed(1)} litros</strong>, pero actualmente tu ingesta es mínima. Esto es una emergencia metabética silenciosa. La deshidratación crónica, incluso si no sientes sed, tiene consecuencias graves:
-<ul class="list-disc list-inside mt-2 space-y-1">
-    <li><strong>Estrés Cardiovascular:</strong> Tu volumen sanguíneo disminuye, lo que obliga a tu corazón a bombear com más fuerza y eleva tu presión arterial.</li>
-    <li><strong>Toxicidad Acumulada:</strong> Tus riñones no tienen suficiente líquido para filtrar y eliminar las toxinas de tu cuerpo, lo que lleva a una acumulación interna.</li>
-    <li><strong>Niebla Mental y Fatiga:</strong> La entrega de oxígeno a tu cerebro se ve drásticamente reducida, causando confusión, falta de concentración y un cansancio que ningún café puede solucionar.</li>
-</ul>
-<p class="mt-2">Tu misión más importante, que no es negociable, es comenzar a hidratarte correctamente desde hoy. Tu primera meta es simplemente beber más agua, y la forma ideal de hacerlo es con la combinación perfecta: Agua Mineral (nunca purificada ni de la llave, por su contenido de flúor y cloro) con una pizca de sal de mar y el jugo de medio limón. Esto no solo hidrata, sino que repone los minerales esenciales para que el agua pueda entrar a tus células.</p>`;
-        } else if (userIntakeLiters < waterGoal) {
-            hydrationText = `¡Excelente que ya tengas el hábito de beber agua! Estás en camino y muy cerca del objetivo. Tu meta de hidratación es de <strong>${waterGoal.toFixed(1)} litros</strong>, y actualmente estás consumiendo alrededor de <strong>${userIntakeLiters.toFixed(1)} litros</strong>. Estás a solo unos vasos de diferencia. Ese último tramo es el que marca la diferencia entre simplemente 'funcionar' y 'prosperar'. Ese extra de agua potenciará la quema de grasa, mejorará drásticamente la apariencia de tu piel y aumentará tu claridad mental. Para optimizar tu esfuerzo, recuerda siempre la combinación perfecta: Agua Mineral con sal de mar y limón.`;
+        const goalCups = (waterGoal / 0.25).toFixed(1);
+        const diffCups = Math.max(0, (waterGoal - userIntakeLiters) / 0.25).toFixed(1);
+
+        let comparisonHeader = "";
+        if (userIntakeLiters < waterGoal) {
+            comparisonHeader = `<p class="mb-3 text-amber-300 font-semibold">El análisis revela que consumes actualmente unos <strong>${userCups} vasos</strong> (${userIntakeLiters.toFixed(2)} L) de agua al día. Sin embargo, tu meta hídrica calculada es de <strong>${goalCups} vasos</strong> (${waterGoal.toFixed(1)} L). Para alcanzar tu estado metabólico óptimo, ¡te encuentras a solo <strong>${diffCups} vasos</strong> de diferencia!</p>`;
         } else {
-            hydrationText = `¡Felicidades! Este es uno de los hábitos más importantes para el éxito en Keto y ya lo tienes dominado. Tu ingesta de agua cumple o supera tu meta de <strong>${waterGoal.toFixed(1)} litros</strong>. Esto significa que estás apoyando activamente la desintoxicación de tu cuerpo, manteniendo tus células energizadas y optimizando cada proceso metabólico. Recuerda siempre la combinación perfecta para potenciar aún más los resultados: Agua Mineral + Sal de Mar + Limón.`;
+            comparisonHeader = `<p class="mb-3 text-green-300 font-semibold">¡Felicidades! Cumples de forma excelente con tu hidratación. Consumes actualmente unos <strong>${userCups} vasos</strong> al día, superando tu meta hídrica de <strong>${goalCups} vasos</strong> (${waterGoal.toFixed(1)} L).</p>`;
         }
+
+        let hydrationText = `
+        ${comparisonHeader}
+        <div class="mt-4 space-y-4">
+            <p class="text-sm">La deshidratación crónica, incluso si no sientes sed, compromete severamente tu función renal y eleva tu cortisol basal. <strong>Evita por completo el agua filtrada común, de la llave o purificada industrial</strong>, ya que carecen de conductividad y arrastran aditivos. Tu hidratación debe estructurarse bajo los siguientes cuatro pilares científicos:</p>
+            
+            <div class="space-y-3 pl-2">
+                <div>
+                    <h5 class="font-bold text-cyan-300 text-xs">🧂 1. SAL DE MAR (Más de 80 Minerales):</h5>
+                    <p class="text-xs text-gray-300">A diferencia de la sal común de mesa (cloruro de sodio refinado al 99%), la sal de mar natural conserva más de 80 minerales y oligoelementos esenciales (como magnesio, selenio y zinc). Al bajar los carbohidratos en Keto, la caída de insulina hace que los riñones excreten sodio rápidamente; reponerlo con sal de mar natural protege tus glándulas suprarrenales y previene dolores de cabeza, fatiga y calambres ("gripe keto").</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-cyan-300 text-xs">🍋 2. EL LIMÓN (Escudo de Ácido Cítrico y Citrato):</h5>
+                    <p class="text-xs text-gray-300">Aporta ácido cítrico que en tu cuerpo se convierte en citrato. El citrato actúa como un potente escudo renal al unirse al calcio en la orina, bloqueando de forma natural la cristalización y previniendo la formación de cálculos renales (piedras), un factor de cuidado clave al movilizar grasas.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-cyan-300 text-xs">💧 3. AGUA MINERAL (Conductividad e Hidratación Intracelular):</h5>
+                    <p class="text-xs text-gray-300">El agua filtrada común es agua "muerta" (desmineralizada) que "roba" electrolitos de tus células para equilibrarse. El agua mineral natural posee conductividad real, lo que permite que el agua sea verdaderamente atraída al interior de tus células, logrando una hidratación celular óptima.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-cyan-300 text-xs">🫧 4. ¿POR QUÉ IDEALMENTE CON GAS? (Estímulo de Secreción Gástrica):</h5>
+                    <p class="text-xs text-gray-300">El dióxido de carbono (CO<sub>2</sub>) disuelto forma un ácido carbónico débil que estimula suavemente las paredes del estómago, promoviendo la acidez clorhídrica. Esto es indispensable para digerir de forma eficiente las proteínas y grasas del plan, optimizando la ionización de minerales para su posterior absorción intestinal.</p>
+                </div>
+            </div>
+            
+            <p class="text-xs italic text-gray-400 mt-2">Prepara esta receta con agua mineral con gas, sal de mar y limón. Puedes aromatizarla agregando rodajas de pepino, hojas de menta, frambuesas o arándanos frescos para disfrutar un sabor natural inigualable.</p>
+        </div>`;
         const hydrationAccordion = { emoji: '💧📈', title: 'Análisis de tu Hidratación', text: hydrationText };
         adviceHtml += createAccordionHtml(hydrationAccordion);
+        handledKeys.add('water_intake');
     }
 
     for (const key in personalizedAdviceLibrary) {
@@ -1491,7 +1913,6 @@ function generatePersonalizedAdvice(answers) {
     return adviceHtml;
 }
 
-
 function renderDashboard() {
     console.log("Rendering dashboard...");
     const dashboardContainer = document.getElementById('dashboard');
@@ -1501,48 +1922,73 @@ function renderDashboard() {
     }
 
     const { measurements, health_conditions = [], glucose_level, blood_pressure, main_goal, weight_history, lipids } = appState.answers;
+    const isPediatric = measurements.age < 18;
     const imc = calculateIMC(measurements.height, measurements.weight);
-    const imcCategory = getIMCCategory(imc);
+    const imcCategory = getIMCCategory(imc, measurements.age, appState.answers.gender);
     const waterIntake = calculateWaterIntake(measurements.weight, measurements.height, measurements.age, appState.answers.gender, appState.answers.activity_level);
-    const healthyWeight = calculateHealthyWeightRange(measurements.height);
+    const healthyWeight = calculateHealthyWeightRange(measurements.height, measurements.age, appState.answers.gender);
     const diferenciaPeso = measurements.weight - healthyWeight.ideal;
 
     let weightGoalCardHtml = '';
     if (diferenciaPeso > 0) {
-        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-amber-400/50"><p class="text-4xl font-bold text-amber-400">${diferenciaPeso.toFixed(1)}</p><p class="text-sm text-amber-400/80 mt-1">Kg a Perder</p></div>`;
+        const valueText = isPediatric ? "Kg para Equilibrio de Crecimiento" : "Kg a Perder";
+        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-amber-400/50"><p class="text-4xl font-bold text-amber-400">${diferenciaPeso.toFixed(1)}</p><p class="text-sm text-amber-400/80 mt-1">${valueText}</p></div>`;
     } else if (diferenciaPeso < 0) {
-        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-green-400/50"><p class="text-4xl font-bold text-green-400">${Math.abs(diferenciaPeso).toFixed(1)}</p><p class="text-sm text-green-400/80 mt-1">Kg a Ganar</p></div>`;
+        const valueText = isPediatric ? "Kg para Equilibrio de Crecimiento" : "Kg a Ganar";
+        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-amber-400/50"><p class="text-4xl font-bold text-amber-400">${Math.abs(diferenciaPeso).toFixed(1)}</p><p class="text-sm text-amber-400/80 mt-1">${valueText}</p></div>`;
+    } else {
+        const valueText = isPediatric ? "Equilibrio de Crecimiento" : "Peso Óptimo";
+        weightGoalCardHtml = `<div class="dashboard-card flex flex-col justify-center items-center text-center border-green-400/50"><p class="text-4xl font-bold text-green-400">0.0</p><p class="text-sm text-green-400/80 mt-1">${valueText}</p></div>`;
     }
 
     let weightProjectionText = '';
     if (diferenciaPeso > 0) {
         const monthsToLose = ((diferenciaPeso * 1000) / 143 / 30).toFixed(1);
-        weightProjectionText = `Basado en una pérdida de grasa saludable y sostenible, podrías alcanzar tu peso ideal en aproximadamente <strong>${monthsToLose} meses</strong>.`;
+        weightProjectionText = isPediatric 
+            ? `Basado en curvas de desarrollo infantil saludable, se estima que el peso de equilibrio para el crecimiento saludable de tu hijo(a) se alcanzaría en aproximadamente <strong>${monthsToLose} meses</strong>.`
+            : `Basado en una pérdida de grasa saludable y de forma sostenible, se estima que el peso óptimo de equilibrio se alcanzaría en aproximadamente <strong>${monthsToLose} meses</strong>.`;
     } else if (diferenciaPeso < 0) {
-        weightProjectionText = `Tu peso está por debajo del rango saludable. Este plan te ayudará a ganar masa muscular y peso de forma saludable.`;
+        const monthsToGain = (Math.abs(diferenciaPeso) / 1.2).toFixed(1);
+        weightProjectionText = isPediatric
+            ? `Proyección de Peso: El peso de partida de tu hijo(a) se encuentra por debajo de la curva saludable de percentiles. El plan se enfocará en ganar masa magra y volumen óseo de manera controlada para su óptimo desarrollo. Basado en un crecimiento saludable y constante, estimamos que tu hijo(a) podría alcanzar su peso óptimo de equilibrio en aproximadamente <strong>${monthsToGain} meses</strong>.`
+            : `Proyección de Peso: Tu peso de partida se encuentra por debajo del rango saludable de referencia. El plan se enfocará en la ganancia de masa muscular magra y densidad de manera controlada. Estimamos que podrías alcanzar tu rango de equilibrio en aproximadamente <strong>${monthsToGain} meses</strong>.`;
     } else {
-        weightProjectionText = `¡Felicidades! Estás en tu peso ideal. El plan se enfocará en optimizar tu energía y salud.`;
+        weightProjectionText = isPediatric
+            ? `¡Excelente! Tu hijo(a) se encuentra en un percentil de peso sumamente óptimo. El enfoque será modular energía y vitalidad metabólica para su crecimiento.`
+            : `¡Excelente! Te encuentras en un percentil de peso sumamente óptimo. El enfoque clínico será modular tu energía y vitalidad metabólica.`;
     }
 
     const goalTitles = {
-        loss: 'Tu Hoja de Ruta para Perder Peso y Equilibrar tu Metabolismo',
-        energy: 'Tu Hoja de Ruta para Mejorar tu Energía y Enfoque',
-        health: 'Tu Hoja de Ruta para Mejorar una Condición de Salud',
-        muscle: 'Tu Hoja de Ruta para Tonificar tu Cuerpo y Aumentar Masa Muscular'
+        loss: isPediatric ? 'Hoja de Ruta para Equilibrar el Metabolismo y Crecimiento de tu hijo(a)' : 'Tu Hoja de Ruta para Perder Peso y Equilibrar tu Metabolismo',
+        energy: isPediatric ? 'Hoja de Ruta para Mejorar la Energía, Enfoque y Atención de tu hijo(a)' : 'Tu Hoja de Ruta para Mejorar tu Energía y Enfoque',
+        health: isPediatric ? 'Hoja de Ruta para Optimizar la Salud y Desarrollo de tu hijo(a)' : 'Tu Hoja de Ruta para Mejorar una Condición de Salud',
+        muscle: isPediatric ? 'Hoja de Ruta para el Desarrollo Muscular y Óseo Óptimo de tu hijo(a)' : 'Tu Hoja de Ruta para Tonificar tu Cuerpo y Aumentar Masa Muscular'
     };
     const mainTitle = goalTitles[main_goal] || 'Tu Hoja de Ruta Personalizada';
-    const mainGoalAccordionHtml = generateMainGoalAccordion(main_goal);
+    const mainGoalAccordionHtml = generateMainGoalAccordion(main_goal, measurements.age);
 
     let introParagraph = '';
-    if (weight_history === 'ideal_weight') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">¡Felicitaciones por estar en tu peso ideal! Este plan optimizará tu bienestar.</p>`;
+    if (weight_history === 'underweight' || diferenciaPeso < 0) {
+        introParagraph = isPediatric 
+            ? `<p class="text-center text-gray-300 mb-4 text-md">Entendemos que tu hijo(a) se encuentra actualmente por debajo de su curva óptima de crecimiento. Este plan no restrictivo es un mapa estructurado para nutrir profundamente su organismo, impulsando un desarrollo celular, muscular y óseo saludable bajo la supervisión de un profesional.</p>`
+            : `<p class="text-center text-gray-300 mb-4 text-md">Entendemos que te encuentras actualmente por debajo de tu rango de peso saludable de referencia. Este plan estratégico está diseñado para nutrir y restablecer tu equilibrio metabólico, impulsando una ganancia celular y muscular sana.</p>`;
+    } else if (weight_history === 'ideal_weight') {
+        introParagraph = isPediatric 
+            ? `<p class="text-center text-gray-300 mb-4 text-md">¡Felicitaciones! Tu hijo(a) se encuentra en su peso de crecimiento ideal. Este plan optimizará su desarrollo celular.</p>`
+            : `<p class="text-center text-gray-300 mb-4 text-md">¡Felicitaciones! Te encuentras en tu peso ideal. Este plan optimizará la vitalidad celular.</p>`;
     } else if (weight_history === 'less_than_year') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Estás en el momento perfecto para actuar. Tu cuerpo responderá rápidamente.</p>`;
+        introParagraph = isPediatric
+            ? `<p class="text-center text-gray-300 mb-4 text-md">Momento ideal para actuar. El sistema de crecimiento y desarrollo de tu hijo(a) responderá con alta velocidad.</p>`
+            : `<p class="text-center text-gray-300 mb-4 text-md">Momento ideal para actuar. Tu sistema metabólico responderá con alta velocidad.</p>`;
     } else if (weight_history === 'more_than_year' || weight_history === 'cant_remember') {
-        introParagraph = `<p class="text-center text-gray-300 mb-4 text-md">Entendemos que llevas tiempo luchando. Este plan es un 'reseteo' profundo. ¡Vamos a hacerlo bien!</p>`;
+        introParagraph = isPediatric
+            ? `<p class="text-center text-gray-300 mb-4 text-md">Entendemos el desgaste de búsquedas anteriores para tu hijo(a). Este plan actuará como un reset molecular profundo para su organismo.</p>`
+            : `<p class="text-center text-gray-300 mb-4 text-md">Entendemos el desgaste de búsquedas anteriores. Este plan actuará como un reset molecular profundo.</p>`;
     }
 
-    const personalizedAdviceHtml = generatePersonalizedAdvice(appState.answers);
+    const personalizedAdviceHtml = isPediatric 
+        ? generatePediatricPersonalizedAdvice(appState.answers)
+        : generatePersonalizedAdvice(appState.answers);
     
     const topMetricsHtml = `
         <div class="dashboard-card flex flex-col justify-center items-center text-center"><p class="text-4xl font-bold text-cyan-400">${measurements.age}</p><p class="text-sm text-gray-400 mt-1">Años</p></div>
@@ -1551,13 +1997,21 @@ function renderDashboard() {
         ${weightGoalCardHtml}
     `;
     
-    const healthyWeightCardHtml = `
+    const healthyWeightCardHtml = isPediatric
+        ? `
         <div class="dashboard-card p-4">
-            <h3 class="font-bold text-xl mb-2 text-green-400">Tu Rango de Peso Saludable</h3>
-            <p class="text-sm text-gray-300">Basado en tu estatura, un peso saludable para ti se encuentra entre <strong class="text-white">${healthyWeight.min} kg</strong> y <strong class="text-white">${healthyWeight.max} kg</strong>.</p>
-            <p class="text-sm text-gray-400 mt-2">Un punto ideal de referencia, con un IMC de 21.75, es alrededor de <strong class="text-green-300">${healthyWeight.ideal} kg</strong>. ¡Esa es una excelente meta a largo plazo!</p>
+            <h3 class="font-bold text-xl mb-2 text-green-400">Rango de Peso de Crecimiento Saludable para tu hijo(a)</h3>
+            <p class="text-sm text-gray-300">Según las curvas de desarrollo clínico infantil (curvas de percentiles CDC/WHO), el peso de tu hijo(a) se proyecta idealmente entre <strong class="text-white">${healthyWeight.min} kg</strong> y <strong class="text-white">${healthyWeight.max} kg</strong> para asegurar un correcto desarrollo óseo y muscular.</p>
+            <p class="text-sm text-gray-400 mt-2">La mediana ideal de control se estima alrededor de <strong class="text-green-300">${healthyWeight.ideal} kg</strong>.</p>
         </div>
-    `;
+        `
+        : `
+        <div class="dashboard-card p-4">
+            <h3 class="font-bold text-xl mb-2 text-green-400">Rango de Peso de Referencia Saludable</h3>
+            <p class="text-sm text-gray-300">Según tu estatura y constantes fisiológicas, tu peso adecuado de control clínico se proyecta entre <strong class="text-white">${healthyWeight.min} kg</strong> y <strong class="text-white">${healthyWeight.max} kg</strong>.</p>
+            <p class="text-sm text-gray-400 mt-2">Tu mediana ideal de control se estima de manera estable alrededor de <strong class="text-green-300">${healthyWeight.ideal} kg</strong>.</p>
+        </div>
+        `;
 
     let healthFocusHtml = '';
     if (health_conditions.length > 0 && !health_conditions.includes('none')) {
@@ -1570,19 +2024,23 @@ function renderDashboard() {
                 let warningClass = '';
                 if (condition === 'insulin_resistance' && glucose_level >= 100) {
                     warningClass = 'medical-warning';
-                    medicalAdvice = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu nivel de glucosa (${glucose_level} mg/dL) sugiere una atención especial. Aunque este plan es una excelente herramienta, es fundamental que converses sobre este valor con tu médico.</p>`;
+                    medicalAdvice = isPediatric
+                        ? `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Foco de Atención Infantil (Rango de Cuidado Moderado/Alto):</b> El nivel de glucosa en ayunas registrado para tu hijo(a) (${glucose_level} mg/dL) se encuentra en un rango de cuidado y alerta que requiere atención oportuna para proteger su desarrollo metabólico. En la etapa de crecimiento de un(a) menor, la estabilidad de la glucosa es vital para evitar la sobrecarga del páncreas y la fatiga escolar. Es sumamente importante que este valor sea enfocado bajo el protocolo pediátrico y la supervisión de un profesional.</p>`
+                        : `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu nivel de glucosa (${glucose_level} mg/dL) sugiere una atención especial. Aunque este plan es una excelente herramienta, es fundamental que converses sobre este valor bajo la supervisión de un profesional.</p>`;
                 }
                 if (condition === 'hypertension' && blood_pressure) {
                     const [systolic, diastolic] = blood_pressure.split('/').map(Number);
                     if (systolic >= 140 || diastolic >= 90) {
                         warningClass = 'medical-warning';
-                        medicalAdvice = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu presión arterial (${blood_pressure}) se encuentra elevada. Si bien este plan te ayudará a mejorar, es crucial que un médico evalúe estos números contigo.</p>`;
+                        medicalAdvice = isPediatric
+                            ? `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Foco de Atención Infantil (Rango de Riesgo Cardiovascular Temprano):</b> La presión arterial registrada para tu hijo(a) (${blood_pressure}) se encuentra elevada. Este es un rango de cuidado cardiovascular temprano que no debe ignorarse, ya que puede forzar silenciosamente el corazón y los riñones en crecimiento. Es fundamental que este valor sea evaluado y enfocado bajo la supervisión de un profesional en pediatría.</p>`
+                            : `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu presión arterial (${blood_pressure}) se encuentra elevada. Si bien este plan te ayudará a mejorar, es crucial que este valor se evalué bajo la supervisión de un profesional.</p>`;
                     }
                 }
 
                 healthFocusHtml += `<div class="mb-3 pb-3 border-b border-gray-700/50 last:border-b-0 ${warningClass}">
-                    <h4 class="font-semibold text-blue-400 text-md">${explanation.title}</h4>
-                    <p class="text-xs text-gray-400 mt-1"><strong class="text-gray-300">La Raíz Metabética:</strong> ${explanation.cause}</p>
+                    <h4 class="font-semibold text-blue-400 text-md">${explanation.title.replace("Tu", isPediatric ? "de tu hijo(a)" : "Tu")}</h4>
+                    <p class="text-xs text-gray-400 mt-1"><strong class="text-gray-300">La Raíz Metabólica:</strong> ${explanation.cause}</p>
                     <p class="text-xs text-gray-400"><strong class="text-gray-300">Tu Plan de Acción Keto:</strong> ${explanation.action}</p>
                     ${medicalAdvice}
                 </div>`;
@@ -1603,34 +2061,60 @@ function renderDashboard() {
         let interpretationClass = '';
         let medicalAdviceLipids = '';
         if (ratio !== 'N/A') {
-             if (gender === 'male') {
+             if (measurements.age < 18) {
+                 const ratioNum = parseFloat(ratio);
+                 if (ratioNum < 1.25) {
+                     interpretationClass = 'interpretation-good';
+                     interpretationText = `<strong>Interpretación Pediátrica:</strong> ¡Excelente! El ratio TG/HDL de tu hijo(a) es de <strong>${ratio}</strong>, situándose en el rango óptimo pediátrico (menor a 1.25). Esto indica un metabolismo sumamente eficiente para su etapa de desarrollo activo.`;
+                 } else if (ratioNum >= 1.25 && ratioNum < 2.5) {
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación Pediátrica:</strong> Rango de Cuidado Moderado. El ratio TG/HDL de tu hijo(a) es de <strong>${ratio}</strong>, situándose en el rango limítrofe (entre 1.25 y 2.5). Sugiere un estado metabólico que requiere atención preventiva en la calidad de la alimentación de tu hijo(a).`;
+                 } else {
+                     interpretationClass = 'interpretation-warning';
+                     interpretationText = `<strong>Interpretación Pediátrica:</strong> Alerta de Atención / Rango de Cuidado Elevado. El ratio TG/HDL de tu hijo(a) es de <strong>${ratio}</strong>, situándose en el rango elevado pediátrico (mayor o igual a 2.5). Esto indica que presenta un patrón lipídico fuertemente asociado a la resistencia a la insulina, lo que justifica la intervención nutricional indicada bajo la supervisión de un profesional.`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo de Soporte:</b> Este ratio elevado en el(la) menor es un marcador temprano que requiere evaluación clínica directa. Es fundamental conversar este valor bajo la supervisión de un profesional.</p>`;
+                 }
+             } else if (gender === 'male') {
                  if (ratio <= 3.5) {
                      interpretationClass = 'interpretation-good';
                      interpretationText = `<strong>Interpretación (Hombre):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango deseable (menor a 3.5).`;
                  } else if (ratio > 5.0) {
                      interpretationClass = 'interpretation-warning';
                      interpretationText = `<strong>Interpretación (Hombre):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 5.0).`;
-                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico.</p>`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor bajo la supervisión de un profesional.</p>`;
                  } else {
                      interpretationClass = 'interpretation-warning';
                      interpretationText = `<strong>Interpretación (Hombre):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 3.5 y 5.0).`;
-                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor bajo la supervisión de un profesional.</p>`;
                  }
-             } else { // female
+             } else {
                  if (ratio <= 2.5) {
                      interpretationClass = 'interpretation-good';
                      interpretationText = `<strong>Interpretación (Mujer):</strong> ¡Excelente! Tu ratio TG/HDL de <strong>${ratio}</strong> está en el rango ideal (menor a 2.5).`;
                  } else if (ratio > 3.5) {
                      interpretationClass = 'interpretation-warning';
                      interpretationText = `<strong>Interpretación (Mujer):</strong> Atención. Tu ratio TG/HDL de <strong>${ratio}</strong> es elevado (mayor a 3.5).`;
-                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor con tu médico.</p>`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) es elevado. Es fundamental que converses sobre este valor bajo la supervisión de un profesional.</p>`;
                  } else {
                      interpretationClass = 'interpretation-warning';
                      interpretationText = `<strong>Interpretación (Mujer):</strong> Tu ratio TG/HDL de <strong>${ratio}</strong> está en un rango moderado (entre 2.5 y 3.5).`;
-                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor con tu médico.</p>`;
+                     medicalAdviceLipids = `<p class="mt-2 p-2 text-sm bg-amber-500/10 text-amber-300 rounded-lg border border-amber-500/20"><b>Consejo Importante:</b> Tu ratio TG/HDL (${ratio}) está en un rango moderado. Considera discutir este valor bajo la supervisión de un profesional.</p>`;
                  }
              }
         }
+        
+        let pediatricLipidRangesHtml = '';
+        if (measurements.age < 18) {
+            const tgLabel = measurements.age < 10 ? 'Triglicéridos (0-9 años): Aceptable (< 75 mg/dL), Elevado (≥ 100 mg/dL)' : 'Triglicéridos (10-17 años): Aceptable (< 90 mg/dL), Elevado (≥ 130 mg/dL)';
+            pediatricLipidRangesHtml = `
+            <div class="mt-3 p-3 bg-blue-950/30 rounded-lg border border-blue-900/40 text-xs text-gray-300">
+                <h5 class="font-bold text-cyan-400 mb-1">🔍 Rangos de Referencia Pediátricos (Academia Americana de Pediatría - AAP):</h5>
+                <p class="mb-1"><strong>Colesterol Total:</strong> Aceptable (&lt; 170 mg/dL), Limítrofe (170-199 mg/dL), Elevado (&ge; 200 mg/dL)</p>
+                <p class="mb-1"><strong>Colesterol LDL:</strong> Aceptable (&lt; 110 mg/dL), Limítrofe (110-129 mg/dL), Elevado (&ge; 130 mg/dL)</p>
+                <p><strong>${tgLabel}</strong></p>
+            </div>`;
+        }
+
         lipidProfileHtml = `
         <div class="dashboard-card p-4 lipid-analysis-card">
             <h3 class="font-bold text-xl mb-4 text-pink-300">🔬 Análisis de tu Perfil Lipídico</h3>
@@ -1651,14 +2135,30 @@ function renderDashboard() {
                 <p>Colesterol LDL: <strong>${ldlVal || 'N/A'} mg/dL</strong></p>
                 <p class="mt-2 text-xl">Ratio TG/HDL: <strong class="text-amber-400">${ratio}</strong></p>
             </div>
+            ${pediatricLipidRangesHtml}
             <div class="interpretation-box ${interpretationClass}">
                 ${interpretationText}
             </div>
             ${medicalAdviceLipids}
-            <p class="mt-4 text-xs italic">El objetivo es: <strong>Triglicéridos bajos</strong> (el cuerpo quema grasa), <strong>HDL alto</strong> (buen sistema de limpieza) y un <strong>LDL "contextualizado"</strong>, donde la calidad de la partícula (inferida por el ratio) es más importante que su cantidad total. Recuerda que estos rangos pueden variar com la edad, consulta siempre a tu médico.</p>
+            <p class="mt-4 text-xs italic">El objetivo es: <strong>Triglicéridos bajos</strong> (el cuerpo quema grasa), <strong>HDL alto</strong> (buen sistema de limpieza) y un <strong>LDL "contextualizado"</strong>, donde la calidad de la partícula (inferida por el ratio) es más importante que su cantidad total. Recuerda que estos rangos pueden variar con la edad, consulta siempre bajo la supervisión de un profesional.</p>
         </div>`;
     }
     
+    let pediatricNoteHtml = '';
+    if (isPediatric) {
+        pediatricNoteHtml = `
+        <div class="dashboard-card border border-pink-500/50 bg-pink-950/20 p-5 mb-6 rounded-xl relative">
+            <h3 class="font-bold text-xl text-pink-400 flex items-center">
+                <span class="mr-2">🩺</span> Nota Pediátrica para el Especialista Clínico
+            </h3>
+            <p class="text-sm text-gray-300 mt-2 leading-relaxed">
+                Este plan ha sido adaptado utilizando <b>parámetros antropométricos pediátricos validados (curvas de percentiles CDC/WHO)</b> e hidratación basal mediante la fórmula de <b>Holliday-Segar</b>. Al tratarse de un(a) menor de edad, recuerda que la cetosis nutricional estricta (dieta cetogénica autogestionada) está contraindicada sin la supervisión de un profesional. Se recomienda orientar al tutor para la aplicación de un enfoque de <b>alimentación antiinflamatoria, comida real y restricción de azúcares procesados</b> como primera línea de abordaje clínico.
+            </p>
+        </div>`;
+    }
+
+    const waterLitersLabel = isPediatric ? "Consumo de agua para tu hijo(a)" : "Consumo de agua";
+
     const otherCardsHtml = `
         <div class="text-center flex flex-col">
             <img src="https://i.ibb.co/mrnDR0CS/PROYECCION-DE-PESO.png" alt="Gráfico de Proyección de Peso" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
@@ -1682,9 +2182,9 @@ function renderDashboard() {
             <img src="https://i.ibb.co/GvFVvJPM/Copia-de-Copia-de-Logo-500-x-500-px-1.png" alt="Gráfico de Consumo de agua" class="w-32 h-32 object-contain mx-auto relative z-10 image-gradient-border" onerror="this.onerror=null;this.src='https://placehold.co/128x128/1e1b2e/ffffff?text=Imagen';">
             <div class="dashboard-card -mt-16 pt-20 flex-grow">
                          <span class="help-icon" data-tooltip-key="water">?</span>
-                <h3 class="font-bold text-white">Consumo de agua</h3>
+                <h3 class="font-bold text-white">${waterLitersLabel}</h3>
                 <p class="text-5xl font-bold text-cyan-400 my-2">${waterIntake !== null ? waterIntake.toFixed(1) : 'N/A'} L</p>
-                <p class="text-xs text-gray-400">El cuerpo pierde 1.5-2.5L de agua al día (respiración, sudor, orina, etc.). Usamos la fórmula de Holliday-Segar para tu recomendación.</p>
+                <p class="text-xs text-gray-400">${isPediatric ? 'Recomendación basal calculada por fórmula de Holliday-Segar para la madurez de su cuerpo en crecimiento.' : 'El cuerpo pierde 1.5-2.5L de agua al día (respiración, sudor, orina, etc.). Usamos la fórmula de Holliday-Segar para tu recomendación.'}</p>
             </div>
         </div>
         <div class="text-center flex flex-col">
@@ -1699,6 +2199,7 @@ function renderDashboard() {
 
     dashboardContainer.innerHTML = `
         <h1 class="text-3xl font-extrabold text-white text-center mb-6">${mainTitle}</h1>
+        ${pediatricNoteHtml}
         ${mainGoalAccordionHtml}
         ${introParagraph}
         <h2 class="text-2xl font-bold text-white text-center mb-2 mt-8">Tus Métricas Clave</h2>
@@ -1718,7 +2219,7 @@ function renderDashboard() {
 
 function unlockAppContent() {
     console.log("Unlocking app content (populating tools)...");
-    populateToolsContent(); // Populate tools before showing them
+    populateToolsContent(); 
     
     const herramientas = document.getElementById('herramientas');
     if(herramientas) herramientas.classList.remove('hidden');
@@ -1872,7 +2373,9 @@ function attachToolsEventListeners() {
             showToast('Por favor, ingresa altura y peso.', 'error');
             return;
         }
-        renderImcDetails(container, height, weight);
+        const age = parseFloat(document.getElementById('hydration-age')?.value) || appState.answers.measurements.age;
+        const gender = document.getElementById('hydration-gender')?.value || appState.answers.gender;
+        renderImcDetails(container, height, weight, age, gender);
     });
 
     addTrackedListener(document.getElementById('calc-agua-btn'), 'click', () => {
@@ -1904,9 +2407,6 @@ function attachToolsEventListeners() {
     addTrackedListener(document.getElementById('reset-lipid-chart-btn'), 'click', resetLipidChartData);
     
     addTrackedListener(document.getElementById('download-full-report-btn'), 'click', downloadFullReportPDF);
-    
-    // El listener para 'full-guide-btn' ya no es necesario aquí.
-
     console.log("Tools specific event listeners attached.");
 }
 
@@ -1970,22 +2470,53 @@ function setupEventListeners() {
     console.log("Global event listeners set up.");
 }
 
-function resetAppAndData() {
-    const confirmation = confirm("¿Estás seguro de que quieres borrar todos tus datos y empezar de nuevo? Esta acción no se puede deshacer.");
-    if (confirmation) {
-        try {
-            localStorage.removeItem('ketoOriginsData');
-            localStorage.removeItem('ketoOriginsSession'); // Clear session too
-            console.log("localStorage data cleared.");
-            showToast('Datos borrados. La aplicación se reiniciará.', 'success');
-            setTimeout(() => window.location.reload(), 2000);
-        } catch (e) {
-            console.error("Error clearing localStorage:", e);
-            showToast('No se pudieron borrar los datos.', 'error');
-        }
-    } else {
-        showToast('Acción cancelada.', 'info');
+function showCustomConfirm(message, callback) {
+    const modal = document.getElementById('confirm-modal');
+    const textEl = document.getElementById('confirm-modal-text');
+    const okBtn = document.getElementById('confirm-modal-ok');
+    const cancelBtn = document.getElementById('confirm-modal-cancel');
+    
+    if (modal && textEl) {
+        textEl.textContent = message;
+        modal.classList.add('flex');
+        modal.classList.remove('hidden');
+        
+        const newOkBtn = okBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        newOkBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            callback(true);
+        });
+        
+        newCancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            callback(false);
+        });
     }
+}
+
+function resetAppAndData() {
+    showCustomConfirm("¿Estás seguro de que quieres borrar todos tus datos y empezar de nuevo? Esta acción no se puede deshacer.", (confirmed) => {
+        if (confirmed) {
+            try {
+                localStorage.removeItem('ketoOriginsData');
+                localStorage.removeItem('ketoOriginsSession'); 
+                console.log("localStorage data cleared.");
+                showToast('Datos borrados. La aplicación se reiniciará.', 'success');
+                setTimeout(() => window.location.reload(), 2000);
+            } catch (e) {
+                console.error("Error clearing localStorage:", e);
+                showToast('No se pudieron borrar los datos.', 'error');
+            }
+        } else {
+            showToast('Acción cancelada.', 'info');
+        }
+    });
 }
 
 
@@ -2048,7 +2579,6 @@ function setActiveNavLink() {
 }
 
 
-// --- Health Tracking Functions ---
 function setupHealthTracking() {
     console.log("Setting up health tracking (charts and input listeners)...");
     renderHealthChart();
@@ -2162,8 +2692,7 @@ function renderWeightChart() {
                 label: 'Peso (kg)',
                 data: weightData.map(d => d.peso),
                 backgroundColor: gradient,
-                borderColor: 'rgba(139, 92, 246, 1)',
-                borderWidth: 1,
+                borderWidth: 0,
                 borderRadius: 5,
             }]
         },
@@ -2238,10 +2767,9 @@ function renderLipidChart() {
     });
 }
 
-// --- Reset Chart Data Functions ---
 function resetWeightChartData() {
     appState.userData.historialPeso = [];
-    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); 
     showToast('Gráfico de Peso Reiniciado.', 'success');
     renderWeightChart();
 }
@@ -2249,116 +2777,128 @@ function resetWeightChartData() {
 function resetHealthChartData() {
     appState.userData.historialGlucosa = [];
     appState.userData.historialPresion = [];
-    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); 
     showToast('Gráfico de Salud Metabólica Reiniciado.', 'success');
     renderHealthChart();
 }
 
 function resetLipidChartData() {
     appState.userData.historialLipidico = [];
-    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); // Update localStorage
+    localStorage.setItem('ketoOriginsData', JSON.stringify(appState)); 
     showToast('Gráfico de Perfil Lipídico Reiniciado.', 'success');
     renderLipidChart();
 }
 
-// --- PDF Generation ---
 async function downloadFullReportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    let yPos = 15; // Initial Y position for content
+    let yPos = 15; 
 
+    showToast('Generando reporte PDF, por favor espera...', 'info', 2000);
+
+    // Intentar cargar e incrustar el logo
+    try {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = 'https://i.ibb.co/20NypXdZ/ketoorigins.png';
+        await new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve; // Continuar aunque falle
+        });
+        
+        if (img.complete && img.naturalWidth > 0) {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const base64Logo = canvas.toDataURL('image/png');
+            doc.addImage(base64Logo, 'PNG', 105 - 15, yPos, 30, 30); // Logo centrado (30x30)
+            yPos += 35;
+        }
+    } catch (e) {
+        console.warn("No se pudo cargar el logo para el PDF", e);
+    }
+
+    // Título Principal
     doc.setFontSize(22);
     doc.text("Reporte de Progreso - Keto Origins", 105, yPos, { align: 'center' });
+    yPos += 10;
+
+    // Información Básica del Paciente
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    const { measurements } = appState.answers;
+    const infoText = `Paciente: ${measurements?.age || '--'} años | Altura: ${measurements?.height || '--'} cm | Peso Inicial: ${appState.userData.pesoInicial || '--'} kg`;
+    doc.text(infoText, 105, yPos, { align: 'center' });
+    doc.setTextColor(0);
     yPos += 15;
 
-    // Helper to add chart and table to PDF
-    const addSection = (chartInstance, title, data, head, bodyMapper) => {
-        if (yPos > 240) { // Check if new page is needed before adding content
-            doc.addPage();
-            yPos = 15;
-        }
+    // Función auxiliar para renderizar tablas dinámicas sin importar el largo
+    const addTableSection = (title, data, head, bodyMapper) => {
         doc.setFontSize(16);
         doc.text(title, 14, yPos);
-        yPos += 10;
+        yPos += 5;
 
-        if (chartInstance && data.length > 0) {
-            const imgData = chartInstance.toBase64Image();
-            doc.addImage(imgData, 'PNG', 14, yPos, 180, 90);
-            yPos += 100;
-
+        if (data && data.length > 0) {
             doc.autoTable({
                 startY: yPos,
                 head: [head],
                 body: data.map(bodyMapper),
                 theme: 'grid',
-                headStyles: { fillColor: [30, 27, 46] }
+                headStyles: { fillColor: [30, 27, 46] },
+                margin: { top: 20 }
             });
-            yPos = doc.autoTable.previous.finalY + 15;
+            // autoTable calcula el final exacto de la tabla, incluso si crea páginas nuevas
+            yPos = doc.autoTable.previous.finalY + 15; 
         } else {
             doc.setFontSize(12);
-            doc.text("No hay datos registrados para este gráfico.", 14, yPos);
-            yPos += 10;
+            doc.setTextColor(150);
+            doc.text("No hay datos registrados en esta sección.", 14, yPos + 5);
+            doc.setTextColor(0);
+            yPos += 20;
         }
     };
 
-    // 1. Weight Section
-    addSection(
-        weightChartInstance,
+    // 1. Tabla de Peso
+    addTableSection(
         "Evolución del Peso",
         appState.userData.historialPeso,
         ['Entrada', 'Fecha', 'Peso (kg)'],
         (d, i) => [`Entrada ${i + 1}`, new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), d.peso]
     );
 
-    // 2. Health Section
-    if (yPos > 240) { doc.addPage(); yPos = 15; }
-    doc.setFontSize(16);
-    doc.text("Evolución de Salud Metabólica", 14, yPos);
-    yPos += 10;
-    if (healthChartInstance && (appState.userData.historialGlucosa.length > 0 || appState.userData.historialPresion.length > 0)) {
-        const imgData = healthChartInstance.toBase64Image();
-        doc.addImage(imgData, 'PNG', 14, yPos, 180, 90);
-        yPos += 100;
+    // 2. Tabla de Glucosa
+    addTableSection(
+        "Evolución de Glucosa en Sangre",
+        appState.userData.historialGlucosa,
+        ['Entrada', 'Fecha', 'Glucosa (mg/dL)'],
+        (d, i) => [`Entrada ${i + 1}`, new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), d.valor]
+    );
 
-        if (appState.userData.historialGlucosa.length > 0) {
-            doc.autoTable({
-                startY: yPos,
-                head: [['Entrada', 'Fecha', 'Glucosa (mg/dL)']],
-                body: appState.userData.historialGlucosa.map((d, i) => [`Entrada ${i + 1}`, new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), d.valor]),
-                theme: 'grid', headStyles: { fillColor: [30, 27, 46] }
-            });
-            yPos = doc.autoTable.previous.finalY + 10;
-        }
-        if (appState.userData.historialPresion.length > 0) {
-            doc.autoTable({
-                startY: yPos,
-                head: [['Entrada', 'Fecha', 'Presión Arterial']],
-                body: appState.userData.historialPresion.map((d, i) => [`Entrada ${i + 1}`, new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), `${d.sistolica}/${d.diastolica}`]),
-                theme: 'grid', headStyles: { fillColor: [30, 27, 46] }
-            });
-            yPos = doc.autoTable.previous.finalY + 15;
-        }
-    } else {
-        doc.setFontSize(12);
-        doc.text("No hay datos de glucosa o presión registrados.", 14, yPos);
-        yPos += 10;
-    }
+    // 3. Tabla de Presión Arterial
+    addTableSection(
+        "Evolución de Presión Arterial",
+        appState.userData.historialPresion,
+        ['Entrada', 'Fecha', 'Presión (Sistólica/Diastólica)'],
+        (d, i) => [`Entrada ${i + 1}`, new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), `${d.sistolica}/${d.diastolica}`]
+    );
 
-    // 3. Lipid Section
-    addSection(
-        lipidChartInstance,
+    // 4. Tabla de Perfil Lipídico (Con Ratio añadido para mayor valor clínico)
+    addTableSection(
         "Evolución del Perfil Lipídico",
         appState.userData.historialLipidico,
-        ['Fecha', 'Triglicéridos', 'HDL', 'LDL'],
-        (d) => [new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), d.triglycerides, d.hdl, d.ldl]
+        ['Fecha', 'Triglicéridos', 'HDL', 'LDL', 'Ratio TG/HDL'],
+        (d) => {
+            const ratio = (d.triglycerides && d.hdl) ? (d.triglycerides / d.hdl).toFixed(2) : 'N/A';
+            return [new Date(d.fecha + 'T00:00:00').toLocaleDateString('es-ES'), d.triglycerides, d.hdl, d.ldl, ratio];
+        }
     );
 
     doc.save('reporte_completo_keto_origins.pdf');
-    showToast('Reporte PDF generado.', 'success');
+    showToast('Reporte PDF generado exitosamente.', 'success');
 }
 
-
-// --- Toast Notification System ---
 function showToast(message, type = 'success', duration = 3000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -2383,8 +2923,6 @@ function showToast(message, type = 'success', duration = 3000) {
 }
 
 
-// --- Functions to send data to Google Sheet ---
-
 function translateValue(key, value) {
     if (!value) return '';
     if (Array.isArray(value)) {
@@ -2399,17 +2937,13 @@ function translateValue(key, value) {
     return value;
 }
 
-/**
- * NEW: Generic function to communicate with the Google Apps Script.
- * It handles errors and expects a JSON response.
- */
 async function sendApiRequest(payload) {
     try {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             redirect: 'follow',
             headers: {
-                'Content-Type': 'text/plain;charset=utf-8' // Workaround for Apps Script CORS
+                'Content-Type': 'text/plain;charset=utf-8' 
             },
             body: JSON.stringify(payload)
         });
@@ -2433,9 +2967,6 @@ async function sendApiRequest(payload) {
     }
 }
 
-/**
- * Gathers user data from the appState and sends it to a Google Apps Script endpoint.
- */
 function sendDataToGoogleSheet() {
     const { measurements, accessCode, ...otherAnswers } = appState.answers;
     const flatAnswers = { ...otherAnswers, ...measurements };
@@ -2463,25 +2994,24 @@ function sendDataToGoogleSheet() {
         action: 'saveInitialData',
         userId: appState.userId,
         data: { UserID: appState.userId, ...translatedData },
-        appStateJSON: JSON.stringify(appState) // Include the full state
+        appStateJSON: JSON.stringify(appState)
     };
 
     sendApiRequest(payload).then(res => {
         console.log("Response from saveInitialData:", res);
-        if (res.status !== 'success' && res.result !== 'success') { // Check both possible success keys
+        if (res.status !== 'success' && res.result !== 'success') { 
             showToast('Error al guardar datos iniciales.', 'error');
         }
     });
 }
 
 
-// --- NEW FUNCTION to send TRACKING data ---
 function sendTrackingDataToSheet(data) {
     const payload = {
         action: 'saveTrackingData',
         userId: appState.userId,
         data: { UserID: appState.userId, ...data },
-        appStateJSON: JSON.stringify(appState) // Include the updated state
+        appStateJSON: JSON.stringify(appState) 
     };
 
     sendApiRequest(payload).then(res => {
@@ -2492,7 +3022,6 @@ function sendTrackingDataToSheet(data) {
     });
 }
 
-// --- NEW Access Control Functions ---
 async function handleCodeValidation() {
     const codeInput = document.getElementById('access-code-input');
     const code = codeInput.value.trim().toUpperCase();
@@ -2516,28 +3045,25 @@ async function handleCodeValidation() {
     submitBtn.disabled = false;
         
     if (result.status === 'success') {
-        if (result.data) { // Returning user with existing data
+        if (result.data) { 
             console.log("Returning user validated. Loading data...");
             try {
-                // Data from Apps Script is expected to be a stringified JSON
                 appState = JSON.parse(result.data);
-                // Save the valid session info
                 localStorage.setItem('ketoOriginsData', JSON.stringify(appState));
                 localStorage.setItem('ketoOriginsSession', JSON.stringify({ code: code, userId: appState.userId }));
                 
                 document.getElementById('access-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                initializeApp(true); // Initialize in "reloading" mode
+                initializeApp(true); 
             } catch (e) {
                 console.error("Failed to parse user data from server:", e);
                 errorEl.textContent = "Error al procesar los datos del usuario.";
             }
-        } else { // New user, validation was successful
+        } else { 
             console.log("New user validated. Proceeding to questionnaire.");
             appState.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            appState.answers.accessCode = code; // Save code to link user later
+            appState.answers.accessCode = code; 
             
-            // Assign user ID to the code in the background
             const assignPayload = { action: 'assignUser', code: code, userId: appState.userId };
             sendApiRequest(assignPayload).then(assignRes => {
                 console.log("User ID assignment response:", assignRes);
@@ -2551,7 +3077,6 @@ async function handleCodeValidation() {
 }
 
 
-// --- Main App Execution ---
 function main() {
     console.log("Main function started. Cleaning up and resetting.");
     cleanupAndReset();
@@ -2580,7 +3105,7 @@ function main() {
         }
     } catch (e) {
         console.error("Error with localStorage, starting fresh.", e);
-        localStorage.clear(); // Clear potentially corrupted storage
+        localStorage.clear(); 
         document.getElementById('access-screen').classList.remove('hidden');
         addTrackedListener(document.getElementById('submit-code-btn'), 'click', handleCodeValidation);
          addTrackedListener(document.getElementById('access-code-input'), 'keypress', (e) => {
